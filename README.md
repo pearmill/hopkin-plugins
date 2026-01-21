@@ -78,10 +78,13 @@ pearmill-skills/
 ├── google-ads/                  # Google Ads skill
 │   ├── SKILL.md
 │   └── references/
-│       ├── ad-performance.md
-│       ├── budget-spend.md
-│       ├── campaign-performance.md
-│       └── keyword-analysis.md
+│       ├── mcp-tools-reference.md
+│       ├── troubleshooting.md
+│       └── workflows/
+│           ├── ad-performance.md
+│           ├── budget-spend.md
+│           ├── campaign-performance.md
+│           └── keyword-analysis.md
 └── meta-ads/                    # Meta Ads skill
     ├── SKILL.md
     └── references/
