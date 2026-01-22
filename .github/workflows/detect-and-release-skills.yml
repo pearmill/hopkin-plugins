@@ -305,22 +305,22 @@ jobs:
           # Format skill name (capitalize and replace hyphens with spaces)
           SKILL_NAME=$(echo "$SKILL" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1')
 
-          # Create Notion page
-          HTTP_CODE=$(curl -X POST https://api.notion.com/v1/pages \
-            -H "Authorization: Bearer ${{ secrets.NOTION_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -H "Notion-Version: 2022-06-28" \
-            -w "%{http_code}" \
-            -o /tmp/notion_response.json \
-            -s \
-            -d '{
+          # Build Notion page payload using jq for proper JSON escaping
+          NOTION_PAYLOAD=$(jq -n \
+            --arg skill_name "$SKILL_NAME" \
+            --arg version "$VERSION" \
+            --arg release_date "$RELEASE_DATE" \
+            --arg release_url "$RELEASE_URL" \
+            --arg download_url "$DOWNLOAD_URL" \
+            --arg changelog "${{ steps.changelog.outputs.changelog }}" \
+            '{
               "parent": { "database_id": "2efade1c60188049a0f8ea158d9313c5" },
               "properties": {
                 "Skill Name": {
                   "title": [
                     {
                       "text": {
-                        "content": "'"$SKILL_NAME"'"
+                        "content": $skill_name
                       }
                     }
                   ]
@@ -329,33 +329,43 @@ jobs:
                   "rich_text": [
                     {
                       "text": {
-                        "content": "'"$VERSION"'"
+                        "content": $version
                       }
                     }
                   ]
                 },
                 "Release Date": {
                   "date": {
-                    "start": "'"$RELEASE_DATE"'"
+                    "start": $release_date
                   }
                 },
                 "GitHub URL": {
-                  "url": "'"$RELEASE_URL"'"
+                  "url": $release_url
                 },
                 "Download URL": {
-                  "url": "'"$DOWNLOAD_URL"'"
+                  "url": $download_url
                 },
                 "Changelog": {
                   "rich_text": [
                     {
                       "text": {
-                        "content": "'"${{ steps.changelog.outputs.changelog }}"'"
+                        "content": $changelog
                       }
                     }
                   ]
                 }
               }
-            }' || echo "000")
+            }')
+
+          # Create Notion page
+          HTTP_CODE=$(curl -X POST https://api.notion.com/v1/pages \
+            -H "Authorization: Bearer ${{ secrets.NOTION_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -H "Notion-Version: 2022-06-28" \
+            -w "%{http_code}" \
+            -o /tmp/notion_response.json \
+            -s \
+            -d "$NOTION_PAYLOAD" || echo "000")
 
           # Check if curl command failed or returned non-2xx status code
           if [ "$HTTP_CODE" = "000" ]; then
@@ -386,20 +396,23 @@ jobs:
           # Format skill name
           SKILL_NAME=$(echo "$SKILL" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1')
 
-          # Format changelog for Slack (extract first few lines)
-          CHANGELOG_PREVIEW=$(echo "${{ steps.changelog.outputs.changelog }}" | head -10 | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          # Format changelog for Slack (extract first 500 chars)
+          CHANGELOG_PREVIEW=$(echo "${{ steps.changelog.outputs.changelog }}" | head -c 500)
 
-          echo "Posting to Slack: ${{ secrets.SLACK_WEBHOOK_URL }}"
-          # Send Slack message
-          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -d '{
+          # Build Slack message payload using jq for proper JSON escaping
+          SLACK_PAYLOAD=$(jq -n \
+            --arg skill_name "$SKILL_NAME" \
+            --arg version "$VERSION" \
+            --arg download_url "$DOWNLOAD_URL" \
+            --arg release_url "$RELEASE_URL" \
+            --arg changelog "$CHANGELOG_PREVIEW" \
+            '{
               "blocks": [
                 {
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": "🚀 New Skill Release: '"$SKILL_NAME"'",
+                    "text": ("🚀 New Skill Release: " + $skill_name),
                     "emoji": true
                   }
                 },
@@ -408,11 +421,11 @@ jobs:
                   "fields": [
                     {
                       "type": "mrkdwn",
-                      "text": "*Version:*\n'"$VERSION"'"
+                      "text": ("*Version:*\n" + $version)
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Skill:*\n'"$SKILL_NAME"'"
+                      "text": ("*Skill:*\n" + $skill_name)
                     }
                   ]
                 },
@@ -420,14 +433,14 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*📥 Download:*\n<'"$DOWNLOAD_URL"'|Download ZIP>"
+                    "text": ("*📥 Download:*\n<" + $download_url + "|Download ZIP>")
                   }
                 },
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*🔗 Links:*\n<'"$RELEASE_URL"'|GitHub Release> | <https://notion.so/2efade1c60188049a0f8ea158d9313c5|Notion Database>"
+                    "text": ("*🔗 Links:*\n<" + $release_url + "|GitHub Release> | <https://notion.so/2efade1c60188049a0f8ea158d9313c5|Notion Database>")
                   }
                 },
                 {
@@ -437,10 +450,31 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*📝 Changelog:*\n```'"${CHANGELOG_PREVIEW:0:500}"'```"
+                    "text": ("*📝 Changelog:*\n```" + $changelog + "```")
                   }
                 }
               ]
-            }'
+            }')
+
+          # Send Slack message
+          HTTP_CODE=$(curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -w "%{http_code}" \
+            -o /tmp/slack_response.json \
+            -s \
+            -d "$SLACK_PAYLOAD" || echo "000")
+
+          # Check if curl command failed or returned non-2xx status code
+          if [ "$HTTP_CODE" = "000" ]; then
+            echo "Error: curl request failed"
+            exit 1
+          fi
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "Error: Slack webhook returned HTTP $HTTP_CODE"
+            echo "Response body:"
+            cat /tmp/slack_response.json
+            exit 1
+          fi
 
           echo "Slack notification sent"
