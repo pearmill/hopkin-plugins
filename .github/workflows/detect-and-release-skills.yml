@@ -233,8 +233,8 @@ jobs:
           chmod +x package-skill.sh
           ./package-skill.sh "$SKILL" "$VERSION"
 
-          # Verify the package was created
-          PACKAGE_FILE="releases/${SKILL}-${VERSION}.zip"
+          # Verify the package was created (note: package-skill.sh adds 'v' prefix)
+          PACKAGE_FILE="releases/${SKILL}-v${VERSION}.zip"
           if [ ! -f "$PACKAGE_FILE" ]; then
             echo "Error: Package file not created at $PACKAGE_FILE"
             exit 1
@@ -250,7 +250,7 @@ jobs:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ matrix.skill }} v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.changelog }}
-          files: releases/${{ matrix.skill }}-${{ steps.version.outputs.version }}.zip
+          files: releases/${{ matrix.skill }}-v${{ steps.version.outputs.version }}.zip
           draft: false
           prerelease: false
         env:
@@ -300,7 +300,7 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           TAG="${{ steps.version.outputs.tag }}"
           RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/$TAG"
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/${SKILL}-${VERSION}.zip"
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/${SKILL}-v${VERSION}.zip"
           RELEASE_DATE=$(date -u +"%Y-%m-%d")
 
           # Format skill name (capitalize and replace hyphens with spaces)
@@ -357,7 +357,7 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           TAG="${{ steps.version.outputs.tag }}"
           RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/$TAG"
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/${SKILL}-${VERSION}.zip"
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG/${SKILL}-v${VERSION}.zip"
 
           # Format skill name
           SKILL_NAME=$(echo "$SKILL" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1')
