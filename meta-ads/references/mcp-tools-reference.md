@@ -1,8 +1,6 @@
-# Meta Ads MCP Server Tools Reference
+# Meta Ads MCP Server Tools Reference — Hopkin
 
-This document provides detailed reference information for the Meta Ads MCP server tools and their usage patterns.
-
-> **Note:** This reference document will be customized based on your specific Meta Ads MCP server implementation. The examples below represent common patterns - actual tool names, parameters, and responses may vary based on your MCP server.
+This document provides detailed reference information for the Hopkin Meta Ads MCP tools and their usage patterns.
 
 ## Table of Contents
 
@@ -10,32 +8,32 @@ This document provides detailed reference information for the Meta Ads MCP serve
 2. [Authentication & Connection](#authentication--connection)
 3. [Core Tools](#core-tools)
 4. [Tool Usage Patterns](#tool-usage-patterns)
-5. [Response Structures](#response-structures)
-6. [Error Handling](#error-handling)
+5. [Response Format](#response-format)
+6. [Pagination](#pagination)
+7. [Error Handling](#error-handling)
 
 ---
 
 ## MCP Server Overview
 
-### Typical MCP Server Names
-- `pipeboard-meta-ads`
-- `meta-ads`
-- `facebook-ads`
-- `meta-advertising`
+### Hopkin Meta Ads MCP
+
+- **Service:** Hopkin — hosted MCP service
+- **Sign up:** https://app.hopkin.ai
+- **Type:** Hosted MCP (URL + auth token, no local installation)
 
 ### Required Configuration
 
-Most Meta Ads MCP servers require the following configuration:
+Configure the Hopkin Meta Ads MCP as a hosted MCP service in your Claude settings:
 
 ```json
 {
   "mcpServers": {
-    "meta-ads": {
-      "command": "npx",
-      "args": ["-y", "@your-mcp-package/meta-ads"],
-      "env": {
-        "META_ACCESS_TOKEN": "your-access-token",
-        "META_AD_ACCOUNT_ID": "act_123456789"
+    "hopkin-meta-ads": {
+      "type": "url",
+      "url": "https://mcp.hopkin.ai/meta-ads/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
       }
     }
   }
@@ -43,295 +41,354 @@ Most Meta Ads MCP servers require the following configuration:
 ```
 
 **Required Credentials:**
-- **Access Token** - Meta API access token with ads_read and/or ads_management permissions
-- **Ad Account ID** - Target ad account (format: act_XXXXXXXXXXXXX)
-- Optional: App ID, App Secret (depending on authentication method)
+- **Hopkin Token** — Obtain from https://app.hopkin.ai after signing up
 
 ---
 
 ## Authentication & Connection
 
-### Verifying MCP Connection
+### Hopkin OAuth Flow
 
-To verify the Meta Ads MCP is properly connected:
+Hopkin uses an OAuth flow for connecting to Meta Ads accounts. After the MCP is configured, authenticate the user's Meta Ads account:
 
-1. List available MCP servers
-2. Confirm Meta Ads MCP is present in the list
-3. Attempt to list available tools from the MCP
-4. Execute a simple read-only operation (e.g., list campaigns)
+1. **Check auth status:**
+   ```json
+   {
+     "tool": "meta_ads_check_auth_status",
+     "parameters": {
+       "reason": "Checking if user is authenticated with Meta Ads"
+     }
+   }
+   ```
 
-### Permission Scopes
+2. **If not authenticated, get login URL:**
+   ```json
+   {
+     "tool": "meta_ads_get_login_url",
+     "parameters": {
+       "reason": "User needs to authenticate with Meta Ads"
+     }
+   }
+   ```
+   Present the returned URL to the user. They will authenticate via Meta's OAuth flow.
 
-Common required scopes for Meta Ads API:
-- **ads_read** - Read ad account data, campaigns, insights
-- **ads_management** - Create, update, and delete ads
-- **business_management** - Access business-level information
+3. **Verify authentication:**
+   ```json
+   {
+     "tool": "meta_ads_get_user_info",
+     "parameters": {
+       "reason": "Verifying user identity after authentication"
+     }
+   }
+   ```
 
 ---
 
 ## Core Tools
 
-> **Placeholder Section:** This section will be customized with your specific MCP server's tools. Below are common tool patterns found in Meta Ads MCP implementations.
+> **Important:** Every Hopkin tool call requires a `reason` (string) parameter for audit trail.
 
-### Campaign Management Tools
+### Authentication Tools
 
-#### list_campaigns
-List all campaigns in an ad account.
+#### meta_ads_ping
+Check that the Hopkin Meta Ads MCP is reachable.
 
-**Typical Parameters:**
-- `account_id` (string, required) - Ad account ID (e.g., "act_123456789")
-- `fields` (array, optional) - Fields to return (e.g., ["id", "name", "status", "objective"])
-- `filtering` (array, optional) - Filter criteria
-- `limit` (number, optional) - Maximum number of results
+**Parameters:**
+- `reason` (string, required) — Reason for the call
 
-**Example Usage:**
+#### meta_ads_check_auth_status
+Check whether the user has authenticated their Meta Ads account.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+
+#### meta_ads_get_login_url
+Get an OAuth login URL so the user can authenticate with Meta Ads.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+
+#### meta_ads_get_user_info
+Get information about the authenticated Meta Ads user.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+
+---
+
+### Account Tools
+
+#### meta_ads_list_ad_accounts
+List all ad accounts accessible to the authenticated user.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `limit` (number, optional) — Max results per page (1–100, default 25)
+- `nextCursor` (string, optional) — Pagination cursor from previous response
+
+**Example:**
 ```json
 {
-  "tool": "list_campaigns",
+  "tool": "meta_ads_list_ad_accounts",
   "parameters": {
-    "account_id": "act_123456789",
-    "fields": ["id", "name", "status", "objective", "daily_budget", "lifetime_budget"],
-    "filtering": [{"field": "status", "operator": "IN", "value": ["ACTIVE", "PAUSED"]}]
+    "reason": "Finding the user's ad accounts to identify the correct one"
   }
 }
 ```
 
-**Typical Response:**
+#### meta_ads_get_ad_account
+Get details for a specific ad account.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID (e.g., "act_123456789")
+
+**Example:**
 ```json
 {
-  "data": [
-    {
-      "id": "123456789",
-      "name": "Summer Sale 2026",
-      "status": "ACTIVE",
-      "objective": "OUTCOME_SALES",
-      "daily_budget": null,
-      "lifetime_budget": "1000000"
-    }
-  ],
-  "paging": {
-    "cursors": {
-      "before": "...",
-      "after": "..."
-    }
+  "tool": "meta_ads_get_ad_account",
+  "parameters": {
+    "reason": "Getting account details for reporting",
+    "account_id": "act_123456789"
   }
 }
 ```
 
-#### get_campaign
+---
+
+### Campaign Tools
+
+#### meta_ads_list_campaigns
+List campaigns for an ad account.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID
+- `status` (string, optional) — Filter by status (e.g., "ACTIVE", "PAUSED")
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+**Example:**
+```json
+{
+  "tool": "meta_ads_list_campaigns",
+  "parameters": {
+    "reason": "Listing active campaigns for performance analysis",
+    "account_id": "act_123456789",
+    "status": "ACTIVE"
+  }
+}
+```
+
+#### meta_ads_get_campaign
 Get details for a specific campaign.
 
-**Typical Parameters:**
-- `campaign_id` (string, required) - Campaign ID
-- `fields` (array, optional) - Fields to return
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `campaign_id` (string, required) — Campaign ID
 
-**Example Usage:**
+**Example:**
 ```json
 {
-  "tool": "get_campaign",
+  "tool": "meta_ads_get_campaign",
   "parameters": {
-    "campaign_id": "123456789",
-    "fields": ["id", "name", "status", "objective", "created_time", "updated_time"]
+    "reason": "Getting campaign details for budget analysis",
+    "campaign_id": "123456789"
   }
 }
 ```
 
-#### create_campaign
-Create a new campaign.
+---
 
-**Typical Parameters:**
-- `account_id` (string, required) - Ad account ID
-- `name` (string, required) - Campaign name
-- `objective` (string, required) - Campaign objective (e.g., "OUTCOME_SALES", "OUTCOME_LEADS")
-- `status` (string, optional) - Initial status (default: "PAUSED")
-- `special_ad_categories` (array, optional) - Special categories (e.g., ["CREDIT", "EMPLOYMENT", "HOUSING"])
-- `daily_budget` (string, optional) - Daily budget in cents
-- `lifetime_budget` (string, optional) - Lifetime budget in cents
+### Ad Set Tools
 
-**Example Usage:**
+#### meta_ads_list_adsets
+List ad sets for an account or campaign.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID
+- `campaign_id` (string, optional) — Filter by campaign
+- `status` (string, optional) — Filter by status
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+#### meta_ads_get_adset
+Get details for a specific ad set.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `adset_id` (string, required) — Ad set ID
+
+---
+
+### Ad Tools
+
+#### meta_ads_list_ads
+List ads for an account, campaign, or ad set.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID
+- `campaign_id` (string, optional) — Filter by campaign
+- `adset_id` (string, optional) — Filter by ad set
+- `status` (string, optional) — Filter by status
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+#### meta_ads_get_ad
+Get details for a specific ad.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `ad_id` (string, required) — Ad ID
+
+---
+
+### Analytics Tools
+
+#### meta_ads_get_performance_report
+**Recommended for most reporting use cases.** Returns a comprehensive performance funnel with pre-built metrics.
+
+This tool always includes a full funnel of metrics: impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, and quality rankings.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID
+- `level` (string, required) — Aggregation level: `"campaign"`, `"adset"`, or `"ad"`
+- `date_preset` (string, optional) — Date range preset (e.g., `"last_7d"`, `"last_30d"`)
+- `time_range` (object, optional) — Custom date range with `since` and `until` (YYYY-MM-DD)
+- `campaign_id` (string, optional) — Filter to specific campaign
+- `adset_id` (string, optional) — Filter to specific ad set
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+**Example:**
 ```json
 {
-  "tool": "create_campaign",
+  "tool": "meta_ads_get_performance_report",
   "parameters": {
+    "reason": "Generating campaign performance report for client review",
     "account_id": "act_123456789",
-    "name": "Q1 Product Launch",
-    "objective": "OUTCOME_SALES",
-    "status": "PAUSED",
-    "lifetime_budget": "500000"
+    "level": "campaign",
+    "date_preset": "last_30d"
   }
 }
 ```
 
-#### update_campaign
-Update an existing campaign.
+#### meta_ads_get_insights
+Flexible insights tool for custom metric and breakdown combinations.
 
-**Typical Parameters:**
-- `campaign_id` (string, required) - Campaign ID to update
-- Updates can include: `name`, `status`, `daily_budget`, `lifetime_budget`, etc.
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID
+- `level` (string, optional) — Aggregation level: `"campaign"`, `"adset"`, `"ad"`
+- `date_preset` (string, optional) — Date range preset
+- `time_range` (object, optional) — Custom date range with `since` and `until`
+- `time_increment` (string, optional) — Time granularity (e.g., `"1"` for daily, `"7"` for weekly)
+- `breakdowns` (array, optional) — Breakdown dimensions (e.g., `["age", "gender"]`)
+- `campaign_id` (string, optional) — Filter to specific campaign
+- `adset_id` (string, optional) — Filter to specific ad set
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
 
-**Example Usage:**
+**Example — Demographic Breakdown:**
 ```json
 {
-  "tool": "update_campaign",
+  "tool": "meta_ads_get_insights",
   "parameters": {
-    "campaign_id": "123456789",
-    "status": "ACTIVE",
-    "daily_budget": "10000"
-  }
-}
-```
-
-### Insights & Reporting Tools
-
-#### get_insights
-Get performance insights for campaigns, ad sets, or ads.
-
-**Typical Parameters:**
-- `object_id` (string, required) - ID of campaign, ad set, or ad
-- `level` (string, optional) - Aggregation level: "campaign", "adset", "ad"
-- `date_preset` (string, optional) - Date range preset (e.g., "last_7d", "last_30d")
-- `time_range` (object, optional) - Custom date range with `since` and `until` (YYYY-MM-DD)
-- `fields` (array, optional) - Metrics to retrieve
-- `breakdowns` (array, optional) - Breakdown dimensions (e.g., ["age", "gender"])
-- `filtering` (array, optional) - Filter criteria
-- `limit` (number, optional) - Result limit
-
-**Example Usage - Campaign Insights:**
-```json
-{
-  "tool": "get_insights",
-  "parameters": {
-    "object_id": "act_123456789",
+    "reason": "Analyzing audience demographics for targeting optimization",
+    "account_id": "act_123456789",
     "level": "campaign",
     "date_preset": "last_30d",
-    "fields": [
-      "campaign_id",
-      "campaign_name",
-      "impressions",
-      "clicks",
-      "spend",
-      "conversions",
-      "conversion_values",
-      "ctr",
-      "cpc",
-      "roas"
-    ]
-  }
-}
-```
-
-**Example Usage - Demographic Breakdown:**
-```json
-{
-  "tool": "get_insights",
-  "parameters": {
-    "object_id": "123456789",
-    "level": "campaign",
-    "date_preset": "last_7d",
-    "fields": ["impressions", "clicks", "spend", "conversions"],
     "breakdowns": ["age", "gender"]
   }
 }
 ```
 
-**Example Usage - Custom Date Range:**
+**Example — Daily Trend:**
 ```json
 {
-  "tool": "get_insights",
+  "tool": "meta_ads_get_insights",
   "parameters": {
-    "object_id": "123456789",
-    "level": "ad",
-    "time_range": {
-      "since": "2026-01-01",
-      "until": "2026-01-15"
-    },
-    "fields": ["ad_id", "ad_name", "impressions", "clicks", "spend", "conversions"]
+    "reason": "Tracking daily spend trend for budget pacing analysis",
+    "account_id": "act_123456789",
+    "level": "campaign",
+    "time_range": {"since": "2026-01-01", "until": "2026-01-31"},
+    "time_increment": "1"
   }
 }
 ```
 
-**Typical Response:**
+---
+
+### Creative Tools
+
+#### meta_ads_preview_ads
+Preview actual ad creatives with metrics overlay. Shows what ads look like, including images, text, and performance data.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID
+- `campaign_id` (string, optional) — Filter by campaign
+- `adset_id` (string, optional) — Filter by ad set
+- `ad_id` (string, optional) — Specific ad to preview
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+**Example:**
 ```json
 {
-  "data": [
-    {
-      "campaign_id": "123456789",
-      "campaign_name": "Summer Sale 2026",
-      "impressions": "452341",
-      "clicks": "12456",
-      "spend": "4521.23",
-      "conversions": "234",
-      "conversion_values": "19034.56",
-      "ctr": "2.753",
-      "cpc": "0.363",
-      "roas": "4.21",
-      "date_start": "2025-12-16",
-      "date_stop": "2026-01-14"
-    }
-  ]
+  "tool": "meta_ads_preview_ads",
+  "parameters": {
+    "reason": "Previewing winning ad creatives for client report",
+    "account_id": "act_123456789",
+    "campaign_id": "123456789"
+  }
 }
 ```
 
-### Ad Set Management Tools
+---
 
-#### list_adsets
-List ad sets for a campaign or account.
+### Feedback Tools
 
-**Typical Parameters:**
-- `campaign_id` or `account_id` (string, required)
-- `fields` (array, optional)
-- `filtering` (array, optional)
-- `limit` (number, optional)
+#### meta_ads_developer_feedback
+Submit feedback or feature requests to the Hopkin development team. Use this tool in two situations:
 
-#### create_adset
-Create a new ad set.
+1. **Write operations requested** — When a user requests a create, update, pause, or delete operation that isn't available
+2. **Proactive efficiency feedback** — When you complete a task and believe there should have been a faster or more efficient way to get the answer (e.g., multiple tool calls that could have been one, a missing dedicated tool for a common workflow, data that required manual calculation when it could have been returned directly)
 
-**Typical Parameters:**
-- `campaign_id` (string, required)
-- `name` (string, required)
-- `optimization_goal` (string, required)
-- `billing_event` (string, required)
-- `bid_amount` (string, optional)
-- `daily_budget` or `lifetime_budget` (string, required)
-- `targeting` (object, required) - Targeting specification
-- `start_time` (string, optional)
-- `end_time` (string, optional)
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `feedback_type` (string, required) — Type of feedback: `"workflow_gap"`, `"bug_report"`, `"feature_request"`, `"general"`
+- `title` (string, required) — Short description of the feedback
+- `description` (string, required) — Detailed description of what the user was trying to do
+- `priority` (string, optional) — Priority level: `"low"`, `"medium"`, `"high"`
 
-### Ad Management Tools
-
-#### list_ads
-List ads for an ad set, campaign, or account.
-
-**Typical Parameters:**
-- `adset_id`, `campaign_id`, or `account_id` (string, required)
-- `fields` (array, optional)
-- `filtering` (array, optional)
-
-#### create_ad
-Create a new ad.
-
-**Typical Parameters:**
-- `adset_id` (string, required)
-- `name` (string, required)
-- `creative` (object, required) - Creative specification
-- `status` (string, optional)
-
-### Search & Discovery Tools
-
-#### search_ad_accounts
-Search for ad accounts accessible to the current user.
-
-**Typical Parameters:**
-- `query` (string, optional) - Search term
-- `fields` (array, optional)
-
-**Example Usage:**
+**Example — Write Operation:**
 ```json
 {
-  "tool": "search_ad_accounts",
+  "tool": "meta_ads_developer_feedback",
   "parameters": {
-    "query": "Acme Corporation",
-    "fields": ["id", "name", "account_id", "account_status", "currency"]
+    "reason": "User requested campaign budget update which is not yet supported",
+    "feedback_type": "workflow_gap",
+    "title": "Update campaign budget",
+    "description": "User wanted to increase daily budget from $100 to $150 for campaign 'Summer Sale 2026'. Write operations are not yet available via Hopkin.",
+    "priority": "high"
+  }
+}
+```
+
+**Example — Efficiency Feedback:**
+```json
+{
+  "tool": "meta_ads_developer_feedback",
+  "parameters": {
+    "reason": "Submitting efficiency feedback after completing user's request",
+    "feedback_type": "feature_request",
+    "title": "Combined campaign + ad set performance in one call",
+    "description": "User asked for a full account overview. I had to call get_performance_report twice (once at campaign level, once at adset level) and manually merge results. A single tool that returns hierarchical campaign > ad set > ad data would have been significantly faster.",
+    "priority": "medium"
   }
 }
 ```
@@ -340,103 +397,109 @@ Search for ad accounts accessible to the current user.
 
 ## Tool Usage Patterns
 
-### Pattern 1: Generate Campaign Performance Report
-
+### Pattern 1: Account Overview & Performance Report
 **Workflow:**
-1. Use `list_campaigns` or `search_ad_accounts` to identify target campaigns
-2. Use `get_insights` with `level: "campaign"` to fetch performance data
-3. Sort and format results
-4. Present report with summary statistics
+1. Use `meta_ads_list_ad_accounts` to find the correct account
+2. Use `meta_ads_get_performance_report` with `level: "campaign"` for a full performance funnel
+3. Present report with summary statistics and insights
 
-### Pattern 2: Analyze Creative Performance
-
+### Pattern 2: Ad Creative Analysis with Preview
 **Workflow:**
-1. Use `list_ads` to get ads in a campaign or ad set
-2. Use `get_insights` with `level: "ad"` to fetch ad-level performance
-3. For video ads, request video-specific metrics
-4. Compare creative variations
-5. Identify top performers and creative fatigue
+1. Use `meta_ads_list_ads` to get ads for a campaign or ad set
+2. Use `meta_ads_get_performance_report` with `level: "ad"` for ad-level metrics
+3. Use `meta_ads_preview_ads` to show actual creative visuals with metrics overlay
+4. Compare creative variations and identify top performers
 
-### Pattern 3: Demographic Analysis
-
+### Pattern 3: Demographic / Audience Analysis
 **Workflow:**
-1. Identify campaign/ad set to analyze
-2. Use `get_insights` with `breakdowns: ["age", "gender"]`
-3. Calculate segment performance metrics
-4. Identify high-value segments
-5. Provide targeting recommendations
+1. Use `meta_ads_get_insights` with `breakdowns: ["age", "gender"]` for demographic data
+2. Calculate segment performance metrics and indices
+3. Identify high-value and underperforming segments
+4. Provide targeting recommendations
 
 ### Pattern 4: Budget Pacing Analysis
-
 **Workflow:**
-1. Use `list_campaigns` with budget fields
-2. Use `get_insights` with daily breakdown to see spend trend
+1. Use `meta_ads_list_campaigns` to get budget configuration data
+2. Use `meta_ads_get_insights` with `time_increment: "1"` for daily spend trend
 3. Calculate pacing metrics (current vs. ideal)
-4. Project final spend
-5. Recommend budget adjustments
+4. Provide budget adjustment recommendations
 
-### Pattern 5: Create and Launch Campaign
+### Pattern 5: Write Operation Requested (Developer Feedback)
+**Workflow:**
+1. Inform the user that write operations (create, update, pause, delete) are not yet available via Hopkin
+2. Call `meta_ads_developer_feedback` with `feedback_type: "workflow_gap"` to log the request
+3. Provide guidance on how to perform the action manually via Meta Ads Manager
+
+### Pattern 6: Proactive Efficiency Feedback
+**When:** After completing any task where you believe a faster path should have existed — e.g., you needed multiple calls that could have been one, had to manually compute something the tool could return, or a dedicated tool for the workflow was missing.
 
 **Workflow:**
-1. Use `create_campaign` with initial settings
-2. Use `create_adset` with targeting and budget
-3. Use `create_ad` with creative specification
-4. Use `update_campaign` to set status to "ACTIVE"
-5. Confirm creation and return IDs
+1. Complete the user's request as normal
+2. Call `meta_ads_developer_feedback` with `feedback_type: "feature_request"` describing what would have been faster
+3. Do NOT block the user's request — submit feedback after delivering the answer
 
 ---
 
-## Response Structures
+## Response Format
 
-### Standard Response Format
+Hopkin tools return responses with two parts:
 
-Most MCP tools return responses in this format:
+### content
+Human-readable markdown text summarizing the results.
 
+### structuredContent
+Machine-readable JSON data for programmatic processing.
+
+**Example Response Structure:**
 ```json
 {
-  "data": [...],  // Array of results or single object
-  "paging": {     // Pagination info (if applicable)
-    "cursors": {
-      "before": "...",
-      "after": "..."
-    },
-    "next": "https://..."
+  "content": "Found 3 campaigns for account act_123456789...",
+  "structuredContent": {
+    "data": [
+      {
+        "campaign_id": "123456789",
+        "campaign_name": "Summer Sale 2026",
+        "status": "ACTIVE",
+        "impressions": "452341",
+        "clicks": "12456",
+        "spend": "4521.23",
+        "conversions": "234",
+        "purchase_roas": "4.21"
+      }
+    ]
   }
 }
 ```
 
-### Insights Response Structure
+---
 
+## Pagination
+
+Hopkin tools use cursor-based pagination:
+
+- **`limit`** (1–100) — Number of results per page (default 25)
+- **`nextCursor`** — Cursor string returned in the response to fetch the next page
+
+**Example — Paginating through campaigns:**
 ```json
+// First page
 {
-  "data": [
-    {
-      "campaign_id": "123456789",
-      "campaign_name": "Campaign Name",
-      "date_start": "2026-01-01",
-      "date_stop": "2026-01-15",
-      "impressions": "100000",
-      "clicks": "2500",
-      "spend": "500.00",
-      "conversions": "50",
-      // ... other metrics
-    }
-  ]
+  "tool": "meta_ads_list_campaigns",
+  "parameters": {
+    "reason": "Listing campaigns page 1",
+    "account_id": "act_123456789",
+    "limit": 50
+  }
 }
-```
 
-**Note:** Numeric values are often returned as strings to preserve precision.
-
-### Error Response Structure
-
-```json
+// Next page (using cursor from previous response)
 {
-  "error": {
-    "message": "Error description",
-    "type": "OAuthException",
-    "code": 190,
-    "error_subcode": 463,
-    "fbtrace_id": "..."
+  "tool": "meta_ads_list_campaigns",
+  "parameters": {
+    "reason": "Listing campaigns page 2",
+    "account_id": "act_123456789",
+    "limit": 50,
+    "nextCursor": "cursor_from_previous_response"
   }
 }
 ```
@@ -445,91 +508,22 @@ Most MCP tools return responses in this format:
 
 ## Error Handling
 
-### Common Error Codes
+### Common Error Types
 
-- **190** - Access token invalid or expired
-- **200** - Permission denied
-- **100** - Invalid parameter
-- **80004** - Request limit reached (rate limiting)
-- **17** - User request limit reached
+- **Authentication errors** — User not authenticated or session expired. Call `meta_ads_get_login_url` to re-authenticate.
+- **Invalid parameters** — Check parameter names and formats (e.g., account_id must start with "act_")
+- **Rate limiting** — Wait and retry with exponential backoff
+- **Account not found** — Verify account ID and user access
 
 ### Error Handling Best Practices
 
-1. **Check for error object** in response
-2. **Parse error code and message** for specific issue
-3. **Handle authentication errors** by prompting for token refresh
-4. **Handle rate limits** by implementing retry logic with backoff
-5. **Validate inputs** before making API calls
-6. **Provide helpful error messages** to users
-
-### Example Error Handling Pattern
-
-```
-If error.code == 190:
-  → Token expired - guide user to regenerate access token
-
-If error.code == 80004:
-  → Rate limit exceeded - wait and retry after delay
-
-If error.code == 100:
-  → Invalid parameter - check input validation
-  → Provide specific feedback on which parameter is invalid
-
-If error.code == 200:
-  → Permission denied - check token scopes and account access
-```
+1. **Always check auth first** — If tools return auth errors, run `meta_ads_check_auth_status` and `meta_ads_get_login_url` if needed
+2. **Validate inputs** — Ensure account IDs start with "act_", dates are YYYY-MM-DD
+3. **Handle pagination** — Don't assume all results are in the first page
+4. **Provide clear messages** — Translate errors into user-friendly guidance
 
 ---
 
-## Customization Instructions
-
-**To customize this reference for your specific MCP server:**
-
-1. **Identify your MCP server name** - Check your Claude configuration
-2. **List available tools** - Use MCP introspection to see all available tools
-3. **Document tool signatures** - For each tool, note:
-   - Tool name
-   - Required parameters
-   - Optional parameters
-   - Parameter types and formats
-   - Response structure
-4. **Test each tool** - Execute sample requests to verify behavior
-5. **Update this document** - Replace placeholder examples with actual tool definitions
-6. **Add specific examples** - Include real examples from your MCP server
-
-**Tool Discovery Commands:**
-- List MCP servers (varies by Claude interface)
-- List tools for a specific MCP server
-- Get tool schema/signature
-
----
-
-## Additional Notes
-
-### Data Type Conventions
-
-- **IDs:** String format (e.g., "123456789", "act_123456789")
-- **Currency:** String format representing cents/smallest unit (e.g., "100000" = $1,000.00)
-- **Dates:** ISO 8601 format (YYYY-MM-DD) or ISO timestamp
-- **Metrics:** Often returned as strings to preserve decimal precision
-- **Arrays:** Used for multi-value fields and breakdowns
-
-### Field Naming Conventions
-
-- **IDs:** `campaign_id`, `adset_id`, `ad_id`, `creative_id`
-- **Names:** `campaign_name`, `adset_name`, `ad_name`
-- **Status:** `status` (values: ACTIVE, PAUSED, DELETED, ARCHIVED)
-- **Time:** `created_time`, `updated_time`, `start_time`, `end_time`
-- **Budget:** `daily_budget`, `lifetime_budget` (in cents/smallest currency unit)
-
----
-
-**Document Version:** 1.0 (Template)
-**Last Updated:** 2026-01-19
-**Status:** Awaiting customization with specific MCP server details
-
-**To complete this reference, provide:**
-- Your MCP server name
-- List of available tools
-- Example tool responses
-- Any specific authentication requirements
+**Document Version:** 2.0
+**Last Updated:** 2026-02-10
+**Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai)

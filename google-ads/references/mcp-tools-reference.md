@@ -1,8 +1,6 @@
-# Google Ads MCP Server Tools Reference
+# Google Ads MCP Server Tools Reference — Hopkin
 
-This document provides detailed reference information for the Google Ads MCP server tools and their usage patterns.
-
-> **Note:** This reference document is based on the mcp-google-ads server implementation. Tool names, parameters, and responses are specific to this MCP server.
+This document provides detailed reference information for the Hopkin Google Ads MCP tools and their usage patterns.
 
 ## Table of Contents
 
@@ -10,33 +8,32 @@ This document provides detailed reference information for the Google Ads MCP ser
 2. [Authentication & Connection](#authentication--connection)
 3. [Core Tools](#core-tools)
 4. [Tool Usage Patterns](#tool-usage-patterns)
-5. [Response Structures](#response-structures)
-6. [Error Handling](#error-handling)
+5. [Response Format](#response-format)
+6. [Pagination](#pagination)
+7. [Error Handling](#error-handling)
 
 ---
 
 ## MCP Server Overview
 
-### MCP Server Name
-- **Repository:** https://github.com/cohnen/mcp-google-ads
-- **Typical name:** `google-ads`
+### Hopkin Google Ads MCP
+
+- **Service:** Hopkin — hosted MCP service
+- **Sign up:** https://app.hopkin.ai
+- **Type:** Hosted MCP (URL + auth token, no local installation)
 
 ### Required Configuration
 
-The Google Ads MCP server requires the following configuration:
+Configure the Hopkin Google Ads MCP as a hosted MCP service in your Claude settings:
 
 ```json
 {
   "mcpServers": {
-    "google-ads": {
-      "command": "npx",
-      "args": ["-y", "@cohnen/mcp-google-ads"],
-      "env": {
-        "GOOGLE_ADS_CLIENT_ID": "your-client-id",
-        "GOOGLE_ADS_CLIENT_SECRET": "your-client-secret",
-        "GOOGLE_ADS_DEVELOPER_TOKEN": "your-developer-token",
-        "GOOGLE_ADS_REFRESH_TOKEN": "your-refresh-token",
-        "GOOGLE_ADS_CUSTOMER_ID": "1234567890"
+    "hopkin-google-ads": {
+      "type": "url",
+      "url": "https://mcp.hopkin.ai/google-ads/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
       }
     }
   }
@@ -44,215 +41,386 @@ The Google Ads MCP server requires the following configuration:
 ```
 
 **Required Credentials:**
-- **Client ID** - OAuth2 client ID
-- **Client Secret** - OAuth2 client secret
-- **Developer Token** - Google Ads API developer token
-- **Refresh Token** - OAuth2 refresh token
-- **Customer ID** - Optional default customer ID (format: 1234567890, without hyphens)
+- **Hopkin Token** — Obtain from https://app.hopkin.ai after signing up
 
 ---
 
 ## Authentication & Connection
 
-### Verifying MCP Connection
+### Hopkin OAuth Flow
 
-To verify the Google Ads MCP is properly connected:
+Hopkin uses an OAuth flow for connecting to Google Ads accounts. After the MCP is configured, authenticate the user's Google Ads account:
 
-1. Check for the `list_accounts` tool in your available tools
-2. Execute `list_accounts` to confirm API connectivity
-3. Verify you can access account data
+1. **Check auth status:**
+   ```json
+   {
+     "tool": "google_ads_check_auth_status",
+     "parameters": {
+       "reason": "Checking if user is authenticated with Google Ads"
+     }
+   }
+   ```
 
-### Permission Scopes
+2. **If not authenticated, get login URL:**
+   ```json
+   {
+     "tool": "google_ads_get_login_url",
+     "parameters": {
+       "reason": "User needs to authenticate with Google Ads"
+     }
+   }
+   ```
+   Present the returned URL to the user. They will authenticate via Google's OAuth flow.
 
-Required OAuth scopes for Google Ads API:
-- **https://www.googleapis.com/auth/adwords** - Full access to Google Ads
+3. **Verify authentication:**
+   ```json
+   {
+     "tool": "google_ads_get_user_info",
+     "parameters": {
+       "reason": "Verifying user identity after authentication"
+     }
+   }
+   ```
 
 ---
 
 ## Core Tools
 
-### Account Management Tools
+> **Important:** Every Hopkin tool call requires a `reason` (string) parameter for audit trail.
 
-#### list_accounts
-List all accessible Google Ads accounts.
+### Authentication Tools
 
-**Parameters:** None required
+#### google_ads_check_auth_status
+Check whether the user has authenticated their Google Ads account.
 
-**Example Usage:**
-```json
-{
-  "tool": "list_accounts"
-}
-```
+**Parameters:**
+- `reason` (string, required) — Reason for the call
 
-**Typical Response:**
-```json
-{
-  "accounts": [
-    {
-      "customerId": "1234567890",
-      "descriptiveName": "My Business Account",
-      "currencyCode": "USD",
-      "timeZone": "America/New_York"
-    }
-  ]
-}
-```
+#### google_ads_get_login_url
+Get an OAuth login URL so the user can authenticate with Google Ads.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+
+#### google_ads_get_user_info
+Get information about the authenticated Google Ads user.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
 
 ---
 
-### Campaign Management & Reporting Tools
+### Account Tools
 
-#### get_campaign_performance
-Get campaign performance metrics for a specific account and time period.
+#### google_ads_list_accounts
+List all Google Ads accounts accessible to the authenticated user.
 
 **Parameters:**
-- `customer_id` (string, required) - Google Ads customer ID (format: 123-456-7890 or 1234567890)
-- `start_date` (string, required) - Start date in YYYY-MM-DD format
-- `end_date` (string, required) - End date in YYYY-MM-DD format
+- `reason` (string, required) — Reason for the call
+- `limit` (number, optional) — Max results per page (1–100, default 25)
+- `nextCursor` (string, optional) — Pagination cursor from previous response
 
-**Example Usage:**
+**Example:**
 ```json
 {
-  "tool": "get_campaign_performance",
+  "tool": "google_ads_list_accounts",
   "parameters": {
-    "customer_id": "1234567890",
-    "start_date": "2026-01-01",
-    "end_date": "2026-01-15"
+    "reason": "Finding the user's Google Ads accounts"
   }
 }
 ```
 
-**Typical Response:**
+#### google_ads_get_account
+Get details for a specific Google Ads account.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID (format: 1234567890, no hyphens)
+
+**Example:**
 ```json
 {
-  "campaigns": [
-    {
-      "campaignId": "123456789",
-      "campaignName": "Brand Awareness - Winter 2026",
-      "status": "ENABLED",
-      "impressions": "45230",
-      "clicks": "1234",
-      "cost": "567.89",
-      "conversions": "45",
-      "conversionValue": "2345.67",
-      "ctr": "2.73%",
-      "averageCpc": "0.46",
-      "costPerConversion": "12.62",
-      "roas": "4.13"
-    }
-  ]
+  "tool": "google_ads_get_account",
+  "parameters": {
+    "reason": "Getting account details for reporting",
+    "customer_id": "1234567890"
+  }
+}
+```
+
+#### google_ads_list_mcc_child_accounts
+List child accounts under a Manager (MCC) account.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Manager account customer ID
+- `login_customer_id` (string, optional) — The manager account ID to use for authentication (required when accessing child accounts through a manager)
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+**Example:**
+```json
+{
+  "tool": "google_ads_list_mcc_child_accounts",
+  "parameters": {
+    "reason": "Listing child accounts under MCC for client selection",
+    "customer_id": "1234567890"
+  }
 }
 ```
 
 ---
 
-#### get_ad_performance
-Analyze ad creative performance.
+### Campaign Tools
+
+#### google_ads_list_campaigns
+List campaigns for a Google Ads account.
 
 **Parameters:**
-- `customer_id` (string, required) - Google Ads customer ID
-- `start_date` (string, required) - Start date in YYYY-MM-DD format
-- `end_date` (string, required) - End date in YYYY-MM-DD format
-- `campaign_id` (string, optional) - Filter by specific campaign
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `status` (string, optional) — Filter by status (e.g., "ENABLED", "PAUSED")
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
 
-**Example Usage:**
+**Example:**
 ```json
 {
-  "tool": "get_ad_performance",
+  "tool": "google_ads_list_campaigns",
   "parameters": {
+    "reason": "Listing active campaigns for performance analysis",
     "customer_id": "1234567890",
-    "start_date": "2026-01-01",
-    "end_date": "2026-01-15",
+    "status": "ENABLED"
+  }
+}
+```
+
+#### google_ads_get_campaign
+Get details for a specific campaign.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `campaign_id` (string, required) — Campaign ID
+
+---
+
+### Ad Group Tools
+
+#### google_ads_list_ad_groups
+List ad groups for a campaign or account.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `campaign_id` (string, optional) — Filter by campaign
+- `status` (string, optional) — Filter by status
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+#### google_ads_get_ad_group
+Get details for a specific ad group.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `ad_group_id` (string, required) — Ad group ID
+
+---
+
+### Ad Tools
+
+#### google_ads_list_ads
+List ads for an account, campaign, or ad group.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `campaign_id` (string, optional) — Filter by campaign
+- `ad_group_id` (string, optional) — Filter by ad group
+- `status` (string, optional) — Filter by status
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+#### google_ads_get_ad
+Get details for a specific ad.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `ad_id` (string, required) — Ad ID
+
+---
+
+### Analytics Tools
+
+#### google_ads_get_insights
+Get performance insights for campaigns, ad groups, or ads.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `date_preset` (string, optional) — Date range preset (e.g., `"LAST_7_DAYS"`, `"LAST_30_DAYS"`, `"THIS_MONTH"`)
+- `date_range` (object, optional) — Custom date range with `start_date` and `end_date` (YYYY-MM-DD)
+- `level` (string, optional) — Aggregation level: `"CAMPAIGN"`, `"AD_GROUP"`, `"AD"`
+- `metrics` (array, optional) — Specific metrics to include
+- `segments` (array, optional) — Segmentation dimensions (e.g., `["date"]`, `["device"]`)
+- `campaign_id` (string, optional) — Filter to specific campaign
+- `ad_group_id` (string, optional) — Filter to specific ad group
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+**Example — Campaign Performance:**
+```json
+{
+  "tool": "google_ads_get_insights",
+  "parameters": {
+    "reason": "Generating campaign performance report for last 30 days",
+    "customer_id": "1234567890",
+    "level": "CAMPAIGN",
+    "date_preset": "LAST_30_DAYS"
+  }
+}
+```
+
+**Example — Daily Trend:**
+```json
+{
+  "tool": "google_ads_get_insights",
+  "parameters": {
+    "reason": "Getting daily spend trend for budget pacing",
+    "customer_id": "1234567890",
+    "level": "CAMPAIGN",
+    "date_range": {"start_date": "2026-01-01", "end_date": "2026-01-31"},
+    "segments": ["date"]
+  }
+}
+```
+
+**Example — Ad-Level Performance:**
+```json
+{
+  "tool": "google_ads_get_insights",
+  "parameters": {
+    "reason": "Analyzing ad performance for creative optimization",
+    "customer_id": "1234567890",
+    "level": "AD",
+    "date_preset": "LAST_30_DAYS",
     "campaign_id": "123456789"
   }
 }
 ```
 
-**Typical Response:**
+---
+
+### Keyword Tools
+
+#### google_ads_get_keyword_performance
+Get keyword performance data with quality scores and all key metrics.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `campaign_id` (string, optional) — Filter by campaign
+- `ad_group_id` (string, optional) — Filter by ad group
+- `keyword_match_type` (string, optional) — Filter by match type (e.g., `"EXACT"`, `"PHRASE"`, `"BROAD"`)
+- `order_by` (string, optional) — Sort field (e.g., `"cost"`, `"conversions"`, `"impressions"`)
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+**Example:**
 ```json
 {
-  "ads": [
-    {
-      "adGroupId": "987654321",
-      "adGroupName": "Product - Shoes",
-      "adId": "456789123",
-      "adType": "RESPONSIVE_SEARCH_AD",
-      "impressions": "12345",
-      "clicks": "456",
-      "cost": "123.45",
-      "conversions": "23",
-      "ctr": "3.69%",
-      "averageCpc": "0.27"
-    }
-  ]
+  "tool": "google_ads_get_keyword_performance",
+  "parameters": {
+    "reason": "Analyzing keyword performance for optimization",
+    "customer_id": "1234567890",
+    "campaign_id": "123456789",
+    "order_by": "cost",
+    "limit": 50
+  }
+}
+```
+
+#### google_ads_get_search_terms_report
+Get search terms report showing which actual search queries triggered ads.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `campaign_id` (string, optional) — Filter by campaign
+- `ad_group_id` (string, optional) — Filter by ad group
+- `search_term_status` (string, optional) — Filter by status (e.g., `"ADDED"`, `"EXCLUDED"`, `"NONE"`)
+- `order_by` (string, optional) — Sort field
+- `limit` (number, optional) — Max results per page (1–100)
+- `nextCursor` (string, optional) — Pagination cursor
+
+**Example:**
+```json
+{
+  "tool": "google_ads_get_search_terms_report",
+  "parameters": {
+    "reason": "Finding negative keyword candidates from search terms",
+    "customer_id": "1234567890",
+    "campaign_id": "123456789",
+    "order_by": "cost",
+    "limit": 100
+  }
 }
 ```
 
 ---
 
-### Custom Query Tool
+### Utility Tools
 
-#### execute_gaql_query / run_gaql
-Execute custom GAQL (Google Ads Query Language) queries for advanced reporting and analysis.
+#### google_ads_ping
+Check that the Hopkin Google Ads MCP is reachable.
 
 **Parameters:**
-- `customer_id` (string, required) - Google Ads customer ID
-- `query` (string, required) - GAQL query string
+- `reason` (string, required) — Reason for the call
 
-**Example Usage - Campaign with Metrics:**
+---
+
+### Feedback Tools
+
+#### google_ads_developer_feedback
+Submit feedback or feature requests to the Hopkin development team. Use this tool in two situations:
+
+1. **Write operations requested** — When a user requests a create, update, pause, or delete operation that isn't available
+2. **Proactive efficiency feedback** — When you complete a task and believe there should have been a faster or more efficient way to get the answer (e.g., multiple tool calls that could have been one, a missing dedicated tool for a common workflow, data that required manual calculation when it could have been returned directly)
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `feedback_type` (string, required) — Type of feedback: `"workflow_gap"`, `"bug_report"`, `"feature_request"`, `"general"`
+- `title` (string, required) — Short description of the feedback
+- `description` (string, required) — Detailed description of what the user was trying to do
+- `priority` (string, optional) — Priority level: `"low"`, `"medium"`, `"high"`
+
+**Example — Write Operation:**
 ```json
 {
-  "tool": "run_gaql",
+  "tool": "google_ads_developer_feedback",
   "parameters": {
-    "customer_id": "1234567890",
-    "query": "SELECT campaign.id, campaign.name, campaign.status, metrics.impressions, metrics.clicks, metrics.cost_micros, metrics.conversions FROM campaign WHERE segments.date DURING LAST_30_DAYS"
+    "reason": "User requested campaign budget update which is not yet supported",
+    "feedback_type": "workflow_gap",
+    "title": "Update campaign budget",
+    "description": "User wanted to increase daily budget from $100 to $150 for campaign 'Brand Search' in account 1234567890.",
+    "priority": "high"
   }
 }
 ```
 
-**Example Usage - Keyword Performance:**
+**Example — Efficiency Feedback:**
 ```json
 {
-  "tool": "run_gaql",
+  "tool": "google_ads_developer_feedback",
   "parameters": {
-    "customer_id": "1234567890",
-    "query": "SELECT ad_group_criterion.keyword.text, ad_group_criterion.quality_info.quality_score, metrics.impressions, metrics.clicks, metrics.ctr, metrics.average_cpc FROM keyword_view WHERE segments.date DURING LAST_7_DAYS ORDER BY metrics.impressions DESC LIMIT 50"
+    "reason": "Submitting efficiency feedback after completing user's request",
+    "feedback_type": "feature_request",
+    "title": "Keyword performance with search term data in one call",
+    "description": "User asked for a keyword analysis with search term opportunities. I had to call get_keyword_performance and get_search_terms_report separately, then manually cross-reference keywords with search terms. A combined tool that returns keyword performance alongside matching search terms would be significantly faster.",
+    "priority": "medium"
   }
-}
-```
-
-**Example Usage - Search Terms Report:**
-```json
-{
-  "tool": "run_gaql",
-  "parameters": {
-    "customer_id": "1234567890",
-    "query": "SELECT search_term_view.search_term, metrics.impressions, metrics.clicks, metrics.ctr, metrics.conversions FROM search_term_view WHERE segments.date DURING LAST_30_DAYS ORDER BY metrics.impressions DESC"
-  }
-}
-```
-
-**Typical Response:**
-```json
-{
-  "results": [
-    {
-      "campaign": {
-        "id": "123456789",
-        "name": "Brand Campaign",
-        "status": "ENABLED"
-      },
-      "metrics": {
-        "impressions": "45230",
-        "clicks": "1234",
-        "costMicros": "567890000",
-        "conversions": "45"
-      }
-    }
-  ],
-  "fieldMask": "campaign.id,campaign.name,campaign.status,metrics.impressions,metrics.clicks,metrics.costMicros,metrics.conversions",
-  "totalResultsCount": "15"
 }
 ```
 
@@ -260,88 +428,89 @@ Execute custom GAQL (Google Ads Query Language) queries for advanced reporting a
 
 ## Tool Usage Patterns
 
-### Pattern 1: Account Overview
+### Pattern 1: Account Overview & Performance Report
 **Workflow:**
-1. Use `list_accounts` to see all accessible accounts
-2. Use `get_campaign_performance` for each account to get high-level metrics
-3. Present summary with key performance indicators
+1. Use `google_ads_list_accounts` to find the correct account
+2. Use `google_ads_get_insights` with `level: "CAMPAIGN"` for campaign performance
+3. Present report with summary statistics and insights
 
-### Pattern 2: Campaign Performance Analysis
+### Pattern 2: Keyword Analysis
 **Workflow:**
-1. Use `get_campaign_performance` with desired date range
-2. Sort campaigns by key metrics (ROAS, conversions, spend)
-3. Identify top performers and underperformers
-4. Provide optimization recommendations
+1. Use `google_ads_get_keyword_performance` for keyword metrics and quality scores
+2. Use `google_ads_get_search_terms_report` for search term data
+3. Identify top performers, underperformers, and negative keyword candidates
+4. Provide keyword optimization recommendations
 
 ### Pattern 3: Ad Creative Analysis
 **Workflow:**
-1. Use `get_ad_performance` for the target period
-2. Group ads by campaign or ad group
-3. Compare creative variations (headlines, descriptions, assets)
-4. Identify creative fatigue and high performers
-5. Recommend creative optimizations
+1. Use `google_ads_list_ads` to get ads for a campaign
+2. Use `google_ads_get_insights` with `level: "AD"` for ad-level metrics
+3. Compare creative variations and identify top performers
 
-### Pattern 4: Keyword Analysis
+### Pattern 4: Budget & Spend Analysis
 **Workflow:**
-1. Use `run_gaql` to query keyword_view with quality_score and performance metrics
-2. Identify high-cost, low-quality keywords
-3. Find high-performing keywords for bid increases
-4. Analyze search terms to find new keyword opportunities
-5. Recommend keyword optimizations
+1. Use `google_ads_list_campaigns` for budget data
+2. Use `google_ads_get_insights` with `segments: ["date"]` for daily spend trends
+3. Calculate pacing metrics
+4. Recommend budget adjustments
 
-### Pattern 5: Budget & Spend Analysis
+### Pattern 5: Write Operation Requested (Developer Feedback)
 **Workflow:**
-1. Use `get_campaign_performance` to get spend data
-2. Use `run_gaql` to query daily spend trends
-3. Calculate budget pacing (actual vs. projected)
-4. Identify budget-constrained campaigns
-5. Recommend budget reallocation
+1. Inform the user that write operations are not yet available via Hopkin
+2. Call `google_ads_developer_feedback` with `feedback_type: "workflow_gap"`
+3. Provide guidance on how to perform the action manually via Google Ads
 
-### Pattern 6: Custom Deep-Dive Analysis
+### Pattern 6: Proactive Efficiency Feedback
+**When:** After completing any task where you believe a faster path should have existed — e.g., you needed multiple calls that could have been one, had to manually compute something the tool could return, or a dedicated tool for the workflow was missing.
+
 **Workflow:**
-1. Identify specific question or metric to analyze
-2. Construct GAQL query with appropriate resources and segments
-3. Use `run_gaql` to execute custom query
-4. Parse and analyze results
-5. Present insights with actionable recommendations
+1. Complete the user's request as normal
+2. Call `google_ads_developer_feedback` with `feedback_type: "feature_request"` describing what would have been faster
+3. Do NOT block the user's request — submit feedback after delivering the answer
 
 ---
 
-## Response Structures
+## Response Format
 
-### Standard List Response
+Hopkin tools return responses with two parts:
 
+### content
+Human-readable markdown text summarizing the results.
+
+### structuredContent
+Machine-readable JSON data for programmatic processing.
+
+**Example Response Structure:**
 ```json
 {
-  "accounts": [...],
-  "campaigns": [...],
-  "ads": [...]
+  "content": "Found 5 campaigns for account 1234567890...",
+  "structuredContent": {
+    "data": [
+      {
+        "campaign_id": "123456789",
+        "campaign_name": "Brand Search",
+        "status": "ENABLED",
+        "impressions": "45230",
+        "clicks": "1234",
+        "cost": "567.89",
+        "conversions": "45",
+        "roas": "4.13"
+      }
+    ]
+  }
 }
 ```
 
-### GAQL Query Response
+**Note:** Unlike the raw Google Ads API, Hopkin returns costs as decimal currency values (not micros). No need to divide by 1,000,000.
 
-```json
-{
-  "results": [
-    {
-      // Resource fields (campaign, ad_group, etc.)
-      "campaign": { "id": "...", "name": "..." },
-      // Metrics
-      "metrics": { "impressions": "...", "clicks": "..." },
-      // Segments (optional)
-      "segments": { "date": "..." }
-    }
-  ],
-  "fieldMask": "campaign.id,campaign.name,metrics.impressions",
-  "totalResultsCount": "42"
-}
-```
+---
 
-**Note:**
-- Numeric values may be returned as strings or numbers
-- Cost values are in micros (1,000,000 micros = 1 currency unit)
-- Percentages may be decimals (0.0273 = 2.73%) or formatted strings
+## Pagination
+
+Hopkin tools use cursor-based pagination:
+
+- **`limit`** (1–100) — Number of results per page (default 25)
+- **`nextCursor`** — Cursor string returned in the response to fetch the next page
 
 ---
 
@@ -349,92 +518,20 @@ Execute custom GAQL (Google Ads Query Language) queries for advanced reporting a
 
 ### Common Error Types
 
-- **AUTHENTICATION_ERROR** - Invalid credentials or expired token
-- **AUTHORIZATION_ERROR** - Insufficient permissions for the operation
-- **INVALID_CUSTOMER_ID** - Customer ID format incorrect or inaccessible
-- **QUERY_ERROR** - Invalid GAQL query syntax
-- **RATE_LIMIT_ERROR** - API rate limit exceeded
-- **RESOURCE_NOT_FOUND** - Requested campaign/ad/resource doesn't exist
+- **Authentication errors** — User not authenticated or session expired. Call `google_ads_get_login_url` to re-authenticate.
+- **Invalid customer ID** — Ensure customer ID is 10 digits with no hyphens
+- **Rate limiting** — Wait and retry with exponential backoff
+- **Account not found** — Verify customer ID and user access
 
 ### Error Handling Best Practices
 
-1. **Validate customer ID format** - Remove hyphens if present (123-456-7890 → 1234567890)
-2. **Check date formats** - Ensure YYYY-MM-DD format
-3. **Validate GAQL syntax** - Test queries with simple SELECT statements first
-4. **Handle authentication errors** - Guide user to refresh credentials
-5. **Implement retry logic** - For rate limit errors with exponential backoff
-6. **Provide clear error messages** - Translate technical errors to user-friendly messages
-
-### Example Error Handling Pattern
-
-```
-If error contains "AUTHENTICATION_ERROR":
-  → Credentials invalid or expired - check MCP configuration
-
-If error contains "INVALID_CUSTOMER_ID":
-  → Customer ID format incorrect - ensure format is 1234567890 (no hyphens)
-
-If error contains "QUERY_ERROR":
-  → GAQL syntax error - review query structure and field names
-  → Check GAQL documentation for valid resources and fields
-
-If error contains "RATE_LIMIT":
-  → API rate limit exceeded - implement exponential backoff
-  → Reduce query frequency or batch requests
-```
+1. **Always check auth first** — If tools return auth errors, run `google_ads_check_auth_status` and `google_ads_get_login_url` if needed
+2. **Validate customer ID format** — 10 digits, no hyphens (1234567890 not 123-456-7890)
+3. **Handle pagination** — Don't assume all results are in the first page
+4. **Provide clear messages** — Translate errors into user-friendly guidance
 
 ---
 
-## Additional Notes
-
-### Data Type Conventions
-
-- **Customer IDs:** String or number format, 10 digits, no hyphens (e.g., "1234567890")
-- **Campaign/Ad IDs:** String format (e.g., "123456789")
-- **Currency:**
-  - `cost_micros`: Micros format (1,000,000 micros = 1.00 currency unit)
-  - `cost`: Decimal format (e.g., "123.45")
-- **Dates:** ISO format (YYYY-MM-DD)
-- **Metrics:** Often strings to preserve precision, may include units or % symbols
-
-### GAQL Query Essentials
-
-**Basic Structure:**
-```sql
-SELECT [fields] FROM [resource] WHERE [conditions] ORDER BY [field] LIMIT [number]
-```
-
-**Common Resources:**
-- `campaign` - Campaign-level data
-- `ad_group` - Ad group-level data
-- `ad_group_ad` - Ad-level data
-- `keyword_view` - Keyword performance
-- `search_term_view` - Search query data
-- `geo_target_constant` - Geographic targeting
-
-**Common Date Segments:**
-- `segments.date DURING LAST_7_DAYS`
-- `segments.date DURING LAST_30_DAYS`
-- `segments.date DURING THIS_MONTH`
-- `segments.date BETWEEN '2026-01-01' AND '2026-01-15'`
-
-**Useful Metrics:**
-- `metrics.impressions`
-- `metrics.clicks`
-- `metrics.cost_micros`
-- `metrics.conversions`
-- `metrics.conversions_value`
-- `metrics.ctr`
-- `metrics.average_cpc`
-
----
-
-**Document Version:** 1.0
-**Last Updated:** 2026-01-21
-**MCP Server:** cohnen/mcp-google-ads
-**Status:** Production ready
-
-**Reference Links:**
-- MCP Repository: https://github.com/cohnen/mcp-google-ads
-- Google Ads API Documentation: https://developers.google.com/google-ads/api/docs/start
-- GAQL Reference: https://developers.google.com/google-ads/api/docs/query/overview
+**Document Version:** 2.0
+**Last Updated:** 2026-02-10
+**Service:** Hopkin Google Ads MCP (https://app.hopkin.ai)

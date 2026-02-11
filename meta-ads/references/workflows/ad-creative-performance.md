@@ -11,17 +11,24 @@ This workflow is particularly useful when:
 - Building client-facing creative test reports
 - Making data-driven decisions about creative scaling and iteration
 
+## Primary Tools
+
+- `meta_ads_get_performance_report` with `level: "ad"` — Get ad-level performance metrics (recommended, includes full funnel)
+- `meta_ads_get_insights` with `level: "ad"` — For custom breakdowns at ad level
+- `meta_ads_preview_ads` — Preview actual ad creatives with metrics overlay
+- `meta_ads_list_ads` — List ads for a campaign or ad set
+
 ## Required Information
 
 Before starting this workflow, gather:
 
-- **Ad Account ID** - format: act_XXXXXXXXXXXXX
-- **Creative Round/Test Scope** - Which campaigns/ad sets are included in this test
-- **Date Range** - Test start and end dates
-- **Primary Success Metric** - Main metric to evaluate creative (CPA, ROAS, CPL, etc.)
-- **Secondary Metrics** (optional) - Supporting metrics (CTR, CVR, CPC, etc.)
-- **Benchmark** - Reference point for comparison (previous round, evergreen average, target)
-- **Output Format** - Desired report format (Notion, Slides/PowerPoint, PDF, Excel/Sheets, or combination)
+- **Ad Account ID** — format: act_XXXXXXXXXXXXX
+- **Creative Round/Test Scope** — Which campaigns/ad sets are included in this test
+- **Date Range** — Test start and end dates
+- **Primary Success Metric** — Main metric to evaluate creative (CPA, ROAS, CPL, etc.)
+- **Secondary Metrics** (optional) — Supporting metrics (CTR, CVR, CPC, etc.)
+- **Benchmark** — Reference point for comparison (previous round, evergreen average, target)
+- **Output Format** — Desired report format (Notion, Slides/PowerPoint, PDF, Excel/Sheets, or combination)
   - If not specified by user, ask explicitly before building the report
 
 ## Detailed Workflow
@@ -103,9 +110,21 @@ Before starting this workflow, gather:
 
 **Steps:**
 
-1. **Export ad-level data from Meta Ads Manager:**
-   - Filter to in-scope campaigns/ad sets and date range
-   - Use the Meta Ads MCP to fetch ad-level data
+1. **Export ad-level data using Hopkin MCP tools:**
+   - Use `meta_ads_get_performance_report` with `level: "ad"` for comprehensive ad-level metrics:
+     ```json
+     {
+       "tool": "meta_ads_get_performance_report",
+       "parameters": {
+         "reason": "Getting ad-level performance data for creative test analysis",
+         "account_id": "act_123456789",
+         "level": "ad",
+         "time_range": {"since": "2026-01-01", "until": "2026-01-31"},
+         "campaign_id": "123456789"
+       }
+     }
+     ```
+   - Or use `meta_ads_get_insights` for custom metrics/breakdowns at ad level
    - Include these core fields:
      - **Ad Details:** ad_name, ad_id, creative_id, adset_name, campaign_name
      - **Creative Type:** creative_type (video, image, carousel, etc.)
@@ -143,9 +162,19 @@ Before starting this workflow, gather:
 
 **Steps:**
 
-1. **Get creative asset URLs from Meta:**
-   - Use Meta Ads MCP to fetch creative preview URLs for each ad
-   - Include fields: `thumbnail_url`, `image_url`, `video_url`, or use the creative preview endpoint
+1. **Get creative previews via Hopkin:**
+   - Use `meta_ads_preview_ads` to preview actual ad creatives with metrics overlay:
+     ```json
+     {
+       "tool": "meta_ads_preview_ads",
+       "parameters": {
+         "reason": "Previewing ad creatives for creative test report",
+         "account_id": "act_123456789",
+         "campaign_id": "123456789"
+       }
+     }
+     ```
+   - This tool shows actual ad creatives including images, text, and performance data
    - For video ads, get both the video file and a thumbnail/poster frame
 
 2. **Download assets for key creatives:**
@@ -694,5 +723,5 @@ For video ads, include additional video performance metrics:
 ## See Also
 
 - **references/report-types.md** - Complete creative metric definitions and video metrics
-- **references/mcp-tools-reference.md** - Specific MCP tools for fetching ad data
-- **references/troubleshooting.md** - Common issues and solutions
+- **references/mcp-tools-reference.md** — Hopkin MCP tools reference
+- **references/troubleshooting.md** — Common issues and solutions

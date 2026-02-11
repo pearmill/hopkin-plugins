@@ -1,466 +1,112 @@
 # Common Actions Workflows
 
-This document provides detailed workflows for common Meta Ads management operations beyond reporting.
+This document covers write operation handling and performance optimization recommendations for Meta Ads.
 
 ## Table of Contents
 
-1. [Creating Campaigns](#creating-campaigns)
-2. [Updating Budgets](#updating-budgets)
-3. [Pausing and Resuming Ads](#pausing-and-resuming-ads)
-4. [Performance Optimization Recommendations](#performance-optimization-recommendations)
+1. [Unsupported Write Operations](#unsupported-write-operations)
+2. [Performance Optimization Recommendations](#performance-optimization-recommendations)
 
 ---
 
-## Creating Campaigns
+## Unsupported Write Operations
 
-### When to Use
+The Hopkin Meta Ads MCP is **read-only**. The following operations are **not available**:
 
-Use this workflow when creating a new advertising campaign from scratch.
+- Creating campaigns, ad sets, or ads
+- Updating budgets or bid strategies
+- Pausing, resuming, or archiving campaigns/ad sets/ads
+- Modifying targeting parameters
+- Updating ad creative
 
-### Required Information
+### When a User Requests a Write Operation
 
-Before creating a campaign, confirm you have:
+When a user asks to create, update, pause, delete, or otherwise modify Meta Ads objects, follow this workflow:
 
-**Essential Parameters:**
-- **Campaign name** - Descriptive name (e.g., "Q1 2026 Product Launch")
-- **Objective** - Campaign goal from Meta's objective types
-- **Ad Account ID** - Target account (format: act_XXXXXXXXXXXXX)
+#### Step 1: Inform the User
 
-**Optional Parameters:**
-- **Special ad categories** - Required for certain industries (credit, employment, housing)
-- **Status** - Initial state (ACTIVE or PAUSED) - recommended to start PAUSED
-- **Budget** - Daily or lifetime budget
-- **Bid strategy** - How to optimize bidding
-- **Start/end dates** - Campaign schedule
+Let the user know that write operations are not yet available via the Hopkin Meta Ads MCP:
 
-### Campaign Objectives
+> Write operations (create, update, pause, delete) are not yet available through the Hopkin Meta Ads MCP. I've submitted a feature request on your behalf so the team knows this capability is needed.
 
-Choose the appropriate objective based on business goal:
+#### Step 2: Submit Developer Feedback
 
-**Awareness Objectives:**
-- **OUTCOME_AWARENESS** - Maximize reach and brand awareness
-- **REACH** - Show ads to maximum number of people
-- **BRAND_AWARENESS** - Increase brand recall
+Call `meta_ads_developer_feedback` to log the request as a workflow gap:
 
-**Consideration Objectives:**
-- **OUTCOME_ENGAGEMENT** - Increase post engagement (likes, comments, shares)
-- **OUTCOME_TRAFFIC** - Drive traffic to website or app
-- **APP_INSTALLS** - Drive app downloads
-- **VIDEO_VIEWS** - Maximize video views
-- **LEAD_GENERATION** - Collect leads via forms
-- **MESSAGES** - Encourage messaging conversations
-
-**Conversion Objectives:**
-- **OUTCOME_LEADS** - Drive lead generation events
-- **OUTCOME_SALES** - Drive purchase events
-- **CONVERSIONS** - Optimize for specific conversion events
-- **CATALOG_SALES** - Promote products from catalog
-- **STORE_TRAFFIC** - Drive foot traffic to physical stores
-
-### Detailed Workflow
-
-#### Step 1: Confirm Required Parameters
-
-Gather all necessary information:
-```
-Campaign Configuration:
-- Name: "Spring Sale 2026"
-- Objective: OUTCOME_SALES
-- Ad Account: act_123456789
-- Special Categories: None (or CREDIT, EMPLOYMENT, HOUSING if applicable)
-- Initial Status: PAUSED (to review before activating)
+```json
+{
+  "tool": "meta_ads_developer_feedback",
+  "parameters": {
+    "reason": "User requested a write operation that is not yet supported",
+    "feedback_type": "workflow_gap",
+    "title": "[Description of the write operation]",
+    "description": "[What the user was trying to do, including specific details like campaign names, budget amounts, status changes, etc.]",
+    "priority": "[low/medium/high based on user's urgency]"
+  }
+}
 ```
 
-#### Step 2: Use MCP Campaign Creation Tool
+**Examples of write operation feedback:**
 
-Call the MCP server's campaign creation tool with parameters:
-
-**Example Request Pattern:**
-```
-Tool: create_campaign
-Parameters:
-  - account_id: "act_123456789"
-  - name: "Spring Sale 2026"
-  - objective: "OUTCOME_SALES"
-  - status: "PAUSED"
-  - special_ad_categories: [] (empty array if none)
+**Creating a campaign:**
+```json
+{
+  "reason": "User wants to create a new campaign",
+  "feedback_type": "workflow_gap",
+  "title": "Create new campaign",
+  "description": "User wanted to create a new Sales campaign named 'Spring Sale 2026' with a $100/day budget in account act_123456789.",
+  "priority": "high"
+}
 ```
 
-**Optional Budget Parameters:**
-- daily_budget: "5000" (in cents, so $50.00/day)
-- lifetime_budget: "50000" (in cents, so $500.00 total)
-
-Note: Choose either daily_budget OR lifetime_budget, not both.
-
-#### Step 3: Capture Campaign ID
-
-The response will include the newly created campaign_id:
-```
-Response:
-  - campaign_id: "123456789012345"
-  - success: true
+**Updating a budget:**
+```json
+{
+  "reason": "User wants to update campaign budget",
+  "feedback_type": "workflow_gap",
+  "title": "Update campaign budget",
+  "description": "User wanted to increase daily budget from $100 to $150 for campaign 'Summer Sale 2026' (ID: 123456789).",
+  "priority": "high"
+}
 ```
 
-Store this ID for reference and return it to the user.
-
-#### Step 4: Create Ad Sets and Ads (Optional)
-
-If the user has provided targeting and creative details, proceed to create:
-
-**Ad Set Creation:**
-- Requires: campaign_id, name, targeting, budget, optimization goal
-- Set audience targeting (location, age, gender, interests, etc.)
-- Configure placement and bidding
-
-**Ad Creation:**
-- Requires: adset_id, name, creative specification
-- Upload or link to creative assets
-- Set ad copy (headline, description, CTA)
-
-#### Step 5: Return Campaign Details
-
-Provide the user with:
-- Campaign ID
-- Campaign name
-- Initial status
-- Next steps (create ad sets, review settings, activate)
-
-**Example Response:**
-```
-✓ Campaign created successfully
-
-Campaign Details:
-- ID: 123456789012345
-- Name: Spring Sale 2026
-- Objective: Sales (OUTCOME_SALES)
-- Status: PAUSED
-- Ad Account: act_123456789
-
-Next Steps:
-1. Create ad sets with targeting and budget
-2. Create ads with creative
-3. Review all settings
-4. Change status to ACTIVE to begin delivery
+**Pausing a campaign:**
+```json
+{
+  "reason": "User wants to pause a campaign",
+  "feedback_type": "workflow_gap",
+  "title": "Pause campaign",
+  "description": "User wanted to pause campaign 'Old Summer Sale' (ID: 123456789) because the promotion has ended.",
+  "priority": "medium"
+}
 ```
 
-### Best Practices
-
-1. **Start paused** - Create campaigns in PAUSED status to review before spending
-2. **Descriptive naming** - Use clear, searchable names with dates or identifiers
-3. **Choose correct objective** - Objective determines optimization and available features
-4. **Set special categories** - Required by law for certain ad types
-5. **Plan structure** - Decide campaign → ad set → ad hierarchy before creating
-
----
-
-## Updating Budgets
-
-### When to Use
-
-Use this workflow to modify budgets for existing campaigns or ad sets based on performance or business needs.
-
-### Required Information
-
-- **Object ID** - campaign_id or adset_id to update
-- **Budget type** - daily_budget or lifetime_budget
-- **New budget amount** - In cents/smallest currency unit
-- **Ad Account ID** - For verification
-
-### Detailed Workflow
-
-#### Step 1: Identify Target Object
-
-Determine which campaign or ad set to update:
-```
-Target: Campaign "Summer Sale 2026"
-Campaign ID: 123456789012345
-Current Budget: $100/day
-New Budget: $150/day
-```
-
-#### Step 2: Determine Budget Type
-
-Identify whether the object uses:
-- **Daily budget** - Maximum spend per day, campaign runs ongoing
-- **Lifetime budget** - Total spend across campaign duration
-
-You can only update the budget type that's currently in use (cannot switch from daily to lifetime via simple update).
-
-#### Step 3: Calculate Budget in Cents
-
-Convert dollar amount to cents (or smallest currency unit):
-```
-$150.00 per day = 15000 cents
-$500.00 lifetime = 50000 cents
-```
-
-#### Step 4: Use MCP Update Tool
-
-Call the MCP server's update tool:
-
-**Example for Campaign Budget Update:**
-```
-Tool: update_campaign
-Parameters:
-  - campaign_id: "123456789012345"
-  - daily_budget: "15000"
-```
-
-**Example for Ad Set Budget Update:**
-```
-Tool: update_adset
-Parameters:
-  - adset_id: "987654321098765"
-  - daily_budget: "15000"
-```
-
-#### Step 5: Verify Update
-
-Check the response for success confirmation:
-```
-Response:
-  - success: true
-  - daily_budget: "15000"
-```
-
-#### Step 6: Optionally Fetch Updated Data
-
-To confirm the change is reflected, fetch the campaign or ad set data:
-```
-Tool: get_campaign
-Parameters:
-  - campaign_id: "123456789012345"
-  - fields: ["id", "name", "daily_budget", "status"]
-```
-
-Verify the returned daily_budget matches the new value.
-
-#### Step 7: Communicate Change
-
-Inform the user of the successful update:
-```
-✓ Budget updated successfully
-
-Campaign: Summer Sale 2026
-Previous Budget: $100.00/day
-New Budget: $150.00/day
-Status: Active (change effective immediately)
-
-Expected Impact:
-- Increased daily spend capacity
-- Potentially higher delivery volume
-- Campaign may exit learning phase faster (if applicable)
-```
-
-### Budget Update Considerations
-
-**When Increasing Budget:**
-- May trigger learning phase reset if increase is >20%
-- Delivery will increase to spend new budget
-- Monitor pacing to ensure efficient spend
-
-**When Decreasing Budget:**
-- Delivery will slow to stay within new budget
-- May become "budget constrained"
-- Check if campaign can still meet objectives with lower budget
-
-**Account-Level Budget Limits:**
-- Individual campaign budgets are subject to account spending limits
-- Increasing campaign budget won't help if account limit is reached
-
-### Best Practices
-
-1. **Gradual changes** - Increase/decrease budgets gradually (<20% at a time) to avoid learning phase reset
-2. **Monitor after changes** - Watch performance closely for 24-48 hours after budget change
-3. **Document reasons** - Note why budget was changed (performance, business need, testing)
-4. **Coordinate with pacing** - Check pacing report before adjusting to understand current utilization
-5. **Consider timing** - Budget changes during peak hours may have immediate impact
-
----
-
-## Pausing and Resuming Ads
-
-### When to Use
-
-Use this workflow to temporarily stop or restart ad delivery for campaigns, ad sets, or individual ads.
-
-### Required Information
-
-- **Object ID(s)** - campaign_id, adset_id, or ad_id to modify
-- **Desired status** - PAUSED, ACTIVE, or ARCHIVED
-- **Reason** - Why the change is being made (for documentation)
-
-### Status Options
-
-**PAUSED:**
-- Stops delivery temporarily
-- Can be reactivated later
-- No spend while paused
-- Metrics and history preserved
-
-**ACTIVE:**
-- Resumes delivery (or starts for new objects)
-- Requires valid payment method and no blocks
-- Begins spending budget
-
-**ARCHIVED:**
-- Permanently archives the object
-- Cannot be reactivated (irreversible)
-- Useful for cleanup and organization
-- Metrics preserved but object cannot be edited
-
-### Detailed Workflow
-
-#### Step 1: Identify Object(s) to Modify
-
-Determine what to pause/resume:
-```
-Action: Pause
-Object Type: Campaign
-Campaign Name: "Old Summer Sale"
-Campaign ID: 123456789012345
-Current Status: ACTIVE
-New Status: PAUSED
-Reason: Campaign ended, product no longer available
-```
-
-#### Step 2: Understand Hierarchy Effects
-
-**Pausing a Campaign:**
-- All child ad sets are paused
-- All child ads are paused
-- Entire campaign stops spending
-
-**Pausing an Ad Set:**
-- All child ads within that ad set are paused
-- Other ad sets in campaign continue running
-
-**Pausing an Ad:**
-- Only that specific ad stops
-- Other ads in ad set continue running
-
-**Reactivating:**
-- Must reactivate each level separately
-- Activating campaign does NOT automatically activate paused ad sets/ads
-- Must reactivate ad sets, then ads individually
-
-#### Step 3: Use MCP Update Tool
-
-Call the appropriate update tool:
-
-**For Campaigns:**
-```
-Tool: update_campaign
-Parameters:
-  - campaign_id: "123456789012345"
-  - status: "PAUSED"
-```
-
-**For Ad Sets:**
-```
-Tool: update_adset
-Parameters:
-  - adset_id: "987654321098765"
-  - status: "PAUSED"
-```
-
-**For Ads:**
-```
-Tool: update_ad
-Parameters:
-  - ad_id: "567890123456789"
-  - status: "PAUSED"
-```
-
-#### Step 4: Confirm Status Change
-
-Verify the response indicates success:
-```
-Response:
-  - success: true
-  - status: "PAUSED"
-  - id: "123456789012345"
-```
-
-#### Step 5: Verify No Delivery Issues (When Reactivating)
-
-If setting status to ACTIVE, check for potential blocks:
-- Payment method valid
-- No account restrictions
-- No policy violations
-- Ad creative approved
-
-The response may include delivery status or warnings if issues exist.
-
-#### Step 6: Communicate Change
-
-Inform the user of the status change:
-
-**For Pausing:**
-```
-✓ Campaign paused successfully
-
-Campaign: Old Summer Sale
-Previous Status: ACTIVE
-New Status: PAUSED
-Effective: Immediately
-
-Impact:
-- Ad delivery has stopped
-- No further spend will occur
-- All child ad sets and ads are also paused
-- Metrics and data remain accessible
-```
-
-**For Resuming:**
-```
-✓ Campaign activated successfully
-
-Campaign: Spring Sale 2026
-Previous Status: PAUSED
-New Status: ACTIVE
-Effective: Immediately
-
-Impact:
-- Ad delivery will begin shortly (may take a few minutes)
-- Spending will resume based on budget settings
-- Campaign may enter learning phase if paused for >7 days
-- Monitor performance closely for first 24 hours
-```
-
-### Common Scenarios
-
-**Pause for Creative Refresh:**
-1. Pause campaign or ad set
-2. Create new ads with fresh creative
-3. Archive or pause old ads
-4. Resume campaign with new ads
-
-**Pause for Budget Reallocation:**
-1. Pause underperforming campaigns
-2. Increase budget on high performers
-3. Monitor for 24-48 hours
-4. Decide whether to resume or archive paused campaigns
-
-**Pause for Seasonal End:**
-1. Pause campaign at end of season
-2. Review final performance
-3. Archive if not reusing
-4. Or keep paused for next season reactivation
-
-**Emergency Pause:**
-1. Immediately pause if issue detected (wrong creative, broken link, etc.)
-2. Investigate and fix issue
-3. Test fix
-4. Reactivate once resolved
-
-### Best Practices
-
-1. **Document reasons** - Note why objects were paused for future reference
-2. **Use pause, not archive** - Unless certain you won't need it again
-3. **Check before reactivating** - Verify no issues during paused period
-4. **Expect learning phase** - Reactivating after >7 days may trigger learning reset
-5. **Communicate timing** - Status changes are immediate but delivery may take minutes to adjust
+#### Step 3: Provide Manual Guidance
+
+Guide the user on how to perform the action manually via Meta Ads Manager:
+
+**For Creating Campaigns:**
+> To create this campaign manually:
+> 1. Go to [Meta Ads Manager](https://adsmanager.facebook.com)
+> 2. Click "+ Create" to start a new campaign
+> 3. Select your campaign objective
+> 4. Configure your ad set targeting, budget, and schedule
+> 5. Add your ad creative
+> 6. Review and publish
+
+**For Updating Budgets:**
+> To update the budget manually:
+> 1. Go to [Meta Ads Manager](https://adsmanager.facebook.com)
+> 2. Find the campaign/ad set you want to update
+> 3. Click the budget column to edit inline, or click into the campaign settings
+> 4. Update the daily or lifetime budget
+> 5. Save changes
+
+**For Pausing/Resuming:**
+> To pause or resume manually:
+> 1. Go to [Meta Ads Manager](https://adsmanager.facebook.com)
+> 2. Find the campaign, ad set, or ad
+> 3. Toggle the status switch to pause or activate
 
 ---
 
@@ -468,7 +114,7 @@ Impact:
 
 ### When to Use
 
-Use these recommendations when analyzing reports to identify and address performance issues.
+Use these recommendations when analyzing reports to identify and address performance issues. These are purely advisory — no write tool calls are needed.
 
 ### Low ROAS (Return on Ad Spend)
 
@@ -653,6 +299,6 @@ Use these recommendations when analyzing reports to identify and address perform
 
 ## See Also
 
-- **references/mcp-tools-reference.md** - Specific MCP tools for campaign management
-- **references/troubleshooting.md** - Common issues when performing actions
-- **references/report-types.md** - Metrics to monitor after making changes
+- **references/mcp-tools-reference.md** — Hopkin MCP tools reference
+- **references/troubleshooting.md** — Common issues when using the MCP
+- **references/report-types.md** — Metrics to monitor after making changes

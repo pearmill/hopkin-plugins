@@ -1,6 +1,6 @@
 # Meta Ads Skill - Troubleshooting Guide
 
-This guide provides solutions to common issues encountered when using the Meta Ads skill with the Meta Ads MCP server.
+This guide provides solutions to common issues encountered when using the Meta Ads skill with the Hopkin Meta Ads MCP.
 
 ## Table of Contents
 
@@ -19,189 +19,163 @@ This guide provides solutions to common issues encountered when using the Meta A
 ### MCP Server Not Found
 
 **Symptoms:**
-- Error: "MCP server not found"
-- Meta Ads tools are not available
+- No `meta_ads_` prefixed tools available
 - Cannot execute Meta Ads operations
 
 **Diagnosis:**
-1. List available MCP servers in your environment
-2. Check if a Meta Ads MCP server appears in the list
-3. Verify the MCP server name (common names: pipeboard-meta-ads, meta-ads, facebook-ads)
+1. Check for `meta_ads_` prefixed tools in your available tools
+2. If none are found, the Hopkin Meta Ads MCP is not configured
 
 **Solutions:**
 
-#### Solution 1: Install the MCP Server
-If the MCP server is not installed:
+#### Solution 1: Sign Up and Configure Hopkin
 
-1. Identify the correct Meta Ads MCP server package for your setup
-2. Install the MCP server following its documentation
-3. Common installation methods:
-   - NPM package: `npm install -g @package/meta-ads-mcp`
-   - Direct installation through Claude Desktop settings
-   - Docker container (if applicable)
+1. Sign up at **https://app.hopkin.ai**
+2. Add the hosted MCP to your Claude configuration:
 
-#### Solution 2: Configure Claude Desktop
-Add MCP server to your Claude Desktop configuration:
-
-**Location of config file:**
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-
-**Example configuration:**
 ```json
 {
   "mcpServers": {
-    "meta-ads": {
-      "command": "npx",
-      "args": ["-y", "@your-package/meta-ads-mcp"],
-      "env": {
-        "META_ACCESS_TOKEN": "your-access-token-here",
-        "META_AD_ACCOUNT_ID": "act_123456789"
+    "hopkin-meta-ads": {
+      "type": "url",
+      "url": "https://mcp.hopkin.ai/meta-ads/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
       }
     }
   }
 }
 ```
 
-#### Solution 3: Restart Claude
-After installing or configuring the MCP server:
-1. Completely quit Claude Desktop
-2. Restart the application
-3. Verify the MCP server appears in available servers
+3. Restart Claude after updating configuration
 
-#### Solution 4: Check MCP Server Process
-Verify the MCP server process is running:
-- Check system processes for the MCP server
-- Review Claude Desktop logs for MCP connection errors
-- Ensure no port conflicts exist
+#### Solution 2: Verify Configuration
+
+If the MCP is configured but tools aren't appearing:
+1. Check that the Hopkin token is correct and not expired
+2. Verify the MCP URL is exactly: `https://mcp.hopkin.ai/meta-ads/mcp`
+3. Ensure the Authorization header format is: `Bearer YOUR_TOKEN` (with a space after Bearer)
+
+#### Solution 3: Restart Claude
+
+After installing or configuring the MCP server:
+1. Completely quit Claude
+2. Restart the application
+3. Verify `meta_ads_` tools appear in available tools
 
 **Prevention:**
-- Keep MCP server packages up to date
+- Keep your Hopkin token up to date
 - Verify MCP configuration before starting complex tasks
-- Document working MCP configuration for reference
 
 ---
 
 ## Authentication Problems
 
-### Invalid Access Token (Error 190)
+### Not Authenticated with Meta Ads
 
 **Symptoms:**
-- Error: "Invalid OAuth access token"
-- Error code: 190
+- `meta_ads_check_auth_status` returns not authenticated
+- Tools return authentication errors
 - Cannot access ad account data
-
-**Common Causes:**
-1. Access token has expired
-2. Access token was revoked
-3. Access token lacks required permissions
-4. Token was copied incorrectly (whitespace, truncation)
 
 **Solutions:**
 
-#### Solution 1: Generate New Access Token
-1. Go to Meta Business Suite (business.facebook.com)
-2. Navigate to Business Settings → Users → System Users (or your user)
-3. Generate a new access token with required permissions:
-   - `ads_read` - For reading ad data
-   - `ads_management` - For creating/updating ads
-   - `business_management` - For account access
-4. Set appropriate expiration (60 days or never expire for development)
-5. Copy the new token carefully (no extra spaces or line breaks)
-6. Update your MCP server configuration with the new token
-7. Restart Claude Desktop
+#### Solution 1: Run the Authentication Flow
 
-#### Solution 2: Verify Token Permissions
-1. Use Meta's Access Token Debugger: https://developers.facebook.com/tools/debug/accesstoken/
-2. Paste your access token
-3. Check "Scopes" section - verify it includes `ads_read` or `ads_management`
-4. If scopes are missing, regenerate token with correct permissions
+1. Call `meta_ads_check_auth_status` to verify current status:
+   ```json
+   {
+     "tool": "meta_ads_check_auth_status",
+     "parameters": {
+       "reason": "Checking if user is authenticated"
+     }
+   }
+   ```
 
-#### Solution 3: Check Token Expiration
-1. In Access Token Debugger, check "Expires" field
-2. If expired or expiring soon, generate a new token
-3. For production use, implement token refresh logic
-4. For development, use longer-lived tokens
+2. If not authenticated, call `meta_ads_get_login_url`:
+   ```json
+   {
+     "tool": "meta_ads_get_login_url",
+     "parameters": {
+       "reason": "Getting login URL for Meta Ads authentication"
+     }
+   }
+   ```
+
+3. Present the returned URL to the user — they need to authenticate via Meta's OAuth flow
+
+4. After the user completes authentication, verify with `meta_ads_get_user_info`:
+   ```json
+   {
+     "tool": "meta_ads_get_user_info",
+     "parameters": {
+       "reason": "Verifying authentication after user login"
+     }
+   }
+   ```
+
+#### Solution 2: Session Expired
+
+If the user was previously authenticated but the session has expired:
+1. Re-run the authentication flow above
+2. The user will need to authenticate again via the login URL
 
 **Prevention:**
-- Use system user tokens (don't expire) instead of personal tokens
-- Set calendar reminders before token expiration
-- Document token generation process
-- Store tokens securely (never commit to git)
+- Always check auth status at the beginning of a session
+- If auth errors occur mid-session, re-authenticate immediately
 
 ### Wrong Ad Account Access
 
 **Symptoms:**
-- Error: "Account not found" or "Permission denied"
+- Error: "Account not found"
 - Can see some accounts but not the target account
-- Error code: 200 or 10
 
 **Solutions:**
 
 #### Solution 1: Verify Ad Account ID Format
-Ensure the Ad Account ID is correctly formatted:
 - Must start with `act_`
 - Example: `act_123456789` (not just `123456789`)
 - Check for typos or extra characters
 
-#### Solution 2: Confirm Account Access
+#### Solution 2: List Available Accounts
+Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can access:
+```json
+{
+  "tool": "meta_ads_list_ad_accounts",
+  "parameters": {
+    "reason": "Listing available accounts to find the correct one"
+  }
+}
+```
+
+#### Solution 3: Confirm Account Access in Meta
 1. Log into Meta Business Suite
 2. Navigate to Ads Manager
-3. Check the account switcher - verify you can access the target account
-4. If account is not listed, you need to request access
-
-#### Solution 3: Grant Access to System User
-If using a system user token:
-1. Go to Business Settings → System Users
-2. Select your system user
-3. Click "Add Assets"
-4. Add the target ad account with appropriate permissions (Advertiser or Analyst)
-5. Generate a new access token
-6. Update MCP configuration
-
-#### Solution 4: Check Account Status
-1. Verify the ad account is not disabled or suspended
-2. Check for account restrictions in Meta Business Suite
-3. Ensure billing is set up (for active campaigns)
+3. Check the account switcher — verify you can access the target account
+4. If account is not listed, the user needs to request access
 
 ---
 
 ## Permission Errors
 
-### Insufficient Permissions (Error 200)
+### Insufficient Permissions
 
 **Symptoms:**
-- Error: "Insufficient permissions for this action"
-- Error code: 200
-- Can read data but cannot create/update
+- Cannot access certain ad account data
+- Limited functionality
 
 **Solutions:**
 
-#### Solution 1: Upgrade Token Scopes
-If you can read but not write:
-1. Current token may have only `ads_read`
-2. Generate new token with `ads_management` scope
-3. Update MCP configuration
-4. Restart Claude
+#### Solution 1: Re-authenticate with Correct Permissions
+1. Run `meta_ads_get_login_url` to get a new login URL
+2. Have the user authenticate again, ensuring they grant all requested permissions
 
-#### Solution 2: Increase Account Role
+#### Solution 2: Check Account Role
 1. Go to Business Settings → Ad Accounts
-2. Find your user or system user
-3. Upgrade role from "Analyst" to "Advertiser" or "Admin"
-4. Role permissions:
+2. Find the user and check their role:
    - **Analyst:** Read-only access, can view reports
    - **Advertiser:** Can create and edit ads, view reports
-   - **Admin:** Full control including billing and permissions
-
-#### Solution 3: Check Business Manager Access
-1. Verify you're in the correct Business Manager
-2. Some ad accounts may be owned by different businesses
-3. Request access from the account owner if needed
-
-**Prevention:**
-- Always request appropriate permissions upfront
-- Document required permissions for different operations
-- Use least-privilege principle (only request what you need)
+   - **Admin:** Full control
 
 ---
 
@@ -211,44 +185,39 @@ If you can read but not write:
 
 **Symptoms:**
 - Query succeeds but returns empty results
-- `data: []` in response
 - No error message
 
 **Common Causes:**
 1. Date range has no activity
 2. Filters are too restrictive
 3. Campaign was not active during specified period
-4. Metrics not applicable to object type
 
 **Solutions:**
 
 #### Solution 1: Verify Date Range
-1. Check campaign start_time and end_time
+1. Check campaign start and end dates
 2. Ensure date range overlaps with campaign activity
-3. Try "lifetime" date preset to see all data
-4. Use broader date range (e.g., last_30d instead of today)
+3. Try broader date range (e.g., `last_30d` instead of `last_7d`)
+4. Use `lifetime` date preset to see all data
 
-#### Solution 2: Remove Filters
-1. Start with no filters to see all data
-2. Add filters incrementally to identify which is too restrictive
-3. Check filter syntax (field names, operators, values)
-
-#### Solution 3: Check Object Status
-1. Verify campaign/ad set/ad status is ACTIVE or PAUSED (not DELETED or ARCHIVED)
-2. Deleted objects may not return data
-3. Use `filtering` parameter to include/exclude statuses
-
-#### Solution 4: Verify Metrics Are Available
-1. Some metrics only available at certain levels (e.g., video metrics only for video ads)
-2. Conversion metrics require pixel setup
-3. Check that requested fields are valid for the object type
+#### Solution 2: Check Campaign Status
+1. Verify campaigns exist and have run during the date range
+2. Use `meta_ads_list_campaigns` to check status:
+   ```json
+   {
+     "tool": "meta_ads_list_campaigns",
+     "parameters": {
+       "reason": "Checking campaign status to troubleshoot missing data",
+       "account_id": "act_123456789"
+     }
+   }
+   ```
 
 ### Incomplete Data
 
 **Symptoms:**
 - Some expected fields are missing
 - Data seems lower than expected
-- Breakdowns return partial results
 
 **Solutions:**
 
@@ -256,17 +225,11 @@ If you can read but not write:
 1. Conversion data may be delayed due to attribution windows
 2. Recent data (last 1-2 days) may be incomplete
 3. Use longer date ranges for conversion analysis
-4. Check attribution settings for account
 
 #### Solution 2: Privacy Thresholds
 1. Small audience sizes may have suppressed demographic data
 2. Some breakdowns unavailable due to privacy restrictions
 3. Aggregate data at higher level if detailed breakdowns are missing
-
-#### Solution 3: Request Specific Fields
-1. Default field sets may not include all desired data
-2. Explicitly request all needed fields in `fields` parameter
-3. Check field compatibility (some fields cannot be requested together)
 
 ---
 
@@ -278,60 +241,31 @@ If you can read but not write:
 **Cause:** Malformed request, invalid field name, or incorrect value
 
 **Solutions:**
-- Verify all field names are spelled correctly
-- Check parameter formats (dates as YYYY-MM-DD, IDs as strings)
+- Verify all parameters are correct
+- Check date formats (YYYY-MM-DD)
+- Ensure account_id starts with "act_"
 - Review API documentation for valid values
-- Validate JSON syntax if sending complex objects
-
-**Example:**
-```
-Error: "Invalid parameter"
-Field: "date_preset"
-Value: "last7days"
-Fix: Use "last_7d" instead
-```
 
 #### Error 190: Access Token Invalid
-**Cause:** Token expired, revoked, or malformed
+**Cause:** Session expired or authentication issue
 
-**Solutions:** See [Invalid Access Token](#invalid-access-token-error-190) section above
+**Solutions:**
+- Re-run authentication flow: `meta_ads_check_auth_status` → `meta_ads_get_login_url`
 
 #### Error 200: Permission Denied
 **Cause:** Insufficient permissions for operation
 
-**Solutions:** See [Insufficient Permissions](#insufficient-permissions-error-200) section above
+**Solutions:**
+- Re-authenticate with correct permissions
+- Check account role in Meta Business Suite
 
 #### Error 80004: API Request Limit Reached
-**Cause:** Rate limiting - too many requests in short period
+**Cause:** Rate limiting — too many requests in short period
 
 **Solutions:**
 - Wait before retrying (exponential backoff recommended)
 - Reduce request frequency
-- Batch multiple operations when possible
-- Check rate limit headers in responses
-- Consider upgrading API tier if consistently hitting limits
-
-**Rate Limit Guidelines:**
-- Default: 200 calls per hour per user
-- Marketing API: Higher limits for approved apps
-- Use batch requests to combine multiple operations
-
-#### Error 17: User Request Limit Reached
-**Cause:** Too many requests from this user
-
-**Solutions:**
-- Similar to Error 80004
-- May indicate need for system user instead of personal token
-- Check for infinite loops or repeated failed requests
-
-#### Error 2635: Account Temporarily Unavailable
-**Cause:** Ad account is disabled, in review, or restricted
-
-**Solutions:**
-- Check ad account status in Meta Business Suite
-- Review any notifications or warnings
-- Contact Meta support if account was unexpectedly disabled
-- Wait if account is under review
+- Use broader queries instead of many narrow ones
 
 ---
 
@@ -339,56 +273,23 @@ Fix: Use "last_7d" instead
 
 ### Slow Response Times
 
-**Symptoms:**
-- Requests take a long time to complete
-- Timeouts
-- Delayed results
-
 **Solutions:**
 
 #### Solution 1: Reduce Data Volume
 1. Use shorter date ranges
-2. Request fewer fields
-3. Limit result count with `limit` parameter
-4. Use pagination for large result sets
+2. Limit result count with `limit` parameter
+3. Use pagination for large result sets
 
 #### Solution 2: Avoid Complex Breakdowns
 1. Multiple breakdowns significantly increase processing time
 2. Use single breakdown when possible
 3. Request breakdowns separately instead of combined
 
-#### Solution 3: Use Date Presets
-1. Presets (last_7d, last_30d) may be faster than custom ranges
-2. Meta may cache common preset queries
-
-#### Solution 4: Optimize Request Timing
-1. Avoid peak hours if possible
-2. Distribute requests over time instead of bursts
-3. Use asynchronous requests for large reports
-
 ### Rate Limit Best Practices
 
-**Prevention Strategies:**
-
-1. **Implement Exponential Backoff**
-   - On rate limit error, wait before retrying
-   - Double wait time with each retry
-   - Example: 1s, 2s, 4s, 8s, 16s
-
-2. **Cache Results**
-   - Store frequently accessed data locally
-   - Avoid repeated identical requests
-   - Use appropriate cache TTL (time-to-live)
-
-3. **Batch Operations**
-   - Combine multiple operations when API supports it
-   - Request multiple objects in single call
-   - Use batch endpoints where available
-
-4. **Monitor Rate Limits**
-   - Track request counts
-   - Check rate limit headers in responses
-   - Implement client-side rate limiting
+1. **Implement Exponential Backoff** — On rate limit error, wait before retrying
+2. **Avoid Repeated Identical Requests** — Cache results when possible
+3. **Use Pagination** — Don't request all data at once; use `limit` and `nextCursor`
 
 ---
 
@@ -396,76 +297,19 @@ Fix: Use "last_7d" instead
 
 ### Discrepancies Between Meta Ads Manager and API
 
-**Symptoms:**
-- Numbers don't match between Ads Manager UI and API responses
-- Totals don't add up
-- Metrics seem inconsistent
-
 **Common Causes & Solutions:**
 
 #### Cause 1: Different Attribution Settings
-**Solution:** Ensure API requests use same attribution window as Ads Manager
-- Default attribution: 7-day click, 1-day view
-- Check account attribution settings
-- Specify attribution window in API requests if supported
+Ensure API requests use same attribution window as Ads Manager (default: 7-day click, 1-day view).
 
 #### Cause 2: Time Zone Differences
-**Solution:**
-- Ads Manager uses ad account time zone
-- API may use UTC or different time zone
-- Specify time zone in requests
-- Use `time_increment` parameter for daily breakdowns
+Ads Manager uses ad account time zone. API may use UTC.
 
-#### Cause 3: Filtering Differences
-**Solution:**
-- Ads Manager may apply default filters (e.g., hide deleted campaigns)
-- API returns all data unless explicitly filtered
-- Match Ads Manager filters in API requests
+#### Cause 3: Data Freshness
+Recent data (today, yesterday) may still be processing.
 
-#### Cause 4: Data Freshness
-**Solution:**
-- Ads Manager may show more recent data
-- API data may have slight delay (up to a few hours)
-- Recent data (today, yesterday) may still be processing
-
-#### Cause 5: Unique vs. Total Metrics
-**Solution:**
-- Ensure comparing same metric (clicks vs. unique_clicks)
-- Check if Ads Manager shows unique or total
-- Request correct metric field in API
-
-### Missing Conversion Data
-
-**Symptoms:**
-- Conversion fields are 0 or null
-- Expected conversions not showing
-- Conversion metrics unavailable
-
-**Solutions:**
-
-#### Solution 1: Verify Pixel Setup
-1. Check Meta Pixel is installed on website
-2. Verify pixel is firing correctly (use Meta Pixel Helper browser extension)
-3. Confirm conversion events are configured
-4. Check pixel ID matches ad account
-
-#### Solution 2: Check Conversion Event Configuration
-1. Go to Events Manager in Meta Business Suite
-2. Verify custom conversion events are set up
-3. Check event parameters and matching rules
-4. Test events with Pixel Helper or Test Events tool
-
-#### Solution 3: Attribution Window
-1. Conversions may not appear immediately
-2. Default attribution: 7-day click, 1-day view
-3. Recent traffic may not have converted yet
-4. Check if conversions appear for older date ranges
-
-#### Solution 4: Aggregation Event Measurement
-1. For iOS 14.5+, check Aggregated Event Measurement setup
-2. Verify domain verification
-3. Configure priority events (maximum 8)
-4. Allow 72 hours for data modeling
+#### Cause 4: Unique vs. Total Metrics
+Ensure comparing same metric (clicks vs. unique_clicks).
 
 ---
 
@@ -474,89 +318,45 @@ Fix: Use "last_7d" instead
 When encountering issues, work through this checklist:
 
 - [ ] **MCP Connection**
-  - [ ] MCP server is installed and configured
-  - [ ] MCP server appears in available servers list
-  - [ ] Claude Desktop has been restarted after config changes
+  - [ ] Hopkin MCP is configured with valid token
+  - [ ] `meta_ads_` tools appear in available tools
+  - [ ] Claude has been restarted after config changes
 
 - [ ] **Authentication**
-  - [ ] Access token is valid (check with Token Debugger)
-  - [ ] Token has required scopes (ads_read, ads_management)
-  - [ ] Token is not expired
-  - [ ] Token is correctly formatted in config (no extra spaces)
+  - [ ] `meta_ads_check_auth_status` returns authenticated
+  - [ ] User has completed OAuth flow via `meta_ads_get_login_url` if needed
 
 - [ ] **Permissions**
-  - [ ] User/system user has access to target ad account
-  - [ ] Role is appropriate for operation (Analyst vs. Advertiser)
+  - [ ] User has access to target ad account
   - [ ] Ad account ID is correctly formatted (act_XXXXX)
 
 - [ ] **Request Parameters**
-  - [ ] All required parameters are provided
-  - [ ] Parameter values are valid and correctly formatted
-  - [ ] Field names are spelled correctly
-  - [ ] Date ranges are valid and logical
+  - [ ] All required parameters are provided (including `reason`)
+  - [ ] Date ranges are valid
+  - [ ] Account ID starts with "act_"
 
 - [ ] **Data Availability**
   - [ ] Campaign/ad was active during requested date range
-  - [ ] Object has not been deleted
   - [ ] Sufficient data exists for requested breakdowns
-  - [ ] Requested metrics are applicable to object type
-
-- [ ] **Rate Limits**
-  - [ ] Not making too many requests in short period
-  - [ ] Implementing retry logic with backoff
-  - [ ] Using appropriate batch sizes
-
----
-
-## Getting Additional Help
-
-If you've worked through this troubleshooting guide and still have issues:
-
-1. **Check Meta Developer Documentation**
-   - https://developers.facebook.com/docs/marketing-apis
-   - Review API changelog for recent changes
-   - Check for known issues or service outages
-
-2. **Review Meta API Error Reference**
-   - https://developers.facebook.com/docs/graph-api/using-graph-api/error-handling
-   - Detailed error code explanations
-   - API-specific troubleshooting
-
-3. **MCP Server Documentation**
-   - Check your specific MCP server's documentation
-   - Review MCP server GitHub issues
-   - Check for MCP server updates
-
-4. **Meta Developer Community**
-   - Meta Developers Community forum
-   - Stack Overflow (tag: facebook-graph-api)
-   - Meta Business Help Center
-
-5. **Enable Debug Logging**
-   - Enable verbose logging in MCP server (if available)
-   - Review Claude Desktop logs
-   - Capture full error responses for analysis
 
 ---
 
 ## Common Patterns Summary
 
 **"Cannot access ad account"**
-→ Check: Ad account ID format, token permissions, account access
+→ Check: Ad account ID format, authentication status, account access
 
 **"No data returned"**
 → Check: Date range, campaign status, filters
 
-**"Permission denied"**
-→ Check: Token scopes, account role, Business Manager access
+**"Not authenticated"**
+→ Run: `meta_ads_check_auth_status` → `meta_ads_get_login_url` → user authenticates → `meta_ads_get_user_info`
 
 **"Rate limit exceeded"**
-→ Check: Request frequency, implement backoff, batch operations
-
-**"Invalid parameter"**
-→ Check: Field names, value formats, API documentation
+→ Check: Request frequency, implement backoff, reduce query scope
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** 2026-01-19
+**Document Version:** 2.0
+**Last Updated:** 2026-02-10
+**Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai)

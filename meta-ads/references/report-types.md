@@ -14,6 +14,55 @@ This document provides comprehensive details for all Meta Ads report types suppo
 
 ---
 
+## Performance Reports via `meta_ads_get_performance_report`
+
+### Overview
+
+The `meta_ads_get_performance_report` tool is the **recommended tool for most reporting use cases**. It always includes a comprehensive funnel of pre-built metrics, so you don't need to specify which fields to retrieve.
+
+### Included Metrics (Always Present)
+
+Every call to `meta_ads_get_performance_report` automatically includes:
+- **impressions** — Total number of ad displays
+- **reach** — Unique people who saw ads
+- **frequency** — Average times each person saw ads
+- **spend** — Total amount spent
+- **clicks** — Total clicks on ads
+- **cpc** — Cost per click
+- **cpm** — Cost per 1,000 impressions
+- **ctr** — Click-through rate
+- **unique_clicks** — Number of unique clickers
+- **actions** — All tracked actions
+- **action_values** — Values of tracked actions
+- **conversions** — Total conversion events
+- **purchase_roas** — Return on ad spend
+- **quality_rankings** — Ad quality indicators
+
+### When to Use
+
+Use `meta_ads_get_performance_report` for:
+- Campaign performance overview reports
+- Ad-level performance comparison
+- Quick full-funnel analysis
+- Any reporting where you want comprehensive metrics without specifying fields
+
+Use `meta_ads_get_insights` instead when you need:
+- Custom breakdowns (age, gender, geography, device, placement)
+- Daily/weekly time increments for trend analysis
+- Specific metric combinations not covered by the performance report
+
+### Parameters
+
+- `reason` (string, required) — Audit trail reason
+- `account_id` (string, required) — Ad account ID (act_XXXXXXXXXXXXX)
+- `level` (string, required) — `"campaign"`, `"adset"`, or `"ad"`
+- `date_preset` (string, optional) — e.g., `"last_7d"`, `"last_30d"`
+- `time_range` (object, optional) — `{"since": "YYYY-MM-DD", "until": "YYYY-MM-DD"}`
+- `campaign_id` (string, optional) — Filter to specific campaign
+- `adset_id` (string, optional) — Filter to specific ad set
+
+---
+
 ## Campaign Performance Reports
 
 ### Overview
@@ -479,5 +528,5 @@ Complete list of available breakdown dimensions:
 
 ---
 
-**Document Version:** 1.0
-**Last Updated:** 2026-01-19
+**Document Version:** 2.0
+**Last Updated:** 2026-02-10
