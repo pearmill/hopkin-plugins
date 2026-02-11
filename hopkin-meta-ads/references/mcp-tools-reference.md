@@ -360,9 +360,10 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
-- `feedback_type` (string, required) — Type of feedback: `"workflow_gap"`, `"bug_report"`, `"feature_request"`, `"general"`
-- `title` (string, required) — Short description of the feedback
-- `description` (string, required) — Detailed description of what the user was trying to do
+- `feedback_type` (string, required) — Type of feedback: `"new_tool"`, `"improvement"`, `"bug"`, `"workflow_gap"`
+- `title` (string, required) — Concise title (5–200 characters)
+- `description` (string, required) — Detailed description of what is needed and why (20–2000 characters)
+- `current_workaround` (string, optional) — How you are currently working around this limitation
 - `priority` (string, optional) — Priority level: `"low"`, `"medium"`, `"high"`
 
 **Example — Write Operation:**
@@ -374,6 +375,7 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
     "feedback_type": "workflow_gap",
     "title": "Update campaign budget",
     "description": "User wanted to increase daily budget from $100 to $150 for campaign 'Summer Sale 2026'. Write operations are not yet available via Hopkin.",
+    "current_workaround": "Directed user to Meta Ads Manager to update budget manually",
     "priority": "high"
   }
 }
@@ -385,9 +387,10 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
   "tool": "meta_ads_developer_feedback",
   "parameters": {
     "reason": "Submitting efficiency feedback after completing user's request",
-    "feedback_type": "feature_request",
+    "feedback_type": "new_tool",
     "title": "Combined campaign + ad set performance in one call",
     "description": "User asked for a full account overview. I had to call get_performance_report twice (once at campaign level, once at adset level) and manually merge results. A single tool that returns hierarchical campaign > ad set > ad data would have been significantly faster.",
+    "current_workaround": "Called get_performance_report at campaign level, then again at adset level, and merged results manually",
     "priority": "medium"
   }
 }
@@ -435,7 +438,7 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 
 **Workflow:**
 1. Complete the user's request as normal
-2. Call `meta_ads_developer_feedback` with `feedback_type: "feature_request"` describing what would have been faster
+2. Call `meta_ads_developer_feedback` with `feedback_type: "new_tool"` or `"improvement"` describing what would have been faster
 3. Do NOT block the user's request — submit feedback after delivering the answer
 
 ---

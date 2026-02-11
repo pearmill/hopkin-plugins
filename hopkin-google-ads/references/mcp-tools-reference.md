@@ -391,9 +391,10 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
-- `feedback_type` (string, required) — Type of feedback: `"workflow_gap"`, `"bug_report"`, `"feature_request"`, `"general"`
-- `title` (string, required) — Short description of the feedback
-- `description` (string, required) — Detailed description of what the user was trying to do
+- `feedback_type` (string, required) — Type of feedback: `"new_tool"`, `"improvement"`, `"bug"`, `"workflow_gap"`
+- `title` (string, required) — Concise title (5–200 characters)
+- `description` (string, required) — Detailed description of what is needed and why (20–2000 characters)
+- `current_workaround` (string, optional) — How you are currently working around this limitation
 - `priority` (string, optional) — Priority level: `"low"`, `"medium"`, `"high"`
 
 **Example — Write Operation:**
@@ -405,6 +406,7 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
     "feedback_type": "workflow_gap",
     "title": "Update campaign budget",
     "description": "User wanted to increase daily budget from $100 to $150 for campaign 'Brand Search' in account 1234567890.",
+    "current_workaround": "Directed user to Google Ads UI to update budget manually",
     "priority": "high"
   }
 }
@@ -416,9 +418,10 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
   "tool": "google_ads_developer_feedback",
   "parameters": {
     "reason": "Submitting efficiency feedback after completing user's request",
-    "feedback_type": "feature_request",
+    "feedback_type": "new_tool",
     "title": "Keyword performance with search term data in one call",
     "description": "User asked for a keyword analysis with search term opportunities. I had to call get_keyword_performance and get_search_terms_report separately, then manually cross-reference keywords with search terms. A combined tool that returns keyword performance alongside matching search terms would be significantly faster.",
+    "current_workaround": "Called get_keyword_performance and get_search_terms_report separately, then cross-referenced results manually",
     "priority": "medium"
   }
 }
@@ -465,7 +468,7 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 
 **Workflow:**
 1. Complete the user's request as normal
-2. Call `google_ads_developer_feedback` with `feedback_type: "feature_request"` describing what would have been faster
+2. Call `google_ads_developer_feedback` with `feedback_type: "new_tool"` or `"improvement"` describing what would have been faster
 3. Do NOT block the user's request — submit feedback after delivering the answer
 
 ---

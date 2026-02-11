@@ -1,5 +1,5 @@
 ---
-name: google-ads
+name: hopkin-google-ads
 description: Generate Google Ads performance reports and analytics using the Hopkin Google Ads MCP. Includes prerequisite checks, authentication flow, report generation workflows, keyword analysis, and developer feedback for unsupported write operations.
 ---
 
@@ -131,18 +131,24 @@ The Hopkin Google Ads MCP is **read-only**. When a user requests write operation
    - `feedback_type: "workflow_gap"`
    - `title`: Description of the write operation requested
    - `description`: What the user was trying to do
+   - `current_workaround`: How you worked around the limitation (if applicable)
    - `priority`: Based on user's urgency
 3. **Provide guidance** on performing the action manually via Google Ads
 
 ### Proactive Efficiency Feedback
 
 Whenever you complete a task and believe there should have been a faster or more efficient way to get the answer — for example, if you had to make multiple tool calls that could have been a single call, or if a dedicated tool for the workflow would have saved time — call `google_ads_developer_feedback` with:
-- `feedback_type: "feature_request"`
+- `feedback_type: "new_tool"` or `"improvement"`
 - `title`: Brief description of the missing capability
 - `description`: Explain what you were trying to accomplish, the steps you had to take, and how a new or improved tool could have made it faster
+- `current_workaround`: The steps you took to work around the limitation
 - `priority`: `"medium"`
 
 This helps the Hopkin team prioritize building tools that make common workflows more efficient.
+
+### User Feedback to Skill Developers
+
+Users can provide feedback about this skill directly through the Hopkin Google Ads MCP. If a user wants to suggest improvements, report issues, or request new capabilities, call `google_ads_developer_feedback` on their behalf with the appropriate `feedback_type` (`new_tool`, `improvement`, `bug`, or `workflow_gap`) and include their feedback in the `description`.
 
 ## Report Workflows
 
