@@ -243,6 +243,51 @@ jobs:
           echo "Package created: $PACKAGE_FILE"
           ls -lh "$PACKAGE_FILE"
 
+      - name: Setup Node.js
+        if: steps.check_release.outputs.exists == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Upload to Vercel Blob
+        if: steps.check_release.outputs.exists == 'false'
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          SKILL: ${{ matrix.skill }}
+          VERSION: ${{ steps.version.outputs.version }}
+          PACKAGE_FILE: releases/${{ matrix.skill }}-v${{ steps.version.outputs.version }}.zip
+        run: |
+          set -e
+
+          npm install @vercel/blob
+
+          node -e "
+            const { put } = require('@vercel/blob');
+            const fs = require('fs');
+
+            async function upload() {
+              const skill = process.env.SKILL;
+              const version = process.env.VERSION;
+              const file = fs.readFileSync(process.env.PACKAGE_FILE);
+
+              // Upload as latest
+              const latest = await put('skills/' + skill + '/latest.zip', file, {
+                access: 'public',
+                addRandomSuffix: false,
+              });
+              console.log('Uploaded latest:', latest.url);
+
+              // Upload versioned copy
+              const versioned = await put('skills/' + skill + '/v' + version + '.zip', file, {
+                access: 'public',
+                addRandomSuffix: false,
+              });
+              console.log('Uploaded versioned:', versioned.url);
+            }
+
+            upload().catch(err => { console.error(err); process.exit(1); });
+          "
+
       - name: Create GitHub Release
         if: steps.check_release.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
