@@ -5,9 +5,10 @@ on:
     branches:
       - main
     paths:
-      - '*/SKILL.md'
-      - '*/references/**'
-      - '*/.claude/**'
+      - '*/skills/**/SKILL.md'
+      - '*/skills/**/references/**'
+      - '*/.claude-plugin/**'
+      - '*/.mcp.json'
   workflow_dispatch:
     inputs:
       skill_name:
@@ -35,13 +36,13 @@ jobs:
           # Manual trigger with specific skill
           if [ -n "${{ github.event.inputs.skill_name }}" ]; then
             SKILL="${{ github.event.inputs.skill_name }}"
-            if [ -f "$SKILL/SKILL.md" ]; then
+            if [ -f "$SKILL/skills/$SKILL/SKILL.md" ]; then
               echo "skills=[\"$SKILL\"]" >> $GITHUB_OUTPUT
               echo "has_changes=true" >> $GITHUB_OUTPUT
               echo "Manual trigger for skill: $SKILL"
               exit 0
             else
-              echo "Error: Skill '$SKILL' not found or missing SKILL.md"
+              echo "Error: Skill '$SKILL' not found or missing skills/$SKILL/SKILL.md"
               echo "skills=[]" >> $GITHUB_OUTPUT
               echo "has_changes=false" >> $GITHUB_OUTPUT
               exit 1
@@ -58,8 +59,8 @@ jobs:
             echo "Changed files:"
             echo "$CHANGED_FILES"
 
-            # Extract skill directories
-            SKILLS=$(echo "$CHANGED_FILES" | grep -E '^[^/]+/(SKILL\.md|references/|\.claude/)' | cut -d'/' -f1 | sort -u)
+            # Extract skill directories (plugin structure: skills/, .claude-plugin/, .mcp.json)
+            SKILLS=$(echo "$CHANGED_FILES" | grep -E '^[^/]+/(skills/|\.claude-plugin/|\.mcp\.json)' | cut -d'/' -f1 | sort -u)
 
             if [ -z "$SKILLS" ]; then
               echo "No skill changes detected"
@@ -68,10 +69,10 @@ jobs:
               exit 0
             fi
 
-            # Verify SKILL.md exists for each detected skill
+            # Verify SKILL.md exists for each detected skill (plugin structure)
             VALID_SKILLS=""
             for SKILL in $SKILLS; do
-              if [ -f "$SKILL/SKILL.md" ]; then
+              if [ -f "$SKILL/skills/$SKILL/SKILL.md" ]; then
                 VALID_SKILLS="$VALID_SKILLS $SKILL"
               fi
             done
@@ -143,6 +144,17 @@ jobs:
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "tag=$SKILL-v$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "previous_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update plugin.json version
+        run: |
+          set -e
+          SKILL="${{ matrix.skill }}"
+          VERSION="${{ steps.version.outputs.version }}"
+          PLUGIN_JSON="$SKILL/.claude-plugin/plugin.json"
+          if [ -f "$PLUGIN_JSON" ]; then
+            jq --arg v "$VERSION" '.version = $v' "$PLUGIN_JSON" > tmp.json && mv tmp.json "$PLUGIN_JSON"
+            echo "Updated $PLUGIN_JSON to version $VERSION"
+          fi
 
       - name: Check if release exists
         id: check_release
@@ -223,15 +235,15 @@ jobs:
           cat changelog.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Package skill
+      - name: Package plugin
         if: steps.check_release.outputs.exists == 'false'
         run: |
           set -e
           SKILL="${{ matrix.skill }}"
           VERSION="${{ steps.version.outputs.version }}"
 
-          chmod +x package-skill.sh
-          ./package-skill.sh "$SKILL" "$VERSION"
+          chmod +x package-plugin.sh
+          ./package-plugin.sh "$SKILL" "$VERSION"
 
           # Verify the package was created (note: package-skill.sh adds 'v' prefix)
           PACKAGE_FILE="releases/${SKILL}-v${VERSION}.zip"
@@ -309,8 +321,9 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           VERSION_FILE="$SKILL/.version"
 
-          # Add and commit the version file
+          # Add and commit the version and plugin.json files
           git add "$VERSION_FILE"
+          git add "$SKILL/.claude-plugin/plugin.json"
           git commit -m "chore: bump $SKILL version to $VERSION [skip ci]"
 
           # Push with retry logic to handle concurrent releases
@@ -534,3 +547,72 @@ jobs:
           fi
 
           echo "Slack notification sent"
+
+  update-marketplace:
+    needs: [detect-changes, release-skill]
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync marketplace versions
+        run: |
+          set -e
+          MARKETPLACE_JSON=".claude-plugin/marketplace.json"
+          if [ ! -f "$MARKETPLACE_JSON" ]; then
+            echo "No marketplace.json found, skipping"
+            exit 0
+          fi
+
+          UPDATED=false
+          for PLUGIN_DIR in */; do
+            PLUGIN="${PLUGIN_DIR%/}"
+            VERSION_FILE="$PLUGIN/.version"
+            if [ -f "$VERSION_FILE" ] && [ -f "$PLUGIN/.claude-plugin/plugin.json" ]; then
+              VERSION=$(cat "$VERSION_FILE")
+              CURRENT=$(jq -r --arg name "$PLUGIN" '.plugins[] | select(.name == $name) | .version' "$MARKETPLACE_JSON")
+              if [ "$CURRENT" != "$VERSION" ]; then
+                jq --arg name "$PLUGIN" --arg v "$VERSION" \
+                  '(.plugins[] | select(.name == $name)).version = $v' \
+                  "$MARKETPLACE_JSON" > tmp.json && mv tmp.json "$MARKETPLACE_JSON"
+                echo "Updated $PLUGIN in marketplace.json to $VERSION"
+                UPDATED=true
+              fi
+            fi
+          done
+
+          if [ "$UPDATED" = "true" ]; then
+            git add "$MARKETPLACE_JSON"
+            git commit -m "chore: sync marketplace.json versions [skip ci]"
+
+            MAX_RETRIES=5
+            RETRY_COUNT=0
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              git pull --rebase origin main || true
+              if git push origin main; then
+                echo "Marketplace versions synced successfully"
+                break
+              else
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                  echo "Push failed, retrying in 2 seconds... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+                  sleep 2
+                else
+                  echo "Failed to push after $MAX_RETRIES attempts"
+                  exit 1
+                fi
+              fi
+            done
+          else
+            echo "Marketplace versions already up to date"
+          fi
