@@ -1,38 +1,44 @@
 # Pearmill Skills
 
-Collection of Claude Skills for common workflows and integrations.
+Collection of Claude Skills for common workflows and integrations. Each skill is also a Claude Code plugin that ships with its MCP server.
 
 ## Available Skills
 
-- **google-ads** - Google Ads performance reports and analytics
-- **meta-ads** - Meta Ads reporting and campaign management skill
+- **hopkin-meta-ads** - Meta Ads performance reports and analytics via Hopkin MCP
+- **hopkin-google-ads** - Google Ads performance reports and analytics via Hopkin MCP
+
+## Install as Claude Code Plugins
+
+Add this repo as a plugin marketplace, then install individual plugins:
+
+```bash
+/plugin marketplace add pearmill/claude-skills
+/plugin install hopkin-meta-ads@pearmill
+/plugin install hopkin-google-ads@pearmill
+```
+
+Each plugin ships with the Hopkin MCP server configured automatically. Users authenticate through the MCP's built-in OAuth flow (via https://app.hopkin.ai).
 
 ## Packaging Skills
 
-Use the `package-skill.sh` script to create versioned zip archives of skills.
+Use the `package-plugin.sh` script to create versioned zip archives of skills.
 
 ### Usage
 
 ```bash
-./package-skill.sh <skill-name> [version]
+./package-plugin.sh <skill-name> [version]
 ```
 
 ### Examples
 
 **Package with auto-detected version:**
 ```bash
-./package-skill.sh meta-ads
+./package-plugin.sh hopkin-meta-ads
 ```
-The script will automatically extract the version from the skill's SKILL.md file.
 
 **Package with specific version:**
 ```bash
-./package-skill.sh meta-ads 1.0.1
-```
-
-**Package with custom version:**
-```bash
-./package-skill.sh meta-ads 2.0.0-beta
+./package-plugin.sh hopkin-meta-ads 1.0.1
 ```
 
 ### Output
@@ -42,66 +48,48 @@ Packaged skills are saved to the `releases/` directory with the naming format:
 releases/<skill-name>-v<version>.zip
 ```
 
-Example: `releases/meta-ads-v1.0.zip`
-
-### What Gets Packaged
-
-The script includes:
-- All skill files (SKILL.md, reference files, workflows, etc.)
-- Preserves directory structure
-
-The script excludes:
-- `.git` directory
-- `node_modules`
-- `.DS_Store` files
-- Python cache files (`__pycache__`, `*.pyc`)
-- IDE configuration (`.vscode`, `.idea`)
-
-### Version Detection
-
-The script automatically detects the version from the skill's SKILL.md file by looking for:
-```markdown
-**Skill Version:** 1.0
-```
-
-If no version is found, it falls back to a timestamp-based version (e.g., `20260119-171900`).
-
 ## Directory Structure
 
 ```
 pearmill-skills/
-├── README.md                    # This file
-├── package-skill.sh             # Packaging script
-├── releases/                    # Packaged skill zip files
-│   ├── google-ads-v1.0.zip
-│   └── meta-ads-v1.0.zip
-├── google-ads/                  # Google Ads skill
-│   ├── SKILL.md
-│   └── references/
-│       ├── mcp-tools-reference.md
-│       ├── troubleshooting.md
-│       └── workflows/
-│           ├── ad-performance.md
-│           ├── budget-spend.md
-│           ├── campaign-performance.md
-│           └── keyword-analysis.md
-└── meta-ads/                    # Meta Ads skill
-    ├── SKILL.md
-    └── references/
-        ├── report-types.md
-        ├── mcp-tools-reference.md
-        ├── troubleshooting.md
-        └── workflows/
-            ├── campaign-performance.md
-            ├── ad-creative-performance.md
-            ├── audience-insights.md
-            ├── budget-pacing.md
-            └── common-actions.md
+├── .claude-plugin/
+│   └── marketplace.json             # Plugin marketplace catalog
+├── README.md
+├── package-plugin.sh                 # Packaging script
+├── hopkin-meta-ads/                 # Meta Ads plugin
+│   ├── .claude-plugin/
+│   │   └── plugin.json              # Plugin manifest
+│   ├── .mcp.json                    # MCP server config (remote URL)
+│   ├── .version
+│   └── skills/
+│       └── hopkin-meta-ads/
+│           ├── SKILL.md
+│           └── references/
+│               ├── mcp-tools-reference.md
+│               ├── report-types.md
+│               ├── troubleshooting.md
+│               └── workflows/
+└── hopkin-google-ads/               # Google Ads plugin
+    ├── .claude-plugin/
+    │   └── plugin.json
+    ├── .mcp.json
+    ├── .version
+    └── skills/
+        └── hopkin-google-ads/
+            ├── SKILL.md
+            └── references/
+                ├── mcp-tools-reference.md
+                ├── troubleshooting.md
+                └── workflows/
 ```
 
 ## Adding New Skills
 
 1. Create a new directory with the skill name (e.g., `my-skill`)
-2. Add a `SKILL.md` file with proper frontmatter and version
-3. Add any reference documentation as needed
-4. Package using `./package-skill.sh my-skill`
+2. Create the plugin structure:
+   - `.claude-plugin/plugin.json` with name, version, description
+   - `.mcp.json` with the MCP server URL config
+   - `skills/<skill-name>/SKILL.md` with the skill content
+   - `skills/<skill-name>/references/` for reference documentation
+3. Add the plugin to `.claude-plugin/marketplace.json`
+4. Package using `./package-plugin.sh my-skill`

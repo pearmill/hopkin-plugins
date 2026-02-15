@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Package Claude Skill to versioned zip file
-# Usage: ./package-skill.sh <skill-name> [version]
-# Example: ./package-skill.sh meta-ads
-# Example: ./package-skill.sh meta-ads 1.0.1
+# Package Claude Code plugin to versioned zip file
+# Usage: ./package-plugin.sh <plugin-name> [version]
+# Example: ./package-plugin.sh hopkin-meta-ads
+# Example: ./package-plugin.sh hopkin-meta-ads 1.0.1
 
 set -e
 
@@ -48,9 +48,9 @@ if [ ! -d "$SKILL_DIR" ]; then
     exit 1
 fi
 
-# Check if SKILL.md exists
-if [ ! -f "$SKILL_DIR/SKILL.md" ]; then
-    print_error "SKILL.md not found in $SKILL_DIR"
+# Check if SKILL.md exists (plugin structure: skills/<name>/SKILL.md)
+if [ ! -f "$SKILL_DIR/skills/$SKILL_NAME/SKILL.md" ]; then
+    print_error "SKILL.md not found in $SKILL_DIR/skills/$SKILL_NAME/"
     exit 1
 fi
 
@@ -60,8 +60,8 @@ if [ -n "$2" ]; then
     VERSION="$2"
     print_info "Using provided version: $VERSION"
 else
-    # Try to extract version from SKILL.md
-    VERSION=$(grep -E "^\*\*Skill Version:\*\*" "$SKILL_DIR/SKILL.md" | sed -E 's/.*Version:\*\* ([0-9.]+).*/\1/' | head -1)
+    # Try to extract version from SKILL.md (plugin structure)
+    VERSION=$(grep -E "^\*\*Skill Version:\*\*" "$SKILL_DIR/skills/$SKILL_NAME/SKILL.md" | sed -E 's/.*Version:\*\* ([0-9.]+).*/\1/' | head -1)
 
     if [ -z "$VERSION" ]; then
         # Fallback to timestamp-based version
