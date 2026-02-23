@@ -286,6 +286,7 @@ jobs:
               const latest = await put('skills/' + skill + '/latest.zip', file, {
                 access: 'public',
                 addRandomSuffix: false,
+                allowOverwrite: true,
               });
               console.log('Uploaded latest:', latest.url);
 
@@ -293,6 +294,7 @@ jobs:
               const versioned = await put('skills/' + skill + '/v' + version + '.zip', file, {
                 access: 'public',
                 addRandomSuffix: false,
+                allowOverwrite: true,
               });
               console.log('Uploaded versioned:', versioned.url);
             }
