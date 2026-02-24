@@ -108,6 +108,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 ### Analytics
 - `google_ads_get_performance_report` — **Recommended.** Full-funnel report with funnel metrics (impressions, clicks, cost, ROAS) plus conversion breakdown by conversion action name — runs two queries in parallel
+- `google_ads_get_geo_performance` — Geographic performance breakdown by country, city, region, metro, or other geo levels. Uses `geographic_view` resource with automatic geo name resolution. Runs a parallel conversion breakdown query. **Only tool that supports geographic segments** — do not use `google_ads_get_insights` for geo data.
 - `google_ads_get_insights` — Custom analytics: full control over metrics, segments, and GAQL; use when `google_ads_get_performance_report` does not cover the required custom query
 
 ### Conversion Actions
@@ -135,10 +136,11 @@ This skill supports four primary report types and a developer feedback workflow 
 
 ### Report Types
 
-1. **Campaign Performance Reports** — Overall campaign metrics, spending, ROAS, and performance analysis
-2. **Keyword Analysis Reports** — Keyword performance, quality scores, search terms, and optimization opportunities
-3. **Ad Performance Reports** — Individual ad performance, RSA analysis, and creative effectiveness
-4. **Budget & Spend Reports** — Budget tracking, spend pacing, cost analysis, and forecasting
+1. **Geographic Performance Reports** — Location-based performance by country, city, region, metro, or other geo levels
+2. **Campaign Performance Reports** — Overall campaign metrics, spending, ROAS, and performance analysis
+3. **Keyword Analysis Reports** — Keyword performance, quality scores, search terms, and optimization opportunities
+4. **Ad Performance Reports** — Individual ad performance, RSA analysis, and creative effectiveness
+5. **Budget & Spend Reports** — Budget tracking, spend pacing, cost analysis, and forecasting
 
 ### Write Operations (Unsupported — Developer Feedback)
 
@@ -169,6 +171,16 @@ This helps the Hopkin team prioritize building tools that make common workflows 
 Users can provide feedback about this skill directly through the Hopkin Google Ads MCP. If a user wants to suggest improvements, report issues, or request new capabilities, call `google_ads_developer_feedback` on their behalf with the appropriate `feedback_type` (`new_tool`, `improvement`, `bug`, or `workflow_gap`) and include their feedback in the `description`.
 
 ## Report Workflows
+
+### Geographic Performance Report
+
+Analyze campaign performance across geographic locations — countries, cities, regions, metros, and more. Identify top-performing geographies, underperforming regions, and geo-targeting opportunities.
+
+**Primary tool:** `google_ads_get_geo_performance` — dedicated tool for geographic data using the `geographic_view` resource with automatic geo name resolution
+
+**See detailed workflow:** **references/workflows/geo-performance.md**
+
+---
 
 ### Campaign Performance Report
 
@@ -235,6 +247,14 @@ Choose metrics appropriate to campaign goal:
 - **Conversions:** Conversions, conversion value, ROAS, cost per conversion, conversion rate
 - **Keywords:** Quality score, search impression share, top-of-page rate
 
+### Geographic Analysis Best Practices
+
+- **Use the dedicated tool:** Geographic segments (`geo_target_city`, `geo_target_region`, etc.) are only available on the `geographic_view` resource. Always use `google_ads_get_geo_performance` — never attempt geographic breakdowns via `google_ads_get_insights`.
+- **One geo level per query:** Combining multiple geo levels (e.g., country + city) in a single query causes silent data loss in the Google Ads API. Run separate queries for each geo level.
+- **Mind the location type:** Results include both `LOCATION_OF_PRESENCE` (user physically there) and `AREA_OF_INTEREST` (user searching about the location). Distinguish between these when making targeting recommendations — physical presence is more reliable for local businesses.
+- **Use campaign filters for granularity:** At city/metro level, data can be sparse. Filter to a specific `campaign_id` to reduce noise and focus the analysis.
+- **Limit appropriately:** Sub-country geo levels can return many rows. Use the `limit` parameter (up to 200) and note that results are ordered by cost descending by default, surfacing the highest-spend locations first.
+
 ### Customer ID Formatting
 
 **CRITICAL:** Google Ads customer IDs must be without hyphens:
@@ -286,12 +306,13 @@ For more detailed information:
 - **references/mcp-tools-reference.md** — Complete Hopkin MCP tool documentation, parameters, and usage examples
 - **references/troubleshooting.md** — Comprehensive error solutions and debugging steps
 - **references/workflows/campaign-performance.md** — Detailed campaign performance report workflow
+- **references/workflows/geo-performance.md** — Detailed geographic performance report workflow
 - **references/workflows/keyword-analysis.md** — Detailed keyword analysis report workflow
 - **references/workflows/ad-performance.md** — Detailed ad performance report workflow
 - **references/workflows/budget-spend.md** — Detailed budget & spend report workflow
 
 ---
 
-**Skill Version:** 2.0
-**Last Updated:** 2026-02-10
+**Skill Version:** 2.1
+**Last Updated:** 2026-02-24
 **Requires:** Hopkin Google Ads MCP (https://app.hopkin.ai)

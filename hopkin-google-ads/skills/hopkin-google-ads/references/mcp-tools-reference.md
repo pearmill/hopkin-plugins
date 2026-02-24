@@ -283,8 +283,71 @@ This tool runs two parallel queries:
 
 ---
 
+#### google_ads_get_geo_performance
+Geographic performance breakdown using the `geographic_view` resource. This is the **only tool that supports geographic segments** — do not use `google_ads_get_insights` for geo data. Runs two parallel queries: geographic metrics + conversion breakdown (with graceful degradation). Location criterion IDs are automatically resolved to human-readable names.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC
+- `date_preset` (string) — Date range preset (e.g., `"LAST_7_DAYS"`, `"LAST_30_DAYS"`, `"THIS_MONTH"`). Required if `date_range` not provided.
+- `date_range` (object) — Custom date range with `start_date` and `end_date` (YYYY-MM-DD). Required if `date_preset` not provided.
+- `geo_level` (string, optional) — Geographic granularity (default: `"country"`). Options: `"country"`, `"geo_target_city"`, `"geo_target_region"`, `"geo_target_state"`, `"geo_target_metro"`, `"geo_target_province"`, `"geo_target_county"`, `"geo_target_district"`, `"geo_target_most_specific_location"`, `"geo_target_postal_code"`, `"geo_target_airport"`, `"geo_target_canton"`. **Only one geo level per query** — combining levels causes silent data loss.
+- `level` (string, optional) — Aggregation level: `"ACCOUNT"`, `"CAMPAIGN"` (default), `"AD_GROUP"`
+- `segments` (array of strings, optional) — Non-geo segments: `"date"`, `"device"`, `"ad_network_type"`
+- `campaign_id` (string, optional) — Filter to a specific campaign
+- `ad_group_id` (string, optional) — Filter to a specific ad group
+- `limit` (number, optional) — Max results (1–200, default 50)
+
+**Returns:**
+- `data` — Geographic performance rows with resolved location names
+- `conversion_breakdown` — Per-entity, per-conversion-action metrics
+- `count`, `geo_level`, `level`, `date_range`/`date_preset`, `fetched_at` — Metadata
+
+**Example — Country-level by campaign:**
+```json
+{
+  "tool": "google_ads_get_geo_performance",
+  "parameters": {
+    "reason": "Analyzing geographic performance by country",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_7_DAYS"
+  }
+}
+```
+
+**Example — City-level for specific campaign:**
+```json
+{
+  "tool": "google_ads_get_geo_performance",
+  "parameters": {
+    "reason": "City-level breakdown for Brand Search campaign",
+    "customer_id": "1234567890",
+    "campaign_id": "123456789",
+    "geo_level": "geo_target_city",
+    "date_preset": "LAST_30_DAYS",
+    "limit": 100
+  }
+}
+```
+
+**Example — Daily country trends:**
+```json
+{
+  "tool": "google_ads_get_geo_performance",
+  "parameters": {
+    "reason": "Daily geographic trends by country",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_7_DAYS",
+    "segments": ["date"]
+  }
+}
+```
+
+---
+
 #### google_ads_get_insights
-Custom analytics with full control over metrics, segments, and GAQL. Use when `google_ads_get_performance_report` does not cover the required query (e.g., custom metric selection, specialized segments, or conversion action segments).
+Custom analytics with full control over metrics, segments, and GAQL. Use when `google_ads_get_performance_report` does not cover the required query (e.g., custom metric selection, specialized segments, or conversion action segments). **Note:** Geographic segments are not available through this tool — use `google_ads_get_geo_performance` instead.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -591,26 +654,36 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 3. Identify top performers, underperformers, and negative keyword candidates
 4. Provide keyword optimization recommendations
 
-### Pattern 3: Ad Creative Analysis
+### Pattern 3: Geographic Performance Analysis
+**Workflow:**
+1. Use `google_ads_get_geo_performance` with `geo_level: "country"` for a high-level geographic overview
+2. Drill into specific geographies with `geo_level: "geo_target_city"` or `"geo_target_metro"` filtered by `campaign_id`
+3. Compare LOCATION_OF_PRESENCE vs AREA_OF_INTEREST performance
+4. Identify high-spend, low-conversion geographies as exclusion candidates
+5. Recommend geo bid adjustments based on CPA/ROAS differences across locations
+
+**Important:** Only one geo level per query. Do not use `google_ads_get_insights` for geographic data.
+
+### Pattern 4: Ad Creative Analysis
 **Workflow:**
 1. Use `google_ads_list_ads` to get ads for a campaign
 2. Use `google_ads_get_insights` with `level: "AD"` for ad-level metrics
 3. Compare creative variations and identify top performers
 
-### Pattern 4: Budget & Spend Analysis
+### Pattern 5: Budget & Spend Analysis
 **Workflow:**
 1. Use `google_ads_list_campaigns` for budget data
 2. Use `google_ads_get_insights` with `segments: ["date"]` for daily spend trends
 3. Calculate pacing metrics
 4. Recommend budget adjustments
 
-### Pattern 5: Write Operation Requested (Developer Feedback)
+### Pattern 6: Write Operation Requested (Developer Feedback)
 **Workflow:**
 1. Inform the user that write operations are not yet available via Hopkin
 2. Call `google_ads_developer_feedback` with `feedback_type: "workflow_gap"`
 3. Provide guidance on how to perform the action manually via Google Ads
 
-### Pattern 6: Proactive Efficiency Feedback
+### Pattern 7: Proactive Efficiency Feedback
 **When:** After completing any task where you believe a faster path should have existed — e.g., you needed multiple calls that could have been one, had to manually compute something the tool could return, or a dedicated tool for the workflow was missing.
 
 **Workflow:**
@@ -682,6 +755,6 @@ Hopkin tools use cursor-based pagination:
 
 ---
 
-**Document Version:** 2.0
-**Last Updated:** 2026-02-10
+**Document Version:** 2.1
+**Last Updated:** 2026-02-24
 **Service:** Hopkin Google Ads MCP (https://app.hopkin.ai)
