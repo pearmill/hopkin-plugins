@@ -235,17 +235,29 @@ jobs:
           cat changelog.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Package plugin
+      - name: Package skill
         if: steps.check_release.outputs.exists == 'false'
         run: |
           set -e
           SKILL="${{ matrix.skill }}"
           VERSION="${{ steps.version.outputs.version }}"
 
-          chmod +x package-plugin.sh
-          ./package-plugin.sh "$SKILL" "$VERSION"
+          mkdir -p releases
 
-          # Verify the package was created (note: package-skill.sh adds 'v' prefix)
+          # Package only the skills/<name>/ subdirectory
+          TEMP_DIR=$(mktemp -d)
+          cp -R "$SKILL/skills/$SKILL" "$TEMP_DIR/$SKILL"
+
+          # Remove unnecessary files
+          find "$TEMP_DIR/$SKILL" -name ".DS_Store" -delete
+
+          cd "$TEMP_DIR"
+          zip -r -q "$SKILL.zip" "$SKILL"
+          cd - > /dev/null
+
+          mv "$TEMP_DIR/$SKILL.zip" "releases/${SKILL}-v${VERSION}.zip"
+          rm -rf "$TEMP_DIR"
+
           PACKAGE_FILE="releases/${SKILL}-v${VERSION}.zip"
           if [ ! -f "$PACKAGE_FILE" ]; then
             echo "Error: Package file not created at $PACKAGE_FILE"
