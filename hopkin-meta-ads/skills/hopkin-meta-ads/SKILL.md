@@ -65,47 +65,60 @@ If no `meta_ads_` prefixed tools are available:
 
 After confirming the MCP is available, authenticate the user's Meta Ads account:
 
-1. **Check auth status:** Call `meta_ads_check_auth_status` to see if the user is already authenticated
-2. **If not authenticated:** Call `meta_ads_get_login_url` and present the URL to the user so they can authenticate via Meta's OAuth flow
-3. **Verify identity:** Call `meta_ads_get_user_info` to confirm successful authentication
+1. **Check auth status:** Call `meta_ads_check_auth_status` to see if the user is already authenticated and to get their user info
+2. **If not authenticated:** Inform the user they need to connect their Meta Ads account via Hopkin at https://app.hopkin.ai and pause execution until they confirm it is done
+3. **Re-verify:** Call `meta_ads_check_auth_status` again to confirm successful authentication
+
+### Quick Start with Preferences
+
+At the start of any session, before asking for an account ID, call `meta_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "default"` to check if the user has a stored default account. If a `default_account_id` preference exists, use it automatically and mention it: "Using your saved account [X]. Use a different one? Let me know." If no stored preference exists, proceed to ask for or look up the account ID.
 
 ### Required Information
 
 Before generating reports, confirm you have:
 
 - **Ad Account ID** — The Meta Ads account to query (format: act_XXXXXXXXXXXXX). If the user mentions a client name, use `meta_ads_list_ad_accounts` to search for their account before asking for an ID.
-- **Date Range** — Time period for data (or use presets like last_7d, last_30d)
+- **Date Range** — Time period for data (use `time_range` with since/until in YYYY-MM-DD format for `meta_ads_get_performance_report`, or `date_preset` presets like last_7d/last_30d for `meta_ads_get_insights`)
+
+### Multi-Account Selection
+
+When `meta_ads_list_ad_accounts` returns multiple accounts:
+
+1. Present them as a numbered list with account name and ID
+2. Ask the user to confirm which account to use: "I found [N] ad accounts. Which one should I use?"
+3. After the user selects, offer to save it: "Would you like me to save this as your default account so we can skip this step next time?"
+4. If yes, call `meta_ads_store_preference` with `entity_type: "ad_account"`, `entity_id: "default"`, `key: "default_account_id"`, and `value: "<selected_account_id>"`
+5. If the user already has a `default_account_id` stored preference, use it automatically but mention it: "Using your saved account [X]. Use a different one? Let me know."
 
 ## Available MCP Tools
 
 ### Authentication
 - `meta_ads_ping` — Check MCP connectivity
-- `meta_ads_check_auth_status` — Check if user is authenticated
-- `meta_ads_get_login_url` — Get OAuth login URL for authentication
-- `meta_ads_get_user_info` — Get authenticated user info
+- `meta_ads_check_auth_status` — Check if user is authenticated and get user profile info
 
 ### Accounts
-- `meta_ads_list_ad_accounts` — List accessible ad accounts
-- `meta_ads_get_ad_account` — Get details for a specific account
+- `meta_ads_list_ad_accounts` — List accessible ad accounts (supports search, status filter, lookup by ID, pagination)
 
 ### Campaigns
-- `meta_ads_list_campaigns` — List campaigns for an account
-- `meta_ads_get_campaign` — Get details for a specific campaign
+- `meta_ads_list_campaigns` — List campaigns for an account (supports status filter, name search, lookup by ID, pagination)
 
 ### Ad Sets
-- `meta_ads_list_adsets` — List ad sets for an account or campaign
-- `meta_ads_get_adset` — Get details for a specific ad set
+- `meta_ads_list_adsets` — List ad sets for an account or campaign (supports status filter, name search, lookup by ID, pagination)
 
 ### Ads
-- `meta_ads_list_ads` — List ads for an account, campaign, or ad set
-- `meta_ads_get_ad` — Get details for a specific ad
+- `meta_ads_list_ads` — List ads for an account, campaign, or ad set (supports status filter, name search, lookup by ID, pagination)
 
 ### Analytics
-- `meta_ads_get_performance_report` — **Recommended.** Full-funnel performance report (always includes impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, quality rankings)
-- `meta_ads_get_insights` — Flexible insights with custom breakdowns and metrics
+- `meta_ads_get_performance_report` — **Recommended.** Full-funnel performance report (always includes impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, quality rankings). Requires `time_range` with explicit since/until dates.
+- `meta_ads_get_insights` — Flexible insights with custom breakdowns, metrics, and date presets
 
 ### Creative
-- `meta_ads_preview_ads` — Preview actual ad creatives with metrics overlay
+- `meta_ads_preview_ads` — **MCP App.** Renders a visual UI with actual ad creative (images/videos) and a configurable metrics overlay — not tabular data. Proactively offer this whenever the user asks "what do my ads look like", wants to review creative quality, or is doing A/B creative comparison. Takes a list of ad IDs with optional per-ad metric values.
+
+### Preferences
+- `meta_ads_store_preference` — Store a persistent preference or observation about an ad entity (account, campaign, ad set, or ad)
+- `meta_ads_get_preferences` — Get all stored preferences for an ad entity
+- `meta_ads_delete_preference` — Delete a specific stored preference by key
 
 ### Feedback
 - `meta_ads_developer_feedback` — Submit feature requests and workflow gap reports
@@ -247,7 +260,7 @@ Always include: spend, impressions/reach, and at least one efficiency metric.
 
 When errors occur:
 
-1. **Check authentication** — Run `meta_ads_check_auth_status`; if not authenticated, use `meta_ads_get_login_url`
+1. **Check authentication** — Run `meta_ads_check_auth_status`; if not authenticated, direct the user to connect their account at https://app.hopkin.ai
 2. **Validate inputs** — Ensure Ad Account ID starts with "act_", date ranges are valid
 3. **Inspect error messages** — Hopkin errors include specific guidance
 4. **Retry with adjusted parameters** — Try smaller date ranges or fewer breakdowns
@@ -262,7 +275,7 @@ For detailed troubleshooting guidance, see **references/troubleshooting.md**.
 Common quick fixes:
 
 - **"MCP server not found"** — Verify Hopkin MCP configuration and token
-- **"Not authenticated"** — Run auth flow: `meta_ads_check_auth_status` → `meta_ads_get_login_url`
+- **"Not authenticated"** — Run `meta_ads_check_auth_status`; if not authenticated, direct user to https://app.hopkin.ai to connect their Meta Ads account
 - **"Account not found"** — Verify Ad Account ID format (starts with "act_")
 - **"Rate limit exceeded"** — Wait and retry; reduce request frequency
 - **"No data available"** — Check date range and campaign activity during period

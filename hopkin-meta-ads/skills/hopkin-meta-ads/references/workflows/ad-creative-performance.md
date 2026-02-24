@@ -15,8 +15,8 @@ This workflow is particularly useful when:
 
 - `meta_ads_get_performance_report` with `level: "ad"` — Get ad-level performance metrics (recommended, includes full funnel)
 - `meta_ads_get_insights` with `level: "ad"` — For custom breakdowns at ad level
-- `meta_ads_preview_ads` — Preview actual ad creatives with metrics overlay
-- `meta_ads_list_ads` — List ads for a campaign or ad set
+- `meta_ads_preview_ads` — **Crown jewel of creative reporting.** An MCP App that renders a visual UI showing actual ad images/videos with a configurable metrics overlay — not tabular data. This is the definitive way to review creative quality. Proactively offer it whenever the user asks "what do my ads look like", wants to review creative quality, is doing A/B creative comparison, or when presenting winners/losers. Requires ad IDs from `meta_ads_list_ads` and optional metrics from the performance tools.
+- `meta_ads_list_ads` — List ads for a campaign or ad set (use to collect ad IDs before calling `meta_ads_preview_ads`)
 
 ## Required Information
 
@@ -163,18 +163,22 @@ Before starting this workflow, gather:
 **Steps:**
 
 1. **Get creative previews via Hopkin:**
-   - Use `meta_ads_preview_ads` to preview actual ad creatives with metrics overlay:
+   - `meta_ads_preview_ads` is an MCP App that renders actual visual ad creative (images/videos) with a metrics overlay in an interactive UI — distinct from tabular data tools. It is the definitive way to let stakeholders see what the ads look like. Proactively offer it in any creative review context.
+   - First, collect ad IDs from `meta_ads_list_ads` and metrics from `meta_ads_get_performance_report` or `meta_ads_get_insights`, then pass them together:
      ```json
      {
        "tool": "meta_ads_preview_ads",
        "parameters": {
-         "reason": "Previewing ad creatives for creative test report",
+         "reason": "Rendering creative visual preview with performance metrics for creative test report",
          "account_id": "act_123456789",
-         "campaign_id": "123456789"
+         "ads": [
+           {"ad_id": "23842453456789", "metrics": {"spend": "450.00", "cpa": "$12.50", "ctr": "3.2%"}},
+           {"ad_id": "23842453456790", "metrics": {"spend": "380.00", "cpa": "$45.00", "ctr": "1.1%"}}
+         ],
+         "metric_labels": {"spend": "Spend", "cpa": "CPA", "ctr": "CTR"}
        }
      }
      ```
-   - This tool shows actual ad creatives including images, text, and performance data
    - For video ads, get both the video file and a thumbnail/poster frame
 
 2. **Download assets for key creatives:**
@@ -664,7 +668,13 @@ For video ads, include additional video performance metrics:
 
 ## Best Practices
 
-1. **ALWAYS include creative visuals in reports** - Never present creative test results without showing the actual ads
+1. **ALWAYS use `meta_ads_preview_ads` for creative review** — This MCP App renders a visual UI with actual images/videos and metrics side-by-side. It is the most powerful tool in this workflow. Use it:
+   - Whenever the user asks "what do my ads look like" or wants to review creative
+   - When presenting winners and losers — visual context makes insights actionable
+   - For A/B creative comparisons — seeing the creative alongside the number is essential
+   - Always pull ad IDs with `meta_ads_list_ads` and metrics with the performance report first, then pass them together to `meta_ads_preview_ads`
+
+2. **ALWAYS include creative visuals in reports** - Never present creative test results without showing the actual ads
    - Winners and top losers must have images/videos included
    - For Notion: Download from Meta first, then upload to Notion (never use Meta URLs directly)
    - Stakeholders need to see what worked/failed, not just read metrics

@@ -4,17 +4,24 @@
 Generate campaign-level performance metrics including impressions, clicks, conversions, cost, and ROAS.
 
 ## Primary Tool
-Use `google_ads_get_insights` with `level: "CAMPAIGN"` for campaign performance reports.
+Use `google_ads_get_performance_report` with `level: "CAMPAIGN"` for campaign performance reports. This tool runs two parallel queries in a single call:
+
+1. **Funnel metrics** — impressions, clicks, cost, CTR, avg CPC, CPM, conversions (total), conversion value, cost per conversion, conversion rate, search impression share
+2. **Conversion breakdown** — per-conversion-action conversions, value, and value/conversion segmented by `conversion_action_name`, grouped by campaign ID
+
+This gives a complete picture of both top-level delivery metrics and the specific conversion actions driving results, without needing a separate `google_ads_get_insights` call.
+
+Use `google_ads_get_insights` only when you need custom metric selection, specialized GAQL, or segments not supported by `google_ads_get_performance_report`.
 
 ## Required Parameters
 - **customer_id**: Google Ads account ID (format: 1234567890, no hyphens)
 - **Date range**: Use `date_preset` (e.g., `"LAST_30_DAYS"`) or `date_range` with `start_date` and `end_date`
 
-## Using google_ads_get_insights
+## Using google_ads_get_performance_report
 
 ```json
 {
-  "tool": "google_ads_get_insights",
+  "tool": "google_ads_get_performance_report",
   "parameters": {
     "reason": "Generating campaign performance report for last 30 days",
     "customer_id": "1234567890",
@@ -27,7 +34,7 @@ Use `google_ads_get_insights` with `level: "CAMPAIGN"` for campaign performance 
 **With custom date range:**
 ```json
 {
-  "tool": "google_ads_get_insights",
+  "tool": "google_ads_get_performance_report",
   "parameters": {
     "reason": "Analyzing campaign performance for January 2026",
     "customer_id": "1234567890",
@@ -40,13 +47,27 @@ Use `google_ads_get_insights` with `level: "CAMPAIGN"` for campaign performance 
 **With daily breakdown:**
 ```json
 {
-  "tool": "google_ads_get_insights",
+  "tool": "google_ads_get_performance_report",
   "parameters": {
     "reason": "Getting daily campaign performance trends",
     "customer_id": "1234567890",
     "level": "CAMPAIGN",
     "date_preset": "LAST_30_DAYS",
     "segments": ["date"]
+  }
+}
+```
+
+**MCC managed account:**
+```json
+{
+  "tool": "google_ads_get_performance_report",
+  "parameters": {
+    "reason": "Campaign performance for client managed under MCC",
+    "customer_id": "1234567890",
+    "login_customer_id": "9999999999",
+    "level": "CAMPAIGN",
+    "date_preset": "LAST_30_DAYS"
   }
 }
 ```

@@ -65,8 +65,11 @@ If no `google_ads_` prefixed tools are available:
 After confirming the MCP is available, authenticate the user's Google Ads account:
 
 1. **Check auth status:** Call `google_ads_check_auth_status` to see if the user is already authenticated
-2. **If not authenticated:** Call `google_ads_get_login_url` and present the URL to the user so they can authenticate via Google's OAuth flow
-3. **Verify identity:** Call `google_ads_get_user_info` to confirm successful authentication
+2. **If not authenticated:** Inform the user that they need to connect their Google Ads account via https://app.hopkin.ai and follow the OAuth flow there
+
+### Quick Start with Preferences
+
+At the start of any session, call `google_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "global"` to check if the user has a stored default customer ID (and `login_customer_id` if applicable). If preferences are found, use them automatically without asking the user. After the user selects or confirms an account, offer to store it as a preference for future sessions using `google_ads_store_preference`.
 
 ### Required Information
 
@@ -75,36 +78,51 @@ Before generating reports, confirm you have:
 - **Customer ID** — The Google Ads account to query (format: 1234567890, without hyphens). If the user mentions a client name, use `google_ads_list_accounts` to find their account.
 - **Date Range** — Time period for data (use presets like LAST_7_DAYS, LAST_30_DAYS, or custom date range)
 
+### Manager (MCC) Accounts
+
+Some Google Ads users manage multiple client accounts through a Manager (MCC) account. When this is the case:
+
+- **What `login_customer_id` is:** The MCC/manager account ID used to authenticate access to a child (client) account. It tells the API which manager account is making the request on behalf of the child account.
+- **How to detect if it's needed:** If `google_ads_list_accounts` returns accounts with a `managerCustomerId` field, or if `google_ads_list_mcc_child_accounts` returns results, or if the user says they manage client accounts.
+- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_performance_report`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`
+- **What happens without it:** Permission errors when trying to query accounts managed under an MCC. The error message will hint that `login_customer_id` is required.
+
 ## Available MCP Tools
 
 ### Authentication
-- `google_ads_check_auth_status` — Check if user is authenticated
-- `google_ads_get_login_url` — Get OAuth login URL for authentication
-- `google_ads_get_user_info` — Get authenticated user info
+- `google_ads_check_auth_status` — Check if user is authenticated; only call when another tool returns an auth error
+- `google_ads_ping` — Health check; verify the MCP server is reachable
 
 ### Accounts
-- `google_ads_list_accounts` — List accessible Google Ads accounts
-- `google_ads_get_account` — Get details for a specific account
+- `google_ads_list_accounts` — List accessible Google Ads accounts; child accounts include `managerCustomerId` indicating the MCC parent
 - `google_ads_list_mcc_child_accounts` — List child accounts under a Manager (MCC) account
 
 ### Campaigns
 - `google_ads_list_campaigns` — List campaigns for an account
-- `google_ads_get_campaign` — Get details for a specific campaign
 
 ### Ad Groups
 - `google_ads_list_ad_groups` — List ad groups for a campaign or account
-- `google_ads_get_ad_group` — Get details for a specific ad group
 
 ### Ads
 - `google_ads_list_ads` — List ads for an account, campaign, or ad group
-- `google_ads_get_ad` — Get details for a specific ad
 
 ### Analytics
-- `google_ads_get_insights` — Performance insights with date presets, custom ranges, levels, metrics, and segments
+- `google_ads_get_performance_report` — **Recommended.** Full-funnel report with funnel metrics (impressions, clicks, cost, ROAS) plus conversion breakdown by conversion action name — runs two queries in parallel
+- `google_ads_get_insights` — Custom analytics: full control over metrics, segments, and GAQL; use when `google_ads_get_performance_report` does not cover the required custom query
+
+### Conversion Actions
+- `google_ads_get_conversion_actions` — List conversion actions by status — foundational for understanding what conversions are tracked before interpreting ROAS or conversion metrics
+
+> **Guidance:** Before analyzing conversion metrics or ROAS for any account, call `google_ads_get_conversion_actions` to establish which conversion actions are active and which are included in the aggregate "Conversions" metric.
 
 ### Keywords
 - `google_ads_get_keyword_performance` — Keyword metrics with quality scores, match type filtering, and ordering
 - `google_ads_get_search_terms_report` — Search terms report with status filtering and ordering
+
+### Preferences
+- `google_ads_store_preference` — Store a persistent preference or observation for a Google Ads entity (account, campaign, ad group, or ad)
+- `google_ads_get_preferences` — Retrieve all stored preferences for a Google Ads entity
+- `google_ads_delete_preference` — Delete a specific stored preference by key
 
 ### Feedback
 - `google_ads_developer_feedback` — Submit feature requests and workflow gap reports
@@ -156,7 +174,7 @@ Users can provide feedback about this skill directly through the Hopkin Google A
 
 Analyze overall campaign performance, compare campaigns across an account, identify top and bottom performers, understand ROAS and conversion metrics, and evaluate campaign effectiveness.
 
-**Primary tool:** `google_ads_get_insights` with `level: "CAMPAIGN"`
+**Primary tool:** `google_ads_get_performance_report` with `level: "CAMPAIGN"` — provides full-funnel metrics plus per-conversion-action breakdowns in a single call
 
 **See detailed workflow:** **references/workflows/campaign-performance.md**
 
@@ -239,7 +257,7 @@ When users provide customer IDs with hyphens, remove them before making API call
 
 When errors occur:
 
-1. **Check authentication** — Run `google_ads_check_auth_status`; if not authenticated, use `google_ads_get_login_url`
+1. **Check authentication** — Run `google_ads_check_auth_status`; if not authenticated, direct the user to connect their account at https://app.hopkin.ai
 2. **Validate inputs** — Ensure customer ID is 10 digits with no hyphens
 3. **Inspect error messages** — Hopkin errors include specific guidance
 4. **Retry with adjusted parameters** — Try shorter date ranges or simpler queries
@@ -254,7 +272,7 @@ For detailed troubleshooting guidance, see **references/troubleshooting.md**.
 Common quick fixes:
 
 - **"MCP server not found"** — Verify Hopkin MCP configuration and token
-- **"Not authenticated"** — Run auth flow: `google_ads_check_auth_status` → `google_ads_get_login_url`
+- **"Not authenticated"** — Run `google_ads_check_auth_status`; direct user to connect their account at https://app.hopkin.ai
 - **"Invalid customer ID"** — Remove hyphens from customer ID (use 1234567890, not 123-456-7890)
 - **"Account not found"** — Verify customer ID and account access
 - **"No data available"** — Check date range and campaign activity during period

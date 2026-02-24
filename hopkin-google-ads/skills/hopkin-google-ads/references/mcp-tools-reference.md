@@ -61,26 +61,7 @@ Hopkin uses an OAuth flow for connecting to Google Ads accounts. After the MCP i
    }
    ```
 
-2. **If not authenticated, get login URL:**
-   ```json
-   {
-     "tool": "google_ads_get_login_url",
-     "parameters": {
-       "reason": "User needs to authenticate with Google Ads"
-     }
-   }
-   ```
-   Present the returned URL to the user. They will authenticate via Google's OAuth flow.
-
-3. **Verify authentication:**
-   ```json
-   {
-     "tool": "google_ads_get_user_info",
-     "parameters": {
-       "reason": "Verifying user identity after authentication"
-     }
-   }
-   ```
+2. **If not authenticated:** Direct the user to connect their Google Ads account at https://app.hopkin.ai. The OAuth flow is completed through the Hopkin web app, not through an MCP tool.
 
 ---
 
@@ -91,32 +72,31 @@ Hopkin uses an OAuth flow for connecting to Google Ads accounts. After the MCP i
 ### Authentication Tools
 
 #### google_ads_check_auth_status
-Check whether the user has authenticated their Google Ads account.
+Check whether the user has authenticated their Google Ads account. Only call this when another tool returns a permission or authentication error — do not call proactively.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 
-#### google_ads_get_login_url
-Get an OAuth login URL so the user can authenticate with Google Ads.
+#### google_ads_ping
+Health check. Verify the MCP server is reachable and returns version/timestamp.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
-
-#### google_ads_get_user_info
-Get information about the authenticated Google Ads user.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
+- `message` (string, optional) — Optional echo message
 
 ---
 
 ### Account Tools
 
 #### google_ads_list_accounts
-List all Google Ads accounts accessible to the authenticated user.
+List all Google Ads accounts accessible to the authenticated user. Child accounts include a `managerCustomerId` field indicating their parent MCC — when querying those accounts with other tools, pass `login_customer_id` with that value.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
+- `customer_id` (string, optional) — Get a single account by ID
+- `customer_ids` (array of strings, optional) — Get multiple accounts by ID in one call
+- `search` (string, optional) — Filter accounts by name
+- `refresh` (boolean, optional) — Force fresh data bypassing cache
 - `limit` (number, optional) — Max results per page (1–100, default 25)
 - `nextCursor` (string, optional) — Pagination cursor from previous response
 
@@ -130,31 +110,13 @@ List all Google Ads accounts accessible to the authenticated user.
 }
 ```
 
-#### google_ads_get_account
-Get details for a specific Google Ads account.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `customer_id` (string, required) — Google Ads customer ID (format: 1234567890, no hyphens)
-
-**Example:**
-```json
-{
-  "tool": "google_ads_get_account",
-  "parameters": {
-    "reason": "Getting account details for reporting",
-    "customer_id": "1234567890"
-  }
-}
-```
-
 #### google_ads_list_mcc_child_accounts
-List child accounts under a Manager (MCC) account.
+List child accounts under a Manager (MCC) account. When querying these child accounts with other tools, pass `login_customer_id` with the MCC Customer ID.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
-- `customer_id` (string, required) — Manager account customer ID
-- `login_customer_id` (string, optional) — The manager account ID to use for authentication (required when accessing child accounts through a manager)
+- `mcc_id` (string, required) — Manager (MCC) account customer ID
+- `search` (string, optional) — Filter child accounts by name
 - `limit` (number, optional) — Max results per page (1–100)
 - `nextCursor` (string, optional) — Pagination cursor
 
@@ -164,7 +126,7 @@ List child accounts under a Manager (MCC) account.
   "tool": "google_ads_list_mcc_child_accounts",
   "parameters": {
     "reason": "Listing child accounts under MCC for client selection",
-    "customer_id": "1234567890"
+    "mcc_id": "9999999999"
   }
 }
 ```
@@ -179,7 +141,12 @@ List campaigns for a Google Ads account.
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `customer_id` (string, required) — Google Ads customer ID
-- `status` (string, optional) — Filter by status (e.g., "ENABLED", "PAUSED")
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
+- `campaign_id` (string, optional) — Get a single campaign by ID
+- `campaign_ids` (array of strings, optional) — Get multiple campaigns by ID in one call
+- `status` (array of strings, optional) — Filter by status (e.g., `["ENABLED"]`, `["PAUSED"]`)
+- `search` (string, optional) — Filter by campaign name
+- `refresh` (boolean, optional) — Force fresh data bypassing cache
 - `limit` (number, optional) — Max results per page (1–100)
 - `nextCursor` (string, optional) — Pagination cursor
 
@@ -190,18 +157,22 @@ List campaigns for a Google Ads account.
   "parameters": {
     "reason": "Listing active campaigns for performance analysis",
     "customer_id": "1234567890",
-    "status": "ENABLED"
+    "status": ["ENABLED"]
   }
 }
 ```
 
-#### google_ads_get_campaign
-Get details for a specific campaign.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `customer_id` (string, required) — Google Ads customer ID
-- `campaign_id` (string, required) — Campaign ID
+**Example — MCC child account:**
+```json
+{
+  "tool": "google_ads_list_campaigns",
+  "parameters": {
+    "reason": "Listing campaigns for MCC-managed client account",
+    "customer_id": "1234567890",
+    "login_customer_id": "9999999999"
+  }
+}
+```
 
 ---
 
@@ -213,18 +184,15 @@ List ad groups for a campaign or account.
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
 - `campaign_id` (string, optional) — Filter by campaign
-- `status` (string, optional) — Filter by status
+- `ad_group_id` (string, optional) — Get a single ad group by ID
+- `ad_group_ids` (array of strings, optional) — Get multiple ad groups by ID in one call
+- `status` (array of strings, optional) — Filter by status (e.g., `["ENABLED"]`)
+- `search` (string, optional) — Filter by ad group name
+- `refresh` (boolean, optional) — Force fresh data bypassing cache
 - `limit` (number, optional) — Max results per page (1–100)
 - `nextCursor` (string, optional) — Pagination cursor
-
-#### google_ads_get_ad_group
-Get details for a specific ad group.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `customer_id` (string, required) — Google Ads customer ID
-- `ad_group_id` (string, required) — Ad group ID
 
 ---
 
@@ -236,35 +204,97 @@ List ads for an account, campaign, or ad group.
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
 - `campaign_id` (string, optional) — Filter by campaign
 - `ad_group_id` (string, optional) — Filter by ad group
-- `status` (string, optional) — Filter by status
+- `ad_id` (string, optional) — Get a single ad by ID
+- `ad_ids` (array of strings, optional) — Get multiple ads by ID in one call
+- `status` (array of strings, optional) — Filter by status (e.g., `["ENABLED"]`)
+- `search` (string, optional) — Filter by ad name/content
+- `refresh` (boolean, optional) — Force fresh data bypassing cache
 - `limit` (number, optional) — Max results per page (1–100)
 - `nextCursor` (string, optional) — Pagination cursor
-
-#### google_ads_get_ad
-Get details for a specific ad.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `customer_id` (string, required) — Google Ads customer ID
-- `ad_id` (string, required) — Ad ID
 
 ---
 
 ### Analytics Tools
 
-#### google_ads_get_insights
-Get performance insights for campaigns, ad groups, or ads.
+#### google_ads_get_performance_report
+**Recommended analytics tool.** Comprehensive performance report providing full delivery-to-conversion funnel metrics AND per-conversion-action breakdowns. Preferred over `google_ads_get_insights` for standard performance analysis.
+
+This tool runs two parallel queries:
+1. **Funnel query** — impressions, clicks, cost, CTR, avg CPC, CPM, conversions (total), conversion value, cost per conversion, conversion rate. At CAMPAIGN level, search impression share is also included.
+2. **Conversion breakdown query** — per-conversion-action conversions, conversion value, and value per conversion (segmented by `conversion_action_name`), grouped by entity ID.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
+- `date_preset` (string) — Date range preset (e.g., `"LAST_7_DAYS"`, `"LAST_30_DAYS"`, `"THIS_MONTH"`). Required if `date_range` not provided.
+- `date_range` (object) — Custom date range with `start_date` and `end_date` (YYYY-MM-DD). Required if `date_preset` not provided.
+- `level` (string, optional) — Aggregation level: `"ACCOUNT"`, `"CAMPAIGN"` (default), `"AD_GROUP"`, or `"AD"`
+- `segments` (array of strings, optional) — Additional breakdown dimensions: `"date"`, `"device"`, `"ad_network_type"`
+- `campaign_id` (string, optional) — Filter to a specific campaign
+- `ad_group_id` (string, optional) — Filter to a specific ad group
+
+**Returns:**
+- `data` — Top-level funnel metrics per entity
+- `conversion_breakdown` — Per-entity, per-conversion-action metrics grouped by entity ID
+- `count`, `level`, `date_range`/`date_preset`, `segments`, `fetched_at` — Metadata
+
+**Example — Campaign overview:**
+```json
+{
+  "tool": "google_ads_get_performance_report",
+  "parameters": {
+    "reason": "Generating campaign performance report for last 30 days",
+    "customer_id": "1234567890",
+    "level": "CAMPAIGN",
+    "date_preset": "LAST_30_DAYS"
+  }
+}
+```
+
+**Example — Daily trend:**
+```json
+{
+  "tool": "google_ads_get_performance_report",
+  "parameters": {
+    "reason": "Getting daily performance trend",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_7_DAYS",
+    "segments": ["date"]
+  }
+}
+```
+
+**Example — MCC child account:**
+```json
+{
+  "tool": "google_ads_get_performance_report",
+  "parameters": {
+    "reason": "Campaign performance for managed client",
+    "customer_id": "1234567890",
+    "login_customer_id": "9999999999",
+    "date_preset": "LAST_30_DAYS"
+  }
+}
+```
+
+---
+
+#### google_ads_get_insights
+Custom analytics with full control over metrics, segments, and GAQL. Use when `google_ads_get_performance_report` does not cover the required query (e.g., custom metric selection, specialized segments, or conversion action segments).
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
 - `date_preset` (string, optional) — Date range preset (e.g., `"LAST_7_DAYS"`, `"LAST_30_DAYS"`, `"THIS_MONTH"`)
 - `date_range` (object, optional) — Custom date range with `start_date` and `end_date` (YYYY-MM-DD)
-- `level` (string, optional) — Aggregation level: `"CAMPAIGN"`, `"AD_GROUP"`, `"AD"`
+- `level` (string, optional) — Aggregation level: `"ACCOUNT"`, `"CAMPAIGN"`, `"AD_GROUP"`, `"AD"`
 - `metrics` (array, optional) — Specific metrics to include
-- `segments` (array, optional) — Segmentation dimensions (e.g., `["date"]`, `["device"]`)
+- `segments` (array, optional) — Segmentation dimensions (e.g., `["date"]`, `["device"]`, `["conversion_action_name"]`)
 - `campaign_id` (string, optional) — Filter to specific campaign
 - `ad_group_id` (string, optional) — Filter to specific ad group
 - `limit` (number, optional) — Max results per page (1–100)
@@ -313,17 +343,50 @@ Get performance insights for campaigns, ad groups, or ads.
 
 ---
 
-### Keyword Tools
+### Conversion Action Tools
 
-#### google_ads_get_keyword_performance
-Get keyword performance data with quality scores and all key metrics.
+#### google_ads_get_conversion_actions
+List all conversion actions configured for a Google Ads account. Call this tool before analyzing conversion metrics, ROAS, or conversion breakdowns to understand which actions are tracked and which are included in the aggregate "Conversions" metric.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
+- `status` (string, optional) — Filter by `"ENABLED"`, `"REMOVED"`, or `"HIDDEN"` (defaults to all non-REMOVED)
+- `limit` (number, optional) — Max results (default 100, max 500)
+
+**Returns:**
+- `data` — Array of conversion actions with `id`, `name`, `type` (WEBPAGE, PHONE_CALL, etc.), `category` (PURCHASE, LEAD, SIGNUP, etc.), `status`, `counting_type`, `origin`, `primary_for_goal`, `include_in_conversions_metric`
+- `count` — Total number returned
+- `fetched_at` — Timestamp
+
+**Example:**
+```json
+{
+  "tool": "google_ads_get_conversion_actions",
+  "parameters": {
+    "reason": "Understanding which conversion actions are active before analyzing ROAS",
+    "customer_id": "1234567890",
+    "status": "ENABLED"
+  }
+}
+```
+
+---
+
+### Keyword Tools
+
+#### google_ads_get_keyword_performance
+Get keyword performance data with quality scores and all key metrics. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
 - `campaign_id` (string, optional) — Filter by campaign
 - `ad_group_id` (string, optional) — Filter by ad group
 - `keyword_match_type` (string, optional) — Filter by match type (e.g., `"EXACT"`, `"PHRASE"`, `"BROAD"`)
+- `status` (array of strings, optional) — Filter by status (e.g., `["ENABLED"]`)
 - `order_by` (string, optional) — Sort field (e.g., `"cost"`, `"conversions"`, `"impressions"`)
 - `limit` (number, optional) — Max results per page (1–100)
 - `nextCursor` (string, optional) — Pagination cursor
@@ -343,14 +406,15 @@ Get keyword performance data with quality scores and all key metrics.
 ```
 
 #### google_ads_get_search_terms_report
-Get search terms report showing which actual search queries triggered ads.
+Get search terms report showing which actual search queries triggered ads. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
 - `campaign_id` (string, optional) — Filter by campaign
 - `ad_group_id` (string, optional) — Filter by ad group
-- `search_term_status` (string, optional) — Filter by status (e.g., `"ADDED"`, `"EXCLUDED"`, `"NONE"`)
+- `search_term_status` (array of strings, optional) — Filter by status (e.g., `["ADDED"]`, `["EXCLUDED"]`, `["NONE"]`)
 - `order_by` (string, optional) — Sort field
 - `limit` (number, optional) — Max results per page (1–100)
 - `nextCursor` (string, optional) — Pagination cursor
@@ -371,13 +435,96 @@ Get search terms report showing which actual search queries triggered ads.
 
 ---
 
-### Utility Tools
+### Preference Tools
 
-#### google_ads_ping
-Check that the Hopkin Google Ads MCP is reachable.
+Preferences allow persistent storage of settings and observations across sessions. Entity listing tools (e.g., `google_ads_list_accounts`) automatically attach stored preferences to each entity in the response as `_stored_preferences`.
+
+**Session start pattern:** At the start of a session, call `google_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "global"` to retrieve stored defaults (e.g., `default_customer_id`, `default_login_customer_id`). If found, use them automatically.
+
+**After account selection:** Offer to store the selected account using `google_ads_store_preference` so it is available in future sessions.
+
+#### google_ads_store_preference
+Store a persistent preference or observation for a Google Ads entity.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
+- `entity_type` (string, required) — Entity type: `"ad_account"`, `"campaign"`, `"ad_set"` (= ad group), or `"ad"`
+- `entity_id` (string, required) — The Google Ads entity ID (use `"global"` for account-level defaults)
+- `key` (string, required) — Preference key (e.g., `"default_customer_id"`, `"preferred_conversion_metric"`)
+- `value` (any, required) — The preference value — string, number, boolean, or object
+- `source` (string, optional) — Who set this: `"agent"` (default), `"user"`, or `"system"`
+- `note` (string, optional) — Context about why this preference was set
+
+**Example — Store default account:**
+```json
+{
+  "tool": "google_ads_store_preference",
+  "parameters": {
+    "reason": "User confirmed this is their default account",
+    "entity_type": "ad_account",
+    "entity_id": "global",
+    "key": "default_customer_id",
+    "value": "1234567890",
+    "note": "Set after user confirmed account selection"
+  }
+}
+```
+
+**Example — Store default MCC login:**
+```json
+{
+  "tool": "google_ads_store_preference",
+  "parameters": {
+    "reason": "Storing MCC ID for future managed account queries",
+    "entity_type": "ad_account",
+    "entity_id": "global",
+    "key": "default_login_customer_id",
+    "value": "9999999999"
+  }
+}
+```
+
+#### google_ads_get_preferences
+Retrieve all stored preferences for a Google Ads entity.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `entity_type` (string, required) — Entity type: `"ad_account"`, `"campaign"`, `"ad_set"` (= ad group), or `"ad"`
+- `entity_id` (string, required) — The Google Ads entity ID (use `"global"` for account-level defaults)
+
+**Example:**
+```json
+{
+  "tool": "google_ads_get_preferences",
+  "parameters": {
+    "reason": "Checking for stored default customer ID at session start",
+    "entity_type": "ad_account",
+    "entity_id": "global"
+  }
+}
+```
+
+#### google_ads_delete_preference
+Delete a specific stored preference by key.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `entity_type` (string, required) — Entity type: `"ad_account"`, `"campaign"`, `"ad_set"` (= ad group), or `"ad"`
+- `entity_id` (string, required) — The Google Ads entity ID
+- `key` (string, required) — The preference key to delete
+
+**Example:**
+```json
+{
+  "tool": "google_ads_delete_preference",
+  "parameters": {
+    "reason": "User wants to clear the stored default account",
+    "entity_type": "ad_account",
+    "entity_id": "global",
+    "key": "default_customer_id"
+  }
+}
+```
 
 ---
 
@@ -434,7 +581,7 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 ### Pattern 1: Account Overview & Performance Report
 **Workflow:**
 1. Use `google_ads_list_accounts` to find the correct account
-2. Use `google_ads_get_insights` with `level: "CAMPAIGN"` for campaign performance
+2. Use `google_ads_get_performance_report` with `level: "CAMPAIGN"` for campaign performance including per-conversion-action breakdowns
 3. Present report with summary statistics and insights
 
 ### Pattern 2: Keyword Analysis
@@ -521,14 +668,14 @@ Hopkin tools use cursor-based pagination:
 
 ### Common Error Types
 
-- **Authentication errors** — User not authenticated or session expired. Call `google_ads_get_login_url` to re-authenticate.
+- **Authentication errors** — User not authenticated or session expired. Call `google_ads_check_auth_status` to confirm, then direct the user to connect their account at https://app.hopkin.ai.
 - **Invalid customer ID** — Ensure customer ID is 10 digits with no hyphens
 - **Rate limiting** — Wait and retry with exponential backoff
 - **Account not found** — Verify customer ID and user access
 
 ### Error Handling Best Practices
 
-1. **Always check auth first** — If tools return auth errors, run `google_ads_check_auth_status` and `google_ads_get_login_url` if needed
+1. **Always check auth first** — If tools return auth errors, run `google_ads_check_auth_status` and direct the user to https://app.hopkin.ai to re-authenticate
 2. **Validate customer ID format** — 10 digits, no hyphens (1234567890 not 123-456-7890)
 3. **Handle pagination** — Don't assume all results are in the first page
 4. **Provide clear messages** — Translate errors into user-friendly guidance
