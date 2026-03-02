@@ -1,0 +1,16 @@
+{
+  "name": "hopkin-linkedin-ads",
+  "version": "1.0.0",
+  "description": "Build reports and analyze LinkedIn Ads campaigns using the Hopkin LinkedIn Ads MCP",
+  "author": {
+    "name": "Hopkin"
+  },
+  "homepage": "https://app.hopkin.ai",
+  "keywords": [
+    "linkedin-ads",
+    "linkedin",
+    "advertising",
+    "analytics",
+    "hopkin"
+  ]
+}

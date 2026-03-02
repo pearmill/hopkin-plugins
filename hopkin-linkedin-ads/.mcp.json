@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "hopkin-linkedin-ads": {
+      "type": "url",
+      "url": "https://mcp.hopkin.ai/linkedin-ads/mcp"
+    }
+  }
+}
