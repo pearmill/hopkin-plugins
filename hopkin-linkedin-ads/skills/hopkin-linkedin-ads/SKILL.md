@@ -34,7 +34,7 @@ Inform the user and provide setup instructions:
 >   "mcpServers": {
 >     "hopkin-linkedin-ads": {
 >       "type": "url",
->       "url": "https://mcp.hopkin.ai/linkedin-ads/mcp",
+>       "url": "https://linkedin.mcp.hopkin.ai/mcp",
 >       "headers": {
 >         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
 >       }

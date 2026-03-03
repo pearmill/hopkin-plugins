@@ -46,7 +46,7 @@ If no `google_ads_` prefixed tools are available:
 >   "mcpServers": {
 >     "hopkin-google-ads": {
 >       "type": "url",
->       "url": "https://mcp.hopkin.ai/google-ads/mcp",
+>       "url": "https://google.mcp.hopkin.ai/mcp",
 >       "headers": {
 >         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
 >       }

@@ -31,7 +31,7 @@ Configure the Hopkin Meta Ads MCP as a hosted MCP service in your Claude setting
   "mcpServers": {
     "hopkin-meta-ads": {
       "type": "url",
-      "url": "https://mcp.hopkin.ai/meta-ads/mcp",
+      "url": "https://meta.mcp.hopkin.ai/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
       }

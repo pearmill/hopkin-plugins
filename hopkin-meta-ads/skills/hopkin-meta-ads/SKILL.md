@@ -47,7 +47,7 @@ If no `meta_ads_` prefixed tools are available:
 >   "mcpServers": {
 >     "hopkin-meta-ads": {
 >       "type": "url",
->       "url": "https://mcp.hopkin.ai/meta-ads/mcp",
+>       "url": "https://meta.mcp.hopkin.ai/mcp",
 >       "headers": {
 >         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
 >       }

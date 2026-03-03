@@ -38,7 +38,7 @@ This guide provides solutions to common issues encountered when using the Google
   "mcpServers": {
     "hopkin-google-ads": {
       "type": "url",
-      "url": "https://mcp.hopkin.ai/google-ads/mcp",
+      "url": "https://google.mcp.hopkin.ai/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
       }
@@ -53,7 +53,7 @@ This guide provides solutions to common issues encountered when using the Google
 
 If the MCP is configured but tools aren't appearing:
 1. Check that the Hopkin token is correct and not expired
-2. Verify the MCP URL is exactly: `https://mcp.hopkin.ai/google-ads/mcp`
+2. Verify the MCP URL is exactly: `https://google.mcp.hopkin.ai/mcp`
 3. Ensure the Authorization header format is: `Bearer YOUR_TOKEN` (with a space after Bearer)
 
 #### Solution 3: Restart Claude

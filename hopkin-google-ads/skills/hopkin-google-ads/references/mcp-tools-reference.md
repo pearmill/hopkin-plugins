@@ -31,7 +31,7 @@ Configure the Hopkin Google Ads MCP as a hosted MCP service in your Claude setti
   "mcpServers": {
     "hopkin-google-ads": {
       "type": "url",
-      "url": "https://mcp.hopkin.ai/google-ads/mcp",
+      "url": "https://google.mcp.hopkin.ai/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
       }

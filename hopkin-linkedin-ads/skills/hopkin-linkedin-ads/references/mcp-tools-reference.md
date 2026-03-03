@@ -31,7 +31,7 @@ Configure the Hopkin LinkedIn Ads MCP as a hosted MCP service in your Claude set
   "mcpServers": {
     "hopkin-linkedin-ads": {
       "type": "url",
-      "url": "https://mcp.hopkin.ai/linkedin-ads/mcp",
+      "url": "https://linkedin.mcp.hopkin.ai/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
       }
