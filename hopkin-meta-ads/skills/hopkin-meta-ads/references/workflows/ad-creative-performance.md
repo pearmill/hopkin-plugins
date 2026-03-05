@@ -28,7 +28,7 @@ Before starting this workflow, gather:
 - **Primary Success Metric** — Main metric to evaluate creative (CPA, ROAS, CPL, etc.)
 - **Secondary Metrics** (optional) — Supporting metrics (CTR, CVR, CPC, etc.)
 - **Benchmark** — Reference point for comparison (previous round, evergreen average, target)
-- **Output Format** — Desired report format (Notion, Slides/PowerPoint, PDF, Excel/Sheets, or combination)
+- **Output Format** — Desired report format (Slides/PowerPoint, PDF, Excel, or combination)
   - If not specified by user, ask explicitly before building the report
 
 ## Detailed Workflow
@@ -45,7 +45,7 @@ Before starting this workflow, gather:
    - Note campaign IDs and ad set IDs in scope
 
 2. **Check project management tools:**
-   - Look for the latest "Creative Round" or "Creative Test" task in Notion, ClickUp, Notion, Gmail or other project communciation /management tools you have access to
+   - Look for the latest "Creative Round" or "Creative Test" task in ClickUp, Gmail, or other project communication/management tools you have access to
    - Note which campaigns/ad sets are referenced for this account (or client)
    - Check for any specific instructions or context
 
@@ -83,14 +83,12 @@ Before starting this workflow, gather:
 8. **Confirm output format:**
    - Ask: "What format would you like for this creative test report?"
    - Common options:
-     - **Notion page** - For internal collaboration, easy updates, and rich formatting
      - **Google Slides / PowerPoint** - For client presentations with visuals
      - **PDF** - For formal reports or email distribution
-     - **Excel / Google Sheets** - For data-heavy analysis with pivot tables
+     - **Excel** - For data-heavy analysis with pivot tables
      - **Combination** - e.g., Slides for executive summary + Excel for detailed data
-   - If not specified by user, ask explicitly: "I'll be preparing a creative test report for [Client]. What format works best for you - Notion, Slides, PDF, Excel, or something else?"
+   - If not specified by user, ask explicitly: "I'll be preparing a creative test report for [Client]. What format works best for you - Slides, PDF, Excel, or something else?"
    - Document the chosen format and adjust report structure accordingly:
-     - **Notion:** Use rich text, toggle sections, embedded tables, image galleries
      - **Slides/PowerPoint:** Focus on visuals, charts, screenshots; limit text per slide
      - **PDF:** Professional formatting, clear sections, tables with good spacing
      - **Excel:** Multiple tabs for different views, pivot tables, sortable columns
@@ -189,20 +187,6 @@ Before starting this workflow, gather:
 
 3. **Format-specific asset handling:**
 
-   **For Notion reports:**
-   - **Download assets locally first:**
-     - Use Meta's creative preview URL to download images/videos to local machine
-     - Save with descriptive filenames: `[client]-[concept]-[ad-id].jpg/mp4`
-     - Example: `acme-3signs-listicle-123456.jpg`
-   - **Upload to Notion:**
-     - Upload downloaded files directly to Notion page
-     - Do NOT use external Meta URLs (they expire and break)
-     - Place images inline in relevant sections (Winners, Losers)
-     - For videos: Upload to Notion or use a stable video host (Vimeo, YouTube unlisted)
-   - **Add captions:**
-     - Label each asset with ad name and key metric
-     - Example: "3 Signs Listicle - $12.50 CPA (30% better than benchmark)"
-
    **For Slides/PowerPoint reports:**
    - Download assets locally
    - Insert images/videos directly into slides
@@ -213,10 +197,10 @@ Before starting this workflow, gather:
    **For PDF reports:**
    - Download assets locally
    - Embed images directly in document
-   - For videos: Include representative thumbnail/screenshot with note "Video - see Notion/link for full asset"
+   - For videos: Include representative thumbnail/screenshot with note "Video - see [link] for full asset"
    - Keep file size manageable (<10MB) - compress images if needed
 
-   **For Excel/Sheets reports:**
+   **For Excel reports:**
    - Download thumbnails/screenshots
    - Insert images in a dedicated "Creative Previews" tab
    - Link from data rows to preview images
@@ -422,14 +406,6 @@ Before starting this workflow, gather:
 
 **Format-Specific Considerations:**
 
-**For Notion:**
-- Use toggle blocks for detailed sections (allow readers to expand/collapse)
-- Embed tables directly for performance data
-- Use image galleries or inline images for creative previews
-- Add callout blocks for key insights and recommendations
-- Link to other Notion pages (dashboards, previous rounds) where relevant
-- Use database views for sortable/filterable ad performance tables
-
 **For Google Slides / PowerPoint:**
 - Limit text per slide (max 3-5 bullets or 1 chart + brief explanation)
 - Use visual hierarchy: large chart/screenshot + supporting text
@@ -446,7 +422,7 @@ Before starting this workflow, gather:
 - Use consistent fonts and professional styling
 - Consider adding footer with report date and version
 
-**For Excel / Google Sheets:**
+**For Excel:**
 - Create separate tabs for different views:
   - "Summary" - Executive overview with key metrics
   - "By Concept" - Concept-level performance
@@ -497,17 +473,13 @@ Before starting this workflow, gather:
 For each key winner:
 
 **Creative Visual (Required):**
-- **Notion:** Upload downloaded image/video directly to the page
-  - Place inline, not as a file attachment
-  - For videos: Embed the video player or use first frame + link
-  - Add caption: "[Ad Name] - [Primary Metric Value]"
 - **Slides/PowerPoint:** Insert downloaded image/video on slide
   - Use large, prominent placement (half to full slide)
   - For videos: Use thumbnail + "Watch Video" indicator, or embed if presenting live
 - **PDF:** Embed downloaded image
   - Size appropriately (3-5 inches wide/tall)
   - For videos: Use thumbnail + note "Video available at [link]"
-- **Excel/Sheets:** Link to image in Creative Previews tab
+- **Excel:** Link to image in Creative Previews tab
   - Or embed thumbnail in cell using Insert > Image
 
 **Key metrics:**
@@ -598,14 +570,6 @@ Focus on instructive underperformers:
    - ✓ Are images/videos high quality and clearly visible?
    - ✓ Are captions accurate and include key metrics?
 
-   **For Notion:**
-   - Are all images loading properly and displaying inline (not as attachments)?
-   - Did you upload assets to Notion (NOT link to Meta URLs)?
-   - Do toggle sections work correctly?
-   - Are tables displaying with correct formatting?
-   - Do links to other pages work?
-   - For videos: Are they playing correctly in Notion?
-
    **For Slides/PowerPoint:**
    - Does each slide have a clear title?
    - Are images high-resolution and properly sized (min 1920x1080)?
@@ -621,7 +585,7 @@ Focus on instructive underperformers:
    - Is the file size reasonable (<10MB)?
    - Does the table of contents have accurate page numbers?
 
-   **For Excel/Sheets:**
+   **For Excel:**
    - Do all formulas calculate correctly?
    - Are tabs labeled clearly?
    - Do filters and sorts work properly?
@@ -678,7 +642,7 @@ For video ads, include additional video performance metrics:
 
 3. **ALWAYS include creative visuals in reports** - Never present creative test results without showing the actual ads
    - Winners and top losers must have images/videos included
-   - For Notion: Download from Meta first, then upload to Notion (never use Meta URLs directly)
+   - Always download assets locally first before embedding in reports (Meta URLs expire)
    - Stakeholders need to see what worked/failed, not just read metrics
    - Creative insights are meaningless without seeing the creative
 
@@ -686,7 +650,7 @@ For video ads, include additional video performance metrics:
 
 5. **Align on metrics early** - Primary metric should be clear from the start
 
-6. **Confirm output format upfront** - Ask what format they want (Notion, Slides, PDF, Excel) before building
+6. **Confirm output format upfront** - Ask what format they want (Slides, PDF, Excel) before building
 
 7. **Define benchmarks explicitly** - Don't rely on intuition for winner/loser calls
 
@@ -710,8 +674,8 @@ For video ads, include additional video performance metrics:
   - Showing only metrics without visuals makes insights impossible to understand
   - Stakeholders can't learn what works if they can't see the creatives
 
-- **Using Meta URLs directly in Notion** - These expire and break
-  - Always download assets locally first, then upload to Notion
+- **Using Meta URLs directly in reports** - These expire and break
+  - Always download assets locally first, then embed in your report
   - Test that all images/videos are displaying before sharing report
 
 - **Showing every single ad** - Focus on winners and instructive losers
@@ -730,7 +694,7 @@ For video ads, include additional video performance metrics:
 
 - **Not documenting methodology** - Clients need to understand how you defined success
 
-- **Not confirming output format** - Building a Slides deck when they wanted Notion wastes time
+- **Not confirming output format** - Building the wrong format wastes time
 
 ## See Also
 
