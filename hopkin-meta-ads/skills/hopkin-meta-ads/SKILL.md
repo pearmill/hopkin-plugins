@@ -109,7 +109,8 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 - `meta_ads_list_ads` — List ads for an account, campaign, or ad set (supports status filter, name search, lookup by ID, pagination)
 
 ### Analytics
-- `meta_ads_get_performance_report` — **Recommended.** Full-funnel performance report (always includes impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, quality rankings). Requires `time_range` with explicit since/until dates.
+- `meta_ads_get_performance_report` — **Recommended for campaign/account/adset-level analysis.** Full-funnel performance report (always includes impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, quality rankings). Requires `time_range` with explicit since/until dates. Supports `level`: account (default), campaign, adset, ad.
+- `meta_ads_get_ad_creative_report` — **Recommended for ad creative analysis.** Ad-level performance report with full funnel metrics and creative asset info (asset_type, asset_url, thumbnail_url). Supports two grouping modes via `level`: `ad_name` (default, aggregates ads with the same name across ad sets — returns a representative ad_id usable with `meta_ads_preview_ads`) or `ad_id` (one row per ad). Use this instead of `meta_ads_get_performance_report` with `level: "ad"` for creative analysis.
 - `meta_ads_get_insights` — Flexible insights with custom breakdowns, metrics, and date presets
 
 ### Creative
@@ -180,7 +181,7 @@ Analyze overall campaign performance, compare campaigns across an account, ident
 
 Evaluate individual ad creative effectiveness, conduct A/B testing analysis, identify best-performing ad formats, and preview actual ad creatives with performance data.
 
-**Primary tools:** `meta_ads_get_performance_report` with `level: "ad"` + `meta_ads_preview_ads`
+**Primary tools:** `meta_ads_get_ad_creative_report` + `meta_ads_preview_ads`
 
 **See detailed workflow:** **references/workflows/ad-creative-performance.md**
 
@@ -297,6 +298,6 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 2.0
-**Last Updated:** 2026-02-10
+**Skill Version:** 2.1
+**Last Updated:** 2026-03-04
 **Requires:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
