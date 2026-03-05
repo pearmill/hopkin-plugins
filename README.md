@@ -1,95 +1,64 @@
-# Pearmill Skills
+# Hopkin Plugins for Claude
 
-Collection of Claude Skills for common workflows and integrations. Each skill is also a Claude Code plugin that ships with its MCP server.
+**Stop switching tabs. Get your ad performance inside Claude.**
 
-## Available Skills
+Hopkin connects your Meta, Google, and LinkedIn Ads accounts directly to Claude — so you can ask questions, pull reports, and surface insights without touching a dashboard.
 
-- **hopkin-meta-ads** - Meta Ads performance reports and analytics via Hopkin MCP
-- **hopkin-google-ads** - Google Ads performance reports and analytics via Hopkin MCP
+## What You Can Do
 
-## Install as Claude Code Plugins
+Ask Claude things like:
 
-Add this repo as a plugin marketplace, then install individual plugins:
+- *"Which Meta campaigns are above target CPA this week?"*
+- *"Compare Google vs Meta spend and ROAS for the last 30 days."*
+- *"Rank my creatives by CPA and show demographic breakdowns."*
+- *"Flag any campaigns that underspent their budget this month."*
+- *"How are my LinkedIn Ads performing compared to Meta this quarter?"*
 
-```bash
-/plugin marketplace add pearmill/claude-skills
-/plugin install hopkin-meta-ads@pearmill
-/plugin install hopkin-google-ads@pearmill
-```
+Claude answers with real data from your accounts — no copy-pasting, no pivot tables, no dashboard fatigue.
 
-Each plugin ships with the Hopkin MCP server configured automatically. Users authenticate through the MCP's built-in OAuth flow (via https://app.hopkin.ai).
+## Install in 30 Seconds
 
-## Packaging Skills
-
-Use the `package-plugin.sh` script to create versioned zip archives of skills.
-
-### Usage
+Add the Hopkin plugin marketplace to Claude Code, then install the platforms you use:
 
 ```bash
-./package-plugin.sh <skill-name> [version]
+/plugin marketplace add hopkin/hopkin-plugins
 ```
 
-### Examples
-
-**Package with auto-detected version:**
+**Meta Ads:**
 ```bash
-./package-plugin.sh hopkin-meta-ads
+/plugin install hopkin-meta-ads@hopkin
 ```
 
-**Package with specific version:**
+**Google Ads:**
 ```bash
-./package-plugin.sh hopkin-meta-ads 1.0.1
+/plugin install hopkin-google-ads@hopkin
 ```
 
-### Output
-
-Packaged skills are saved to the `releases/` directory with the naming format:
-```
-releases/<skill-name>-v<version>.zip
+**LinkedIn Ads:**
+```bash
+/plugin install hopkin-linkedin-ads@hopkin
 ```
 
-## Directory Structure
+After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai). No credentials are stored — read-only access only.
 
-```
-pearmill-skills/
-├── .claude-plugin/
-│   └── marketplace.json             # Plugin marketplace catalog
-├── README.md
-├── package-plugin.sh                 # Packaging script
-├── hopkin-meta-ads/                 # Meta Ads plugin
-│   ├── .claude-plugin/
-│   │   └── plugin.json              # Plugin manifest
-│   ├── .mcp.json                    # MCP server config (remote URL)
-│   ├── .version
-│   └── skills/
-│       └── hopkin-meta-ads/
-│           ├── SKILL.md
-│           └── references/
-│               ├── mcp-tools-reference.md
-│               ├── report-types.md
-│               ├── troubleshooting.md
-│               └── workflows/
-└── hopkin-google-ads/               # Google Ads plugin
-    ├── .claude-plugin/
-    │   └── plugin.json
-    ├── .mcp.json
-    ├── .version
-    └── skills/
-        └── hopkin-google-ads/
-            ├── SKILL.md
-            └── references/
-                ├── mcp-tools-reference.md
-                ├── troubleshooting.md
-                └── workflows/
-```
+## Why Hopkin
 
-## Adding New Skills
+Most ad teams repeat the same workflows every week: morning performance checks, cross-platform comparisons, creative ranking, client reporting. Hopkin turns those into one-line questions.
 
-1. Create a new directory with the skill name (e.g., `my-skill`)
-2. Create the plugin structure:
-   - `.claude-plugin/plugin.json` with name, version, description
-   - `.mcp.json` with the MCP server URL config
-   - `skills/<skill-name>/SKILL.md` with the skill content
-   - `skills/<skill-name>/references/` for reference documentation
-3. Add the plugin to `.claude-plugin/marketplace.json`
-4. Package using `./package-plugin.sh my-skill`
+- **Cross-platform in one conversation** — pull Meta, Google, and LinkedIn data side by side
+- **Creative performance** — rank ads by CPA or ROAS with demographic breakdowns
+- **Budget tracking** — spot underspend and overspend across 60+ accounts at once
+- **Trend analysis** — 3, 6, or 12-month views on demand
+- **Secure by design** — OAuth only, read-only, no stored credentials
+
+## Available Plugins
+
+| Plugin | Platform | What it does |
+|---|---|---|
+| `hopkin-meta-ads` | Meta (Facebook/Instagram) | Campaign reports, creative analysis, budget monitoring |
+| `hopkin-google-ads` | Google Ads | Keyword performance, search terms, campaign insights |
+| `hopkin-linkedin-ads` | LinkedIn Ads | Campaign performance, audience insights, spend reporting |
+
+## Get an Account
+
+Plugins require a Hopkin account. Sign up at [hopkin.ai](https://hopkin.ai).

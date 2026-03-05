@@ -1,7 +1,7 @@
 {
-  "name": "pearmill",
+  "name": "hopkin",
   "owner": {
-    "name": "Pearmill"
+    "name": "Pearmill Inc. d/b/a Hopkin"
   },
   "plugins": [
     {
@@ -15,6 +15,12 @@
       "source": "./hopkin-google-ads",
       "description": "Generate Google Ads performance reports using the Hopkin Google Ads MCP",
       "version": "1.9.0"
+    },
+    {
+      "name": "hopkin-linkedin-ads",
+      "source": "./hopkin-linkedin-ads",
+      "description": "Build reports and analyze LinkedIn Ads campaigns using the Hopkin LinkedIn Ads MCP",
+      "version": "1.0.0"
     }
   ]
 }
