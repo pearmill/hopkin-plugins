@@ -39,7 +39,7 @@ Add the Hopkin plugin marketplace to Claude Code, then install the platforms you
 /plugin install hopkin-linkedin-ads@hopkin
 ```
 
-After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai). No credentials are stored — read-only access only.
+After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai). No performance data is stored — read-only access only.
 
 ## Why Hopkin
 
@@ -53,11 +53,11 @@ Most ad teams repeat the same workflows every week: morning performance checks, 
 
 ## Available Plugins
 
-| Plugin | Platform | What it does |
-|---|---|---|
-| `hopkin-meta-ads` | Meta (Facebook/Instagram) | Campaign reports, creative analysis, budget monitoring |
-| `hopkin-google-ads` | Google Ads | Keyword performance, search terms, campaign insights |
-| `hopkin-linkedin-ads` | LinkedIn Ads | Campaign performance, audience insights, spend reporting |
+| Plugin | Platform |
+|---|---|
+| `hopkin-meta-ads` | Meta (Facebook/Instagram) |
+| `hopkin-google-ads` | Google Ads |
+| `hopkin-linkedin-ads` | LinkedIn Ads |
 
 ## Get an Account
 
