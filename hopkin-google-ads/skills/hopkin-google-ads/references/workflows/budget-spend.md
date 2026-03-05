@@ -115,6 +115,32 @@ Recommended Daily = Remaining Budget / Remaining Days
 | Pacing | XX% |
 | Status | On Track / Over / Under |
 
+## Visualize Budget Trends
+
+Render a timeseries chart with daily spend data:
+
+```json
+{
+  "tool": "google_ads_render_chart",
+  "parameters": {
+    "reason": "Showing daily spend trend for budget pacing analysis",
+    "chart": {
+      "type": "timeseries",
+      "data": {
+        "current": [
+          {"date": "2026-03-01", "values": {"spend": 1250}},
+          {"date": "2026-03-02", "values": {"spend": 1180}},
+          {"date": "2026-03-03", "values": {"spend": 1320}}
+        ]
+      },
+      "primaryAxis": {"field": "spend", "label": "Daily Spend ($)", "mark": "line"}
+    }
+  }
+}
+```
+
+Use a waterfall chart to show spend contribution by campaign with CPA color encoding.
+
 ## Insights to Provide
 
 1. **Pacing Status**: Over/under budget against expected spend

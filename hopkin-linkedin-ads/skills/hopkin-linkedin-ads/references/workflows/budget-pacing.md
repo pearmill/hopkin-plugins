@@ -144,29 +144,7 @@ This returns recommended minimum and maximum bid amounts for the specified audie
 
 ### Step 6: Present Budget Report
 
-**Example Report Structure:**
-```
-LinkedIn Ads Budget & Pacing Report
-Ad Account: 123456789
-Report Date: March 2, 2026
-Period: March 2026 (1–31)
-
-Account Summary:
-  Spend to Date (March 1–2): $2,450
-  Projected Month-End Spend: $37,975
-  Monthly Budget: $30,000
-  Pacing: 127% (Overpacing ⚠)
-
-Campaign Group Budgets:
-| Campaign Group       | Daily Budget | Spent (Mar 1-2) | Avg Daily | Pacing |
-|----------------------|-------------|-----------------|-----------|--------|
-| Q1 Lead Gen          | $750         | $1,650          | $825      | 110%   |
-| Brand Awareness Q1   | $500         | $800            | $400      | 80%    |
-
-Recommendations:
-→ Q1 Lead Gen is overpacing by 10% — within acceptable range, monitor closely
-→ Brand Awareness Q1 is underpacing (80%) — check bid competitiveness or audience size
-```
+Present an account summary (spend to date, projected month-end spend, monthly budget, pacing %) followed by a table with columns: Campaign Group, Daily Budget, Spend to Date, Avg Daily, Pacing %. Include per-campaign-group recommendations.
 
 ## Common Budget Scenarios
 
@@ -243,6 +221,32 @@ LinkedIn paces daily spend throughout the day to avoid front-loading. Actual dai
 3. **LinkedIn bid floors are high** — LinkedIn CPCs are typically $2–$15+ (vs. $0.50–$2 on Meta). If bids are too low, campaigns won't deliver. Always validate bids against `linkedin_ads_get_budget_pricing`
 4. **Account for weekday bias** — LinkedIn impressions are highest on weekdays (professional audience). Weekend CPMs can be lower; budget may not spend evenly across all 7 days
 5. **Minimum daily budget** — LinkedIn typically requires a minimum $10/day per campaign. Below this threshold, delivery becomes unreliable
+
+## Visualize Budget Trends
+
+Render a timeseries chart with daily spend data:
+
+```json
+{
+  "tool": "linkedin_ads_render_chart",
+  "parameters": {
+    "reason": "Showing daily spend trend for budget pacing analysis",
+    "chart": {
+      "type": "timeseries",
+      "data": {
+        "current": [
+          {"date": "2026-03-01", "values": {"spend": 1250}},
+          {"date": "2026-03-02", "values": {"spend": 1180}},
+          {"date": "2026-03-03", "values": {"spend": 1320}}
+        ]
+      },
+      "primaryAxis": {"field": "spend", "label": "Daily Spend ($)", "mark": "line"}
+    }
+  }
+}
+```
+
+Use a waterfall chart to show spend contribution by campaign group with CPA color encoding.
 
 ## See Also
 

@@ -106,6 +106,31 @@ Present results in a table format:
 |----------|--------|-------------|--------|-----|------|-------------|------|
 | [name] | [status] | [impressions] | [clicks] | [ctr]% | $[cost] | [conv] | [roas]x |
 
+## Visualize with Charts
+
+Render a bar chart comparing campaigns by spend or ROAS:
+
+```json
+{
+  "tool": "google_ads_render_chart",
+  "parameters": {
+    "reason": "Comparing campaign performance by spend and ROAS",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "Brand Search", "values": {"spend": 4521, "roas": 5.2}},
+        {"label": "Non-Brand", "values": {"spend": 3200, "roas": 2.8}},
+        {"label": "Shopping", "values": {"spend": 2100, "roas": 4.1}}
+      ],
+      "metric": {"field": "spend", "label": "Spend ($)"},
+      "colorBy": {"field": "roas", "label": "ROAS"}
+    }
+  }
+}
+```
+
+For daily trend analysis, use a timeseries chart. For conversion pipeline, use a funnel chart.
+
 ## Insights to Provide
 
 After presenting data, analyze:

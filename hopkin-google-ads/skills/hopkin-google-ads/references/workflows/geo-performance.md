@@ -119,6 +119,30 @@ Present results in a table format:
 
 For sub-country levels, replace the "Country" column with the appropriate geo level (City, Region, Metro, etc.).
 
+## Visualize Geographic Data
+
+Render a choropleth map for US state-level performance:
+
+```json
+{
+  "tool": "google_ads_render_chart",
+  "parameters": {
+    "reason": "Visualizing spend distribution across US states",
+    "chart": {
+      "type": "choropleth",
+      "data": [
+        {"state": "CA", "value": 12500, "meta": {"conversions": 245, "roas": 4.2}},
+        {"state": "TX", "value": 8900, "meta": {"conversions": 178, "roas": 3.8}},
+        {"state": "NY", "value": 7600, "meta": {"conversions": 156, "roas": 5.1}}
+      ],
+      "valueLabel": "Spend ($)"
+    }
+  }
+}
+```
+
+Use a bar chart for top cities or regions within a state.
+
 ## Insights to Provide
 
 After presenting geographic data, analyze:

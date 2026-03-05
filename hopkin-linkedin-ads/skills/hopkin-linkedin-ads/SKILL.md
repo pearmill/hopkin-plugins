@@ -109,6 +109,9 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `linkedin_ads_get_preferences` — Retrieve stored preferences for an entity
 - `linkedin_ads_delete_preference` — Delete a stored preference by key
 
+### Visualization
+- `linkedin_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or demographic data — do not substitute a table or text summary when a chart is requested.
+
 ### Feedback
 - `linkedin_ads_developer_feedback` — Submit feature requests and workflow gap reports
 
@@ -137,6 +140,20 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - **MEMBER_AGE** — By age group
 
 > **MEMBER_* pivots only work with `linkedin_ads_get_insights`** — not `linkedin_ads_get_performance_report`.
+
+### Data Visualization
+
+After fetching report data, proactively render charts to make insights more accessible. Use `linkedin_ads_render_chart` to visualize data — always pair charts with a summary table and textual insights.
+
+**When to use each chart type:**
+- **Campaign/entity comparisons** → bar chart (spend, ROAS, conversions by campaign group)
+- **Trends over time** → timeseries chart (daily/weekly spend, CTR, conversions)
+- **Conversion funnel** → funnel chart (impressions → clicks → leads)
+- **Metric correlations** → scatter chart (spend vs ROAS, CPC vs CTR)
+- **Budget breakdown** → waterfall chart (spend by campaign group with CPA coloring)
+- **Demographic comparisons** → bar chart (CPA by job function, seniority, industry)
+
+Charts enhance the report — they don't replace the analysis. Always include written insights alongside visualizations.
 
 ### Write Operations (Unsupported — Developer Feedback)
 
@@ -269,6 +286,6 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Skill Version:** 1.0
-**Last Updated:** 2026-03-02
+**Skill Version:** 1.1
+**Last Updated:** 2026-03-05
 **Requires:** Hopkin LinkedIn Ads MCP (https://app.hopkin.ai)

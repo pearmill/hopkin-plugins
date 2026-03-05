@@ -259,3 +259,29 @@ Prioritized action list:
 2. **Add negative keywords** to cut wasted spend
 3. **Adjust bids/budgets** for best-performing audience segments
 4. **Re-run this report** after 2-4 weeks to measure impact
+
+## Visualize Keyword Performance
+
+Render a scatter chart plotting keywords by spend vs. conversions:
+
+```json
+{
+  "tool": "google_ads_render_chart",
+  "parameters": {
+    "reason": "Plotting keywords by spend vs conversions to identify scaling opportunities",
+    "chart": {
+      "type": "scatter",
+      "data": [
+        {"label": "project management software", "values": {"spend": 2500, "conversions": 45, "impressions": 12000}},
+        {"label": "task management tool", "values": {"spend": 1800, "conversions": 38, "impressions": 9500}},
+        {"label": "team collaboration app", "values": {"spend": 950, "conversions": 12, "impressions": 15000}}
+      ],
+      "x": {"field": "spend", "label": "Spend ($)"},
+      "y": {"field": "conversions", "label": "Conversions"},
+      "size": {"field": "impressions", "label": "Impressions"}
+    }
+  }
+}
+```
+
+Use bar charts for top keyword performance by CPA or ROAS.

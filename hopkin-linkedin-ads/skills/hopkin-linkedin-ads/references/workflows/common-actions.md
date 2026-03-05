@@ -30,44 +30,14 @@ When a user requests a create, update, pause, or delete operation:
 
 Direct them to perform the action manually via LinkedIn Campaign Manager at https://www.linkedin.com/campaignmanager/
 
-### Common Write Operations and Manual Steps
+### Common Write Operations
 
-#### Create a Campaign Group
-1. Log into LinkedIn Campaign Manager
-2. Select your ad account
-3. Click **Create** → **Campaign Group**
-4. Set name, start/end date, and total budget (or no end date for ongoing)
-5. Click **Next** to add campaigns
-
-#### Create a Campaign
-1. In Campaign Manager, open the target Campaign Group
-2. Click **Create Campaign**
-3. Select objective (Brand Awareness, Website Visits, Engagement, Lead Generation, Website Conversions, Job Applicants, Talent Leads)
-4. Define audience targeting
-5. Set bid type and bid amount (use `linkedin_ads_get_budget_pricing` via Hopkin for recommended ranges)
-6. Select creatives or create new ones
-
-#### Pause/Resume a Campaign Group
-1. In Campaign Manager, find the Campaign Group
-2. Toggle the status switch (green = active, grey = paused)
-
-#### Update Budget
-1. In Campaign Manager, click on the Campaign Group name
-2. Click the edit (pencil) icon next to the budget
-3. Update daily or total budget
-4. Click **Save**
-
-#### Create a Creative
-1. In Campaign Manager, navigate to **Account Assets** → **Creatives** (for single image/video)
-2. Or create directly within a Campaign during setup
-3. Choose ad format (Single Image, Carousel, Video, Text Ad, etc.)
-4. Upload media and enter headline, body, CTA, and destination URL
-
-#### Adjust Bids
-1. In Campaign Manager, open the Campaign
-2. Click **Edit** → go to **Bid** section
-3. Update the bid amount
-4. **Tip:** Use `linkedin_ads_get_budget_pricing` via Hopkin to get recommended bid ranges before adjusting
+All performed manually in LinkedIn Campaign Manager (https://www.linkedin.com/campaignmanager/):
+- **Create Campaign Group/Campaign** — Campaign Manager → Create
+- **Pause/Resume** — Toggle status switch on Campaign Group
+- **Update Budget** — Edit pencil icon on Campaign Group budget
+- **Create Creative** — Account Assets → Creatives, or within Campaign setup
+- **Adjust Bids** — Edit Campaign → Bid section. Use `linkedin_ads_get_budget_pricing` for recommended ranges
 
 ---
 

@@ -124,19 +124,7 @@ Sort creatives by the primary KPI based on campaign objective:
 
 ### Step 6: Present Results
 
-**Example Table:**
-```
-Creative Performance Report
-Ad Account: 123456789
-Date Range: Last 30 Days
-Campaign: Q1 Lead Gen
-
-| Headline (truncated)       | Spend  | Impr.  | CTR  | Leads | CPA    |
-|----------------------------|--------|--------|------|-------|--------|
-| "See How [Company] Boosted…"| $620   | 89,450 | 3.4% | 19    | $32.63 |
-| "Free Trial — No CC…"      | $450   | 45,678 | 2.8% | 12    | $37.50 |
-| "Boost Your Revenue by 30%…"| $380  | 52,100 | 1.2% | 5     | $76.00 |
-```
+Present as a table with columns: Headline (truncated), Spend, Impressions, CTR, Leads, CPA. Sort by the primary KPI based on campaign objective.
 
 ### Step 7: Identify Insights
 
@@ -216,6 +204,31 @@ A steady CTR decline over time with stable impression volume is a strong creativ
 4. **Consider format differences** — Don't compare video CTR to static image CTR directly; they have different benchmarks
 5. **Monitor frequency** — High ad frequency (5+) often correlates with CTR decline and creative fatigue
 6. **LinkedIn CTR benchmarks** — LinkedIn average CTR is ~0.4–0.6%; 1%+ CTR is strong; 2%+ is excellent for Sponsored Content
+
+## Visualize Creative Performance
+
+Render a bar chart comparing creatives by CPA or CTR:
+
+```json
+{
+  "tool": "linkedin_ads_render_chart",
+  "parameters": {
+    "reason": "Comparing creative performance by CPA to identify winners",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "See How [Company]…", "values": {"cpa": 32.63, "ctr": 3.4}},
+        {"label": "Free Trial — No CC…", "values": {"cpa": 37.50, "ctr": 2.8}},
+        {"label": "Boost Revenue by 30%…", "values": {"cpa": 76.00, "ctr": 1.2}}
+      ],
+      "metric": {"field": "cpa", "label": "CPA ($)"},
+      "sort": "asc"
+    }
+  }
+}
+```
+
+For creative fatigue analysis, use a timeseries chart plotting CTR over time per creative.
 
 ## See Also
 
