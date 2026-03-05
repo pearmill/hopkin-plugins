@@ -13,10 +13,10 @@ This workflow is particularly useful when:
 
 ## Primary Tools
 
-- `meta_ads_get_performance_report` with `level: "ad"` — Get ad-level performance metrics (recommended, includes full funnel)
-- `meta_ads_get_insights` with `level: "ad"` — For custom breakdowns at ad level
-- `meta_ads_preview_ads` — **Crown jewel of creative reporting.** An MCP App that renders a visual UI showing actual ad images/videos with a configurable metrics overlay — not tabular data. This is the definitive way to review creative quality. Proactively offer it whenever the user asks "what do my ads look like", wants to review creative quality, is doing A/B creative comparison, or when presenting winners/losers. Requires ad IDs from `meta_ads_list_ads` and optional metrics from the performance tools.
-- `meta_ads_list_ads` — List ads for a campaign or ad set (use to collect ad IDs before calling `meta_ads_preview_ads`)
+- `meta_ads_get_ad_creative_report` — **Recommended for creative analysis.** Ad-level performance report with full funnel metrics plus creative asset info (asset_type, asset_url, thumbnail_url). Use `level: "ad_name"` (default) to aggregate ads by name across ad sets — returns a representative `ad_id` per creative that can be passed directly to `meta_ads_preview_ads`. Use `level: "ad_id"` to compare distinct individual ads.
+- `meta_ads_preview_ads` — **Crown jewel of creative reporting.** An MCP App that renders a visual UI showing actual ad images/videos with a configurable metrics overlay — not tabular data. This is the definitive way to review creative quality. Proactively offer it whenever the user asks "what do my ads look like", wants to review creative quality, is doing A/B creative comparison, or when presenting winners/losers. The `ad_id` values from `meta_ads_get_ad_creative_report` can be passed directly — no need to call `meta_ads_list_ads` first.
+- `meta_ads_get_insights` with `level: "ad"` — For custom fields or breakdowns not available in the creative report
+- `meta_ads_list_ads` — Use only if you need to look up specific ad IDs before running `meta_ads_get_ad_creative_report` with `level: "ad_id"` filtering
 
 ## Required Information
 
@@ -111,28 +111,28 @@ Before starting this workflow, gather:
 **Steps:**
 
 1. **Export ad-level data using Hopkin MCP tools:**
-   - Use `meta_ads_get_performance_report` with `level: "ad"` for comprehensive ad-level metrics:
+   - Use `meta_ads_get_ad_creative_report` for comprehensive ad-level metrics with creative asset info:
      ```json
      {
-       "tool": "meta_ads_get_performance_report",
+       "tool": "meta_ads_get_ad_creative_report",
        "parameters": {
-         "reason": "Getting ad-level performance data for creative test analysis",
+         "reason": "Getting creative performance data for creative test analysis",
          "account_id": "act_123456789",
-         "level": "ad",
-         "time_range": {"since": "2026-01-01", "until": "2026-01-31"},
-         "campaign_id": "123456789"
+         "level": "ad_name",
+         "time_range": {"since": "2026-01-01", "until": "2026-01-31"}
        }
      }
      ```
-   - Or use `meta_ads_get_insights` for custom metrics/breakdowns at ad level
-   - Include these core fields:
-     - **Ad Details:** ad_name, ad_id, creative_id, adset_name, campaign_name
-     - **Creative Type:** creative_type (video, image, carousel, etc.)
-     - **Engagement:** impressions, reach, clicks, ctr, cpc
+   - Use `level: "ad_name"` (default) to aggregate ads sharing the same name across ad sets — the response includes a representative `ad_id` per creative for use with `meta_ads_preview_ads`
+   - Use `level: "ad_id"` if you need one row per individual ad
+   - Use `meta_ads_get_insights` only for custom fields or breakdowns not available in the creative report
+   - The response includes these fields automatically:
+     - **Ad Details:** ad_id, ad_name, ad_count (ad_name mode only)
+     - **Creative Asset:** asset_type (image/video/unknown), asset_url (GCS URL), thumbnail_url (GCS URL, videos only)
+     - **Engagement:** impressions, reach, clicks, ctr, cpc, cpm
      - **Spend:** spend
-     - **Primary Conversion:** The conversion event aligned with your primary metric (purchases, leads, trials, etc.)
-     - **Cost per Primary Conversion:** CPA, CPL, or cost per acquisition for primary metric
-     - **Secondary Events:** Any additional metrics requested (video plays, add-to-cart, etc.)
+     - **All conversion types** individually with counts, costs, and values
+     - **Secondary Events:** All action types with counts and values
 
 2. **Pull additional creative metadata from Motion or BI (if available):**
    - Creative tags (concept names, hook types, angles, offers)
@@ -164,7 +164,7 @@ Before starting this workflow, gather:
 
 1. **Get creative previews via Hopkin:**
    - `meta_ads_preview_ads` is an MCP App that renders actual visual ad creative (images/videos) with a metrics overlay in an interactive UI — distinct from tabular data tools. It is the definitive way to let stakeholders see what the ads look like. Proactively offer it in any creative review context.
-   - First, collect ad IDs from `meta_ads_list_ads` and metrics from `meta_ads_get_performance_report` or `meta_ads_get_insights`, then pass them together:
+   - The `ad_id` values returned by `meta_ads_get_ad_creative_report` (including representative IDs in `ad_name` mode) can be passed directly — no need to call `meta_ads_list_ads` separately:
      ```json
      {
        "tool": "meta_ads_preview_ads",
@@ -179,7 +179,7 @@ Before starting this workflow, gather:
        }
      }
      ```
-   - For video ads, get both the video file and a thumbnail/poster frame
+   - For video ads, get both the video file and a thumbnail/poster frame. The `thumbnail_url` field in the creative report response provides a GCS-hosted thumbnail.
 
 2. **Download assets for key creatives:**
    - **Download all winners** - Essential to show what worked
@@ -668,39 +668,41 @@ For video ads, include additional video performance metrics:
 
 ## Best Practices
 
-1. **ALWAYS use `meta_ads_preview_ads` for creative review** — This MCP App renders a visual UI with actual images/videos and metrics side-by-side. It is the most powerful tool in this workflow. Use it:
+1. **ALWAYS use `meta_ads_get_ad_creative_report` as the primary data source** — This is the dedicated tool for creative analysis. Use `level: "ad_name"` (default) to compare creative concepts across ad sets; use `level: "ad_id"` for individual ad comparisons. The returned `ad_id` values work directly with `meta_ads_preview_ads`.
+
+2. **ALWAYS use `meta_ads_preview_ads` for creative review** — This MCP App renders a visual UI with actual images/videos and metrics side-by-side. It is the most powerful tool in this workflow. Use it:
    - Whenever the user asks "what do my ads look like" or wants to review creative
    - When presenting winners and losers — visual context makes insights actionable
    - For A/B creative comparisons — seeing the creative alongside the number is essential
-   - Always pull ad IDs with `meta_ads_list_ads` and metrics with the performance report first, then pass them together to `meta_ads_preview_ads`
+   - Pass `ad_id` values from `meta_ads_get_ad_creative_report` directly — no need to call `meta_ads_list_ads` first
 
-2. **ALWAYS include creative visuals in reports** - Never present creative test results without showing the actual ads
+3. **ALWAYS include creative visuals in reports** - Never present creative test results without showing the actual ads
    - Winners and top losers must have images/videos included
    - For Notion: Download from Meta first, then upload to Notion (never use Meta URLs directly)
    - Stakeholders need to see what worked/failed, not just read metrics
    - Creative insights are meaningless without seeing the creative
 
-2. **Always confirm scope before pulling data** - Ambiguity leads to rework
+4. **Always confirm scope before pulling data** - Ambiguity leads to rework
 
-3. **Align on metrics early** - Primary metric should be clear from the start
+5. **Align on metrics early** - Primary metric should be clear from the start
 
-4. **Confirm output format upfront** - Ask what format they want (Notion, Slides, PDF, Excel) before building
+6. **Confirm output format upfront** - Ask what format they want (Notion, Slides, PDF, Excel) before building
 
-5. **Define benchmarks explicitly** - Don't rely on intuition for winner/loser calls
+7. **Define benchmarks explicitly** - Don't rely on intuition for winner/loser calls
 
-6. **Review actual creatives, not just numbers** - The "why" comes from watching the ads
+8. **Review actual creatives, not just numbers** - The "why" comes from watching the ads
    - Watch videos fully, don't just look at thumbnails
    - Note first 3 seconds (hook quality), messaging, visual style, CTA placement
 
-7. **Be specific in insights** - "Social proof hooks work" is weak; "3-item listicle hooks doubled CTR" is strong
+9. **Be specific in insights** - "Social proof hooks work" is weak; "3-item listicle hooks doubled CTR" is strong
    - Reference specific creative elements visible in the assets
 
-8. **Connect actions to expectations** - Tell the client what should happen next
+10. **Connect actions to expectations** - Tell the client what should happen next
 
-9. **QA rigorously** - Metric misalignment destroys credibility
-   - Verify all creative assets are displaying correctly before sharing
+11. **QA rigorously** - Metric misalignment destroys credibility
+    - Verify all creative assets are displaying correctly before sharing
 
-10. **Capture feedback for next time** - Every round should improve your process
+12. **Capture feedback for next time** - Every round should improve your process
 
 ## Common Pitfalls to Avoid
 

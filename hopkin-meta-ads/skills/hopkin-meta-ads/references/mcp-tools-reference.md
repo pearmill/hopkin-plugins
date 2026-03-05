@@ -186,18 +186,17 @@ List ads for an account, campaign, or ad set. Supports adset filtering, status f
 ### Analytics Tools
 
 #### meta_ads_get_performance_report
-**Recommended for most reporting use cases.** Returns a comprehensive performance funnel with pre-built metrics.
+**Recommended for account, campaign, and adset-level reporting.** Returns a comprehensive performance funnel with pre-built metrics.
 
-This tool always includes a full funnel of metrics: impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, and quality rankings. Use `meta_ads_get_insights` if you need date presets or custom fields.
+This tool always includes a full funnel of metrics: impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, and quality rankings. Use `meta_ads_get_insights` if you need date presets or custom fields. **For ad creative analysis, use `meta_ads_get_ad_creative_report` instead.**
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `account_id` (string, required) — Ad account ID
 - `time_range` (object, required) — Date range with `since` and `until` (YYYY-MM-DD format)
 - `level` (string, optional) — Aggregation level: `"account"` (default), `"campaign"`, `"adset"`, or `"ad"`
-- `time_increment` (number or string, optional) — Time grouping: `1` for daily, `7` for weekly, `"monthly"`
-- `breakdowns` (array, optional) — Segment data by dimension (e.g., `["age", "gender"]`)
-- `action_breakdowns` (array, optional) — Action breakdown dimensions
+- `time_increment` (number or string, optional) — Time grouping: `1` for daily, `7` for weekly, `"monthly"`, `"all_days"` for a single row over the entire range
+- `breakdowns` (array, optional) — Segment data by dimension (e.g., `["age", "gender"]`). Pass multiple values in a single call to get cross-tabulated rows — do NOT make separate calls per dimension.
 - `filtering` (array, optional) — Filters as `[{field, operator, value}]`
 
 **Example:**
@@ -209,6 +208,60 @@ This tool always includes a full funnel of metrics: impressions, reach, frequenc
     "account_id": "act_123456789",
     "level": "campaign",
     "time_range": {"since": "2026-01-01", "until": "2026-01-31"}
+  }
+}
+```
+
+#### meta_ads_get_ad_creative_report
+**Recommended for ad creative analysis.** Ad-level performance report with full funnel metrics and creative asset information (type, URL, thumbnail). Use this instead of `meta_ads_get_performance_report` with `level: "ad"` for any creative analysis workflow.
+
+Supports two grouping modes via the `level` parameter:
+- **`ad_name`** (default): aggregates all ads sharing the same name across ad sets, returns a representative `ad_id` (highest impressions) that can be passed directly to `meta_ads_preview_ads` — ideal for comparing the same creative running in multiple ad sets. Omits non-aggregatable fields (`frequency`, quality rankings, ROAS).
+- **`ad_id`**: one row per ad — use when comparing distinct individual ads.
+
+All conversion types are shown individually, not collapsed into a single number. Always fetches fresh data.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID
+- `time_range` (object, required) — Date range with `since` and `until` (YYYY-MM-DD format)
+- `level` (string, optional) — Grouping mode: `"ad_name"` (default) or `"ad_id"`
+- `time_increment` (number or string, optional) — Time grouping: `1` for daily, `7` for weekly, `"monthly"`, `"all_days"` for a single row over the entire range
+- `breakdowns` (array, optional) — Segment data by dimension (e.g., `["age", "gender"]`). Available: age, gender, country, region, device_platform, publisher_platform, platform_position, impression_device, dma
+- `filtering` (array, optional) — Filters as `[{field, operator, value}]`
+
+**Returns:**
+- `ad_id` — the ad ID (or representative ad_id in `ad_name` mode)
+- `ad_name` — the ad name
+- `ad_count` — number of ads aggregated (only in `ad_name` mode)
+- `asset_type` — `'image'` | `'video'` | `'unknown'`
+- `asset_url` — GCS URL to the creative asset
+- `thumbnail_url` — GCS URL to thumbnail (videos only)
+- Full delivery, engagement, action, and conversion metrics
+
+**Example — Creative round analysis by name:**
+```json
+{
+  "tool": "meta_ads_get_ad_creative_report",
+  "parameters": {
+    "reason": "Getting creative performance for round analysis",
+    "account_id": "act_123456789",
+    "level": "ad_name",
+    "time_range": {"since": "2026-01-01", "until": "2026-01-31"}
+  }
+}
+```
+
+**Example — Individual ad comparison:**
+```json
+{
+  "tool": "meta_ads_get_ad_creative_report",
+  "parameters": {
+    "reason": "Comparing individual ads for A/B analysis",
+    "account_id": "act_123456789",
+    "level": "ad_id",
+    "time_range": {"since": "2026-01-01", "until": "2026-01-31"},
+    "filtering": [{"field": "campaign.id", "operator": "EQUAL", "value": "123456789"}]
   }
 }
 ```
@@ -263,7 +316,7 @@ Flexible insights tool for custom metric and breakdown combinations. Supports da
 #### meta_ads_preview_ads
 **MCP App** — Renders a visual UI with actual ad creative content (images/videos) and a configurable metrics overlay. This is distinct from tabular data tools: it returns an interactive visual panel, not a data table. Proactively offer this whenever the user asks "what do my ads look like", wants to review creative quality, or is doing A/B creative comparison.
 
-You must first retrieve ad IDs (via `meta_ads_list_ads`) and their metrics (via `meta_ads_get_performance_report` or `meta_ads_get_insights`), then pass them to this tool.
+Use `meta_ads_get_ad_creative_report` to get ad metrics and representative ad IDs in a single call, then pass them to this tool. The `ad_id` values from the creative report (including representative IDs in `ad_name` mode) work directly here — no separate `meta_ads_list_ads` call needed.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -455,12 +508,11 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 
 ### Pattern 2: Ad Creative Analysis with Preview
 **Workflow:**
-1. Use `meta_ads_list_ads` to get ads for a campaign or ad set — collect ad IDs
-2. Use `meta_ads_get_performance_report` with `level: "ad"` for ad-level metrics — collect spend, CTR, CPA etc. per ad ID
-3. Use `meta_ads_preview_ads` with the collected ad IDs and metrics to render the visual creative UI with metrics overlay
-4. Compare creative variations and identify top performers
+1. Use `meta_ads_get_ad_creative_report` with `level: "ad_name"` (default) to get creative metrics and representative ad IDs in a single call — no need to first call `meta_ads_list_ads`
+2. Use `meta_ads_preview_ads` with the `ad_id` values from the creative report and their metrics to render the visual creative UI with metrics overlay
+3. Compare creative variations and identify top performers
 
-> `meta_ads_preview_ads` requires ad IDs — you must call `meta_ads_list_ads` first to obtain them. It does not accept `campaign_id` or `adset_id` directly.
+> In `ad_name` mode, `meta_ads_get_ad_creative_report` returns a representative `ad_id` per creative name that can be passed directly to `meta_ads_preview_ads`. Use `level: "ad_id"` if you need to compare distinct individual ads rather than aggregated creative names.
 
 ### Pattern 3: Demographic / Audience Analysis
 **Workflow:**
@@ -585,6 +637,6 @@ Hopkin list tools use cursor-based pagination:
 
 ---
 
-**Document Version:** 2.0
-**Last Updated:** 2026-02-10
+**Document Version:** 2.1
+**Last Updated:** 2026-03-04
 **Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
