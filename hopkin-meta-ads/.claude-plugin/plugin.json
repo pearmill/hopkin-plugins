@@ -1,6 +1,6 @@
 {
   "name": "hopkin-meta-ads",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "Build reports and analyze Meta Ads campaigns using the Hopkin Meta Ads MCP",
   "icon": "icon.png",
   "author": {
