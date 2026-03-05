@@ -47,24 +47,7 @@ Configure the Hopkin Meta Ads MCP as a hosted MCP service in your Claude setting
 
 ## Authentication & Connection
 
-### Hopkin OAuth Flow
-
-Hopkin uses an OAuth flow for connecting to Meta Ads accounts. After the MCP is configured, authenticate the user's Meta Ads account:
-
-1. **Check auth status:**
-   ```json
-   {
-     "tool": "meta_ads_check_auth_status",
-     "parameters": {
-       "reason": "Checking if user is authenticated with Meta Ads"
-     }
-   }
-   ```
-   This returns `authenticated`, `user_id`, `email`, `expires_at`, and a status message.
-
-2. **If not authenticated:** Inform the user they need to connect their Meta Ads account via Hopkin. Direct them to https://app.hopkin.ai to complete the OAuth flow, then pause execution until they confirm it is done.
-
-3. **Re-verify:** Call `meta_ads_check_auth_status` again to confirm the connection is active.
+Hopkin uses OAuth. If a tool call fails with an auth error, call `meta_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai to connect their Meta Ads account.
 
 ---
 
@@ -358,6 +341,105 @@ Use `meta_ads_get_ad_creative_report` to get ad metrics and representative ad ID
 
 ---
 
+### Visualization Tools
+
+#### `meta_ads_render_chart`
+
+**MCP App.** Renders interactive data visualization charts from advertising data.
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `reason` | string | Yes | Why you're rendering this chart |
+| `chart` | object | Yes | Chart configuration — must include `type` and type-specific fields |
+
+**Chart Types:**
+
+**bar** — Compare values across categories (campaigns, placements, demographics).
+```json
+{
+  "type": "bar",
+  "data": [
+    {"label": "Prospecting", "values": {"spend": 4521, "roas": 5.2}},
+    {"label": "Retargeting", "values": {"spend": 1800, "roas": 8.1}}
+  ],
+  "metric": {"field": "spend", "label": "Spend ($)"}
+}
+```
+Optional: `colorBy` (color bars by a secondary metric), `sort` ("asc"/"desc"), `orientation` ("horizontal"/"vertical"), `table` (show data table below chart), `referenceLines`.
+
+**timeseries** — Plot metrics over time with optional previous-period overlay and projections.
+```json
+{
+  "type": "timeseries",
+  "data": {
+    "current": [
+      {"date": "2026-02-24", "values": {"spend": 450}},
+      {"date": "2026-02-25", "values": {"spend": 520}},
+      {"date": "2026-02-26", "values": {"spend": 480}}
+    ]
+  },
+  "primaryAxis": {"field": "spend", "label": "Daily Spend ($)", "mark": "line"}
+}
+```
+Optional: `data.previous` (prior period overlay), `data.projection` (forecast), `secondaryAxis` (dual-axis chart).
+
+**funnel** — Conversion stages from impressions to purchases.
+```json
+{
+  "type": "funnel",
+  "data": {
+    "stages": ["Impressions", "Clicks", "Add to Cart", "Purchases"],
+    "volume": [500000, 15000, 3200, 890],
+    "costPer": [0.01, 0.33, 1.56, 5.62]
+  }
+}
+```
+
+**scatter** — Correlate two metrics across entities.
+```json
+{
+  "type": "scatter",
+  "data": [
+    {"label": "Prospecting", "values": {"spend": 4521, "roas": 5.2}},
+    {"label": "Retargeting", "values": {"spend": 1800, "roas": 8.1}}
+  ],
+  "x": {"field": "spend", "label": "Spend ($)"},
+  "y": {"field": "roas", "label": "ROAS"}
+}
+```
+Optional: `color` (color by field), `size` (size by field), `referenceLines`, `table`.
+
+**waterfall** — Cumulative contribution with color encoding.
+```json
+{
+  "type": "waterfall",
+  "data": [
+    {"label": "Prospecting", "value": 4521, "colorValue": 45.20},
+    {"label": "Retargeting", "value": 1800, "colorValue": 22.50},
+    {"label": "Lookalike", "value": 2200, "colorValue": 38.90}
+  ],
+  "valueLabel": "Spend ($)",
+  "colorLabel": "CPA ($)"
+}
+```
+
+**choropleth** — US state-level geographic heatmap.
+```json
+{
+  "type": "choropleth",
+  "data": [
+    {"state": "CA", "value": 12500},
+    {"state": "TX", "value": 8900},
+    {"state": "NY", "value": 7600}
+  ],
+  "valueLabel": "Spend ($)"
+}
+```
+Optional: `tip` (tooltip fields from `meta`), `colorScheme`, `colorType`.
+
+---
+
 ### Preference Tools
 
 Preference tools let you store and retrieve persistent key-value observations about ad entities. Preferences survive across conversations and are automatically attached to entity-listing responses as `_stored_preferences`. Use them to remember user choices, default accounts, reporting preferences, and analytical observations.
@@ -541,6 +623,13 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 1. Complete the user's request as normal
 2. Call `meta_ads_developer_feedback` with `feedback_type: "new_tool"` or `"improvement"` describing what would have been faster
 3. Do NOT block the user's request — submit feedback after delivering the answer
+
+### Pattern 8: Data Visualization
+
+1. Fetch data with analytics tools (performance report, insights, etc.)
+2. Transform data into chart format (array of `{label, values}` objects)
+3. Call `meta_ads_render_chart` with the appropriate chart type
+4. Present chart alongside summary table and written insights
 
 ### Pattern 7: Session Start with Preferences
 **When:** At the beginning of any new session before asking the user for account information.

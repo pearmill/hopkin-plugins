@@ -159,18 +159,7 @@ Sort campaign groups by the most relevant metric based on the user's objective:
 - **Website visit campaigns:** Sort by clicks, CTR, or CPC
 - **Conversion campaigns:** Sort by conversions, ROAS, or CPA
 
-**Example Table Structure:**
-```
-LinkedIn Campaign Group Performance Report
-Date Range: [date_range]
-Ad Account: [account_id]
-
-| Campaign Group | Status | Spend | Impressions | Clicks | CTR  | Leads | CPA    | ROAS |
-|----------------|--------|-------|-------------|--------|------|-------|--------|------|
-| Q1 Lead Gen    | ACTIVE | $4,521| 234,567     | 5,678  | 2.4% | 89    | $50.80 | 3.2x |
-| Brand Awareness| ACTIVE | $2,100| 567,890     | 3,456  | 0.6% | 12    | $175   | 1.1x |
-| ...            | ...    | ...   | ...         | ...    | ...  | ...   | ...    | ...  |
-```
+Present as a table with columns: Campaign Group, Status, Spend, Impressions, Clicks, CTR, Leads, CPA, ROAS.
 
 ### Step 7: Add Summary Statistics
 
@@ -226,6 +215,31 @@ For trend analysis, use `time_granularity: "DAILY"`:
 4. **Use appropriate date ranges** — LinkedIn campaigns often need 30+ days for statistically meaningful data, especially for conversion campaigns
 5. **Include campaign group names** — Use `linkedin_ads_list_campaign_groups` alongside analytics to get human-readable names
 6. **Note B2B attribution complexity** — B2B purchase cycles are long; last-click attribution may undervalue top-of-funnel LinkedIn campaigns
+
+## Visualize with Charts
+
+Render a bar chart comparing campaign groups by spend:
+
+```json
+{
+  "tool": "linkedin_ads_render_chart",
+  "parameters": {
+    "reason": "Comparing campaign group performance by spend and leads",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "Q1 Lead Gen", "values": {"spend": 4521, "leads": 89, "cpa": 50.80}},
+        {"label": "Brand Awareness", "values": {"spend": 2100, "leads": 12, "cpa": 175}},
+        {"label": "Webinar Promo", "values": {"spend": 1800, "leads": 45, "cpa": 40}}
+      ],
+      "metric": {"field": "spend", "label": "Spend ($)"},
+      "colorBy": {"field": "cpa", "label": "CPA ($)"}
+    }
+  }
+}
+```
+
+Use a funnel chart for conversion pipeline (impressions → clicks → leads) and a timeseries chart for daily trend analysis.
 
 ## See Also
 

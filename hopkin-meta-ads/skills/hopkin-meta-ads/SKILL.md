@@ -116,6 +116,9 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 ### Creative
 - `meta_ads_preview_ads` — **MCP App.** Renders a visual UI with actual ad creative (images/videos) and a configurable metrics overlay — not tabular data. Proactively offer this whenever the user asks "what do my ads look like", wants to review creative quality, or is doing A/B creative comparison. Takes a list of ad IDs with optional per-ad metric values.
 
+### Visualization
+- `meta_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
+
 ### Preferences
 - `meta_ads_store_preference` — Store a persistent preference or observation about an ad entity (account, campaign, ad set, or ad)
 - `meta_ads_get_preferences` — Get all stored preferences for an ad entity
@@ -136,6 +139,20 @@ This skill supports four primary report types and a developer feedback workflow 
 2. **Ad Creative Performance Reports** — Individual ad performance, creative previews, and A/B testing insights
 3. **Audience Insights Reports** — Demographics, interests, and behavior breakdowns
 4. **Budget & Pacing Reports** — Budget tracking, spend pacing, and forecasting
+
+### Data Visualization
+
+After fetching report data, proactively render charts to make insights more accessible. Use `meta_ads_render_chart` to visualize data — always pair charts with a summary table and textual insights.
+
+**When to use each chart type:**
+- **Campaign/entity comparisons** → bar chart (spend, ROAS, conversions by campaign)
+- **Trends over time** → timeseries chart (daily/weekly spend, CTR, conversions)
+- **Conversion funnel** → funnel chart (impressions → clicks → conversions → purchases)
+- **Metric correlations** → scatter chart (spend vs ROAS, CPC vs CTR)
+- **Budget breakdown** → waterfall chart (spend by campaign with CPA coloring)
+- **Geographic performance** → choropleth chart (US state-level spend or conversions)
+
+Charts enhance the report — they don't replace the analysis. Always include written insights alongside visualizations.
 
 ### Write Operations (Unsupported — Developer Feedback)
 
@@ -298,6 +315,6 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 2.1
-**Last Updated:** 2026-03-04
+**Skill Version:** 2.2
+**Last Updated:** 2026-03-05
 **Requires:** Hopkin Meta Ads MCP (https://app.hopkin.ai)

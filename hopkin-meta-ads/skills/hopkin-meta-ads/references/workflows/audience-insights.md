@@ -82,20 +82,33 @@ Choose appropriate dimensions based on analysis goals:
 
 Organize data for easy analysis:
 
-**Single Dimension Example (Age & Gender):**
-```
-Audience Insights Report - Demographics
-Campaign: [Campaign Name]
-Date Range: [start_date] to [end_date]
-Breakdown: Age & Gender
+Present as a table with columns: Segment (e.g., "F 25-34"), Spend, Impressions, Clicks, CTR, Conversions, CPA, ROAS. Sort by highest performing segment.
 
-| Age-Gender | Spend  | Impr. | Clicks | CTR  | Conv. | CPA    | ROAS |
-|------------|--------|-------|--------|------|-------|--------|------|
-| F 25-34    | $1,234 | 156K  | 4,567  | 2.9% | 89    | $13.87 | 5.2x |
-| F 35-44    | $987   | 134K  | 3,456  | 2.6% | 67    | $14.73 | 4.8x |
-| M 25-34    | $856   | 128K  | 3,012  | 2.4% | 54    | $15.85 | 4.1x |
-| ...        | ...    | ...   | ...    | ...  | ...   | ...    | ...  |
+### Step 3a: Visualize Audience Segments
+
+Render a bar chart showing performance by demographic segment:
+
+```json
+{
+  "tool": "meta_ads_render_chart",
+  "parameters": {
+    "reason": "Visualizing CPA by age-gender segment to identify high-value audiences",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "F 25-34", "values": {"cpa": 13.87, "spend": 1234}},
+        {"label": "F 35-44", "values": {"cpa": 14.73, "spend": 987}},
+        {"label": "M 25-34", "values": {"cpa": 15.85, "spend": 856}},
+        {"label": "M 35-44", "values": {"cpa": 18.20, "spend": 720}}
+      ],
+      "metric": {"field": "cpa", "label": "CPA ($)"},
+      "sort": "asc"
+    }
+  }
+}
 ```
+
+Use scatter charts to correlate spend vs. ROAS across audience segments for scaling decisions.
 
 ### Step 4: Calculate Segment Performance Metrics
 

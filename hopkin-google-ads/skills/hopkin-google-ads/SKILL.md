@@ -120,6 +120,9 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_get_keyword_performance` — Keyword metrics with quality scores, match type filtering, and ordering
 - `google_ads_get_search_terms_report` — Search terms report with status filtering and ordering
 
+### Visualization
+- `google_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
+
 ### Preferences
 - `google_ads_store_preference` — Store a persistent preference or observation for a Google Ads entity (account, campaign, ad group, or ad)
 - `google_ads_get_preferences` — Retrieve all stored preferences for a Google Ads entity
@@ -141,6 +144,20 @@ This skill supports four primary report types and a developer feedback workflow 
 3. **Keyword Analysis Reports** — Keyword performance, quality scores, search terms, and optimization opportunities
 4. **Ad Performance Reports** — Individual ad performance, RSA analysis, and creative effectiveness
 5. **Budget & Spend Reports** — Budget tracking, spend pacing, cost analysis, and forecasting
+
+### Data Visualization
+
+After fetching report data, proactively render charts to make insights more accessible. Use `google_ads_render_chart` to visualize data — always pair charts with a summary table and textual insights.
+
+**When to use each chart type:**
+- **Campaign/entity comparisons** → bar chart (spend, ROAS, conversions by campaign)
+- **Trends over time** → timeseries chart (daily/weekly spend, CTR, conversions)
+- **Conversion funnel** → funnel chart (impressions → clicks → conversions → purchases)
+- **Metric correlations** → scatter chart (spend vs ROAS, CPC vs CTR)
+- **Budget breakdown** → waterfall chart (spend by campaign with CPA coloring)
+- **Geographic performance** → choropleth chart (US state-level spend or conversions)
+
+Charts enhance the report — they don't replace the analysis. Always include written insights alongside visualizations.
 
 ### Write Operations (Unsupported — Developer Feedback)
 
@@ -313,6 +330,6 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 2.1
-**Last Updated:** 2026-02-24
+**Skill Version:** 2.2
+**Last Updated:** 2026-03-05
 **Requires:** Hopkin Google Ads MCP (https://app.hopkin.ai)

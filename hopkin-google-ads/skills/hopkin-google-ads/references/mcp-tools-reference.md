@@ -47,21 +47,7 @@ Configure the Hopkin Google Ads MCP as a hosted MCP service in your Claude setti
 
 ## Authentication & Connection
 
-### Hopkin OAuth Flow
-
-Hopkin uses an OAuth flow for connecting to Google Ads accounts. After the MCP is configured, authenticate the user's Google Ads account:
-
-1. **Check auth status:**
-   ```json
-   {
-     "tool": "google_ads_check_auth_status",
-     "parameters": {
-       "reason": "Checking if user is authenticated with Google Ads"
-     }
-   }
-   ```
-
-2. **If not authenticated:** Direct the user to connect their Google Ads account at https://app.hopkin.ai. The OAuth flow is completed through the Hopkin web app, not through an MCP tool.
+Hopkin uses OAuth. If a tool call fails with an auth error, call `google_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai to connect their Google Ads account.
 
 ---
 
@@ -498,6 +484,106 @@ Get search terms report showing which actual search queries triggered ads. Also 
 
 ---
 
+### Visualization Tools
+
+#### `google_ads_render_chart`
+
+**MCP App.** Renders interactive data visualization charts from advertising data.
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `reason` | string | Yes | Why you're rendering this chart |
+| `chart` | object | Yes | Chart configuration — must include `type` and type-specific fields |
+
+**Chart Types:**
+
+**bar** — Compare values across categories (campaigns, ad groups, keywords).
+```json
+{
+  "type": "bar",
+  "data": [
+    {"label": "Brand Search", "values": {"spend": 4521, "roas": 5.2}},
+    {"label": "Non-Brand", "values": {"spend": 3200, "roas": 2.8}},
+    {"label": "Retargeting", "values": {"spend": 1800, "roas": 8.1}}
+  ],
+  "metric": {"field": "spend", "label": "Spend ($)"}
+}
+```
+Optional: `colorBy`, `sort`, `orientation`, `table`, `referenceLines`.
+
+**timeseries** — Plot metrics over time with optional previous-period overlay and projections.
+```json
+{
+  "type": "timeseries",
+  "data": {
+    "current": [
+      {"date": "2026-02-24", "values": {"spend": 450}},
+      {"date": "2026-02-25", "values": {"spend": 520}},
+      {"date": "2026-02-26", "values": {"spend": 480}}
+    ]
+  },
+  "primaryAxis": {"field": "spend", "label": "Daily Spend ($)", "mark": "line"}
+}
+```
+Optional: `data.previous`, `data.projection`, `secondaryAxis`.
+
+**funnel** — Conversion stages.
+```json
+{
+  "type": "funnel",
+  "data": {
+    "stages": ["Impressions", "Clicks", "Conversions", "Purchases"],
+    "volume": [500000, 15000, 3200, 890],
+    "costPer": [0.01, 0.33, 1.56, 5.62]
+  }
+}
+```
+
+**scatter** — Correlate two metrics across entities.
+```json
+{
+  "type": "scatter",
+  "data": [
+    {"label": "Brand Search", "values": {"spend": 4521, "roas": 5.2}},
+    {"label": "Non-Brand", "values": {"spend": 3200, "roas": 2.8}}
+  ],
+  "x": {"field": "spend", "label": "Spend ($)"},
+  "y": {"field": "roas", "label": "ROAS"}
+}
+```
+Optional: `color`, `size`, `referenceLines`, `table`.
+
+**waterfall** — Cumulative contribution with color encoding.
+```json
+{
+  "type": "waterfall",
+  "data": [
+    {"label": "Brand Search", "value": 4521, "colorValue": 45.20},
+    {"label": "Non-Brand", "value": 3200, "colorValue": 62.50},
+    {"label": "Retargeting", "value": 1800, "colorValue": 22.50}
+  ],
+  "valueLabel": "Spend ($)",
+  "colorLabel": "CPA ($)"
+}
+```
+
+**choropleth** — US state-level geographic heatmap.
+```json
+{
+  "type": "choropleth",
+  "data": [
+    {"state": "CA", "value": 12500},
+    {"state": "TX", "value": 8900},
+    {"state": "NY", "value": 7600}
+  ],
+  "valueLabel": "Spend ($)"
+}
+```
+Optional: `tip`, `colorScheme`, `colorType`.
+
+---
+
 ### Preference Tools
 
 Preferences allow persistent storage of settings and observations across sessions. Entity listing tools (e.g., `google_ads_list_accounts`) automatically attach stored preferences to each entity in the response as `_stored_preferences`.
@@ -690,6 +776,13 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 1. Complete the user's request as normal
 2. Call `google_ads_developer_feedback` with `feedback_type: "new_tool"` or `"improvement"` describing what would have been faster
 3. Do NOT block the user's request — submit feedback after delivering the answer
+
+### Pattern 8: Data Visualization
+
+1. Fetch data with analytics tools (performance report, insights, geo performance, etc.)
+2. Transform data into chart format (array of `{label, values}` objects)
+3. Call `google_ads_render_chart` with the appropriate chart type
+4. Present chart alongside summary table and written insights
 
 ---
 

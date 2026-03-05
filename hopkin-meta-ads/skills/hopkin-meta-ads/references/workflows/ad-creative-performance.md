@@ -35,72 +35,15 @@ Before starting this workflow, gather:
 
 ### 1. Clarify Scope and Success Metric
 
-**Objective:** Define exactly what you're analyzing and how you'll measure success.
+Gather and confirm before pulling data:
 
-**Steps:**
-
-1. **Identify test campaigns/ad sets in Meta Ads Manager:**
-   - Filter campaign and ad set names for patterns like "Creative Test", "CR1", "CR2", "R1", "Round 3", "Test", etc.
-   - Sort by creation date and last significant edit to see the most recent test-type campaigns/ad sets
-   - Note campaign IDs and ad set IDs in scope
-
-2. **Check project management tools:**
-   - Look for the latest "Creative Round" or "Creative Test" task in ClickUp, Gmail, or other project communication/management tools you have access to
-   - Note which campaigns/ad sets are referenced for this account (or client)
-   - Check for any specific instructions or context
-
-3. **Verify the round is unambiguous:**
-   - Ask yourself: "Is it obvious which campaigns/ad sets belong to the latest creative round?"
-   - Ask yourself: "Is there more than one round being tested at the same time?"
-   - If unclear, ask the user or GM/channel lead:
-     - "For [Client], which campaigns/ad sets should we treat as the latest Meta creative round for this report?"
-     - "What start and end dates should we use for that round?"
-
-4. **Confirm the date range:**
-   - **Start date:** When the first creative in this round went live and spend started meaningfully (not just a few dollars)
-   - **End date:** When the team "called" the test, or a clean cut-off (e.g., yesterday or end of last week)
-   - If in doubt, confirm with the user: "I'm planning to use [Start Date]–[End Date] for this round. Does that match the test window?"
-
-5. **Confirm the primary success metric:**
-   - Ask: "What should be the primary success metric for this creative round?"
-   - Search project management tools for Tracking Glossary for this account/client to see what the metric(s) are called in Meta
-   - Look for any past reports in Slack/Gmail for the performance metric to use
-   - Common options based on client goals:
-     - **E-commerce:** Purchases, CPA, ROAS
-     - **B2B/Lead Gen:** Qualified leads (HQL, SQL), CPL, cost per trial
-     - **Early-funnel:** Landing page views, leads, add-to-cart (if insufficient down-funnel volume)
-   - If you aren't sure, ask the user for the appropriate primary success metric.
-
-6. **Identify secondary metrics:**
-   - Ask: "Are there any secondary metrics you want to see in this report?"
-   - Common examples: CTR, CPC, CVR (click-to-conversion rate), thumb-stop rate, 3-second views, view-through conversions
-
-7. **Confirm source of truth:**
-   - Ask: "Should we pull the main performance numbers from Meta, from backend analytics (Funnel/BI/CRM), or show both?"
-   - Ask: "If platform and backend disagree, which should we treat as the main reference?"
-   - Document decision: Platform only (Meta), Backend only (Funnel/CRM), or Both with explanation
-
-8. **Confirm output format:**
-   - Ask: "What format would you like for this creative test report?"
-   - Common options:
-     - **Google Slides / PowerPoint** - For client presentations with visuals
-     - **PDF** - For formal reports or email distribution
-     - **Excel** - For data-heavy analysis with pivot tables
-     - **Combination** - e.g., Slides for executive summary + Excel for detailed data
-   - If not specified by user, ask explicitly: "I'll be preparing a creative test report for [Client]. What format works best for you - Slides, PDF, Excel, or something else?"
-   - Document the chosen format and adjust report structure accordingly:
-     - **Slides/PowerPoint:** Focus on visuals, charts, screenshots; limit text per slide
-     - **PDF:** Professional formatting, clear sections, tables with good spacing
-     - **Excel:** Multiple tabs for different views, pivot tables, sortable columns
-
-9. **Document scope at top of report:**
-   - Client and channel (Meta)
-   - Test round name
-   - Campaigns/ad sets in scope
-   - Date range
-   - Primary metric and its source of truth
-   - Secondary metrics
-   - Output format
+1. **Identify test campaigns/ad sets** — Filter for patterns like "Creative Test", "CR1", "Round 3". Check project management tools for scope. If ambiguous, ask the user.
+2. **Confirm date range** — Start: when meaningful spend began. End: when the test was called or a clean cut-off. Confirm with user if uncertain.
+3. **Confirm primary success metric** — E-commerce: Purchases/CPA/ROAS. B2B/Lead Gen: CPL/HQL. Early-funnel: Landing page views/leads. Check Tracking Glossary and past reports. Ask if unclear.
+4. **Confirm secondary metrics** — CTR, CPC, CVR, thumb-stop rate, 3-second views, etc.
+5. **Confirm source of truth** — Meta only, backend only (Funnel/CRM), or both? Which takes precedence?
+6. **Confirm output format** — Slides, PDF, Excel, or combination. Ask explicitly if not specified.
+7. **Document scope** — Client, channel, round name, campaigns/ad sets, date range, primary metric + source, secondary metrics, output format.
 
 ### 2. Pull Creative-Level Data
 
@@ -154,85 +97,27 @@ Before starting this workflow, gather:
 
 ### 2.1. Download Creative Assets
 
-**Objective:** Obtain actual creative assets (images/videos) for inclusion in the report.
+**Always include visual examples of creatives in reports.** Stakeholders need to see what performed well/poorly.
 
-**Critical:** Always include visual examples of creatives in reports. Stakeholders need to see what performed well/poorly, not just read about it.
-
-**Steps:**
-
-1. **Get creative previews via Hopkin:**
-   - `meta_ads_preview_ads` is an MCP App that renders actual visual ad creative (images/videos) with a metrics overlay in an interactive UI — distinct from tabular data tools. It is the definitive way to let stakeholders see what the ads look like. Proactively offer it in any creative review context.
-   - The `ad_id` values returned by `meta_ads_get_ad_creative_report` (including representative IDs in `ad_name` mode) can be passed directly — no need to call `meta_ads_list_ads` separately:
-     ```json
-     {
-       "tool": "meta_ads_preview_ads",
-       "parameters": {
-         "reason": "Rendering creative visual preview with performance metrics for creative test report",
-         "account_id": "act_123456789",
-         "ads": [
-           {"ad_id": "23842453456789", "metrics": {"spend": "450.00", "cpa": "$12.50", "ctr": "3.2%"}},
-           {"ad_id": "23842453456790", "metrics": {"spend": "380.00", "cpa": "$45.00", "ctr": "1.1%"}}
-         ],
-         "metric_labels": {"spend": "Spend", "cpa": "CPA", "ctr": "CTR"}
-       }
+1. **Use `meta_ads_preview_ads`** to render visual ad previews with metrics overlay. Pass `ad_id` values from `meta_ads_get_ad_creative_report` directly:
+   ```json
+   {
+     "tool": "meta_ads_preview_ads",
+     "parameters": {
+       "reason": "Rendering creative visual preview with performance metrics",
+       "account_id": "act_123456789",
+       "ads": [
+         {"ad_id": "23842453456789", "metrics": {"spend": "450.00", "cpa": "$12.50", "ctr": "3.2%"}},
+         {"ad_id": "23842453456790", "metrics": {"spend": "380.00", "cpa": "$45.00", "ctr": "1.1%"}}
+       ],
+       "metric_labels": {"spend": "Spend", "cpa": "CPA", "ctr": "CTR"}
      }
-     ```
-   - For video ads, get both the video file and a thumbnail/poster frame. The `thumbnail_url` field in the creative report response provides a GCS-hosted thumbnail.
+   }
+   ```
 
-2. **Download assets for key creatives:**
-   - **Download all winners** - Essential to show what worked
-   - **Download top 2-3 losers** - Important to show what didn't work
-   - **Download any notable/promising creatives** - Those with interesting patterns
-   - For large creative rounds (>20 ads), prioritize top/bottom performers and skip middle-tier ads
+2. **Download assets** for all winners, top 2-3 losers, and notable creatives. For large rounds (>20 ads), prioritize top/bottom performers. Always download locally — Meta URLs expire.
 
-3. **Format-specific asset handling:**
-
-   **For Slides/PowerPoint reports:**
-   - Download assets locally
-   - Insert images/videos directly into slides
-   - Do NOT link to external URLs
-   - For videos: Use first frame as thumbnail with play indicator, or export key frames as images
-   - Ensure images are high-resolution (at least 1920x1080 for full-slide images)
-
-   **For PDF reports:**
-   - Download assets locally
-   - Embed images directly in document
-   - For videos: Include representative thumbnail/screenshot with note "Video - see [link] for full asset"
-   - Keep file size manageable (<10MB) - compress images if needed
-
-   **For Excel reports:**
-   - Download thumbnails/screenshots
-   - Insert images in a dedicated "Creative Previews" tab
-   - Link from data rows to preview images
-   - Alternative: Include thumbnail URLs in a column (but note they may expire)
-
-4. **Organize downloaded assets:**
-   - Create a folder structure: `[Client]/[Round]/assets/`
-   - Separate subfolders for winners, losers, and other
-   - Keep original filenames + metadata for reference
-
-5. **Handle special cases:**
-
-   **Carousel ads:**
-   - Download all cards/frames, not just the first one
-   - Show key frames that illustrate the concept
-   - Note which frame(s) performed best if data available
-
-   **Dynamic/Catalog ads:**
-   - Download representative examples
-   - Show product variations if testing different products
-   - Note the template/format rather than every single variation
-
-   **UGC/Creator content:**
-   - Ensure you have rights/permission to include in client reports
-   - If sharing externally, verify creator agreements allow it
-   - Consider blurring faces if privacy concerns exist
-
-6. **Quality check:**
-   - Verify all downloaded assets are readable/playable
-   - Check file sizes are reasonable (compress if >5MB per image)
-   - Ensure videos are in compatible formats (.mp4, .mov)
-   - Confirm no corrupted or broken downloads
+3. **Special cases:** For carousel ads, download all cards. For video ads, get thumbnail via `thumbnail_url`. For UGC, verify rights before including in client reports.
 
 ### 3. Group Performance by Concept/Angle
 
@@ -260,6 +145,32 @@ Before starting this workflow, gather:
 3. **Keep both levels of detail:**
    - **Concept-level table:** For client-facing storytelling and high-level insights
    - **Ad-level table:** As a detailed appendix or internal reference sheet
+
+### 3a. Visualize Creative Performance
+
+Render a bar chart comparing creatives by CPA or CTR:
+
+```json
+{
+  "tool": "meta_ads_render_chart",
+  "parameters": {
+    "reason": "Comparing creative concepts by CPA to identify top performers",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "Social Proof Video", "values": {"cpa": 32.50, "spend": 2100}},
+        {"label": "Product Demo", "values": {"cpa": 45.00, "spend": 1800}},
+        {"label": "Testimonial Carousel", "values": {"cpa": 28.90, "spend": 1500}}
+      ],
+      "metric": {"field": "cpa", "label": "CPA ($)"},
+      "colorBy": {"field": "spend", "label": "Spend ($)"},
+      "sort": "asc"
+    }
+  }
+}
+```
+
+For creative fatigue analysis, use a timeseries chart plotting CTR over time per creative.
 
 ### 4. Define Benchmarks and Winner Criteria
 
@@ -402,215 +313,42 @@ Before starting this workflow, gather:
 
 ### 8. Build the Client-Facing Report
 
-**Objective:** Present findings in a clear, actionable format tailored to the chosen output format.
-
-**Format-Specific Considerations:**
-
-**For Google Slides / PowerPoint:**
-- Limit text per slide (max 3-5 bullets or 1 chart + brief explanation)
-- Use visual hierarchy: large chart/screenshot + supporting text
-- Include creative thumbnails/screenshots prominently
-- Use consistent brand colors and formatting
-- Create a clear slide flow: Context → Results → Winners → Losers → Actions → Next Steps
-- Export key data tables as images or simplified charts
-
-**For PDF:**
-- Use clear section headers and page breaks
-- Include table of contents with page numbers for longer reports
-- Ensure tables are well-formatted with proper spacing and borders
-- Embed creative preview images at appropriate size (not too large/small)
-- Use consistent fonts and professional styling
-- Consider adding footer with report date and version
-
-**For Excel:**
-- Create separate tabs for different views:
-  - "Summary" - Executive overview with key metrics
-  - "By Concept" - Concept-level performance
-  - "By Ad" - Detailed ad-level data
-  - "Charts" - Visualizations and graphs
-  - "Raw Data" - Full export from Meta
-- Use freeze panes to keep headers visible
-- Apply conditional formatting to highlight winners/losers
-- Add pivot tables for flexible data exploration
-- Include filters and sorting on all data tables
-- Document calculations in a "Methodology" tab
-
 **Report Structure:**
 
-#### 1. Title & Context
-- "Meta Creative Test Round [#] – [Client] – [Date Range]"
-- Short context:
-  - Objective of the round
-  - In-scope campaigns/ad sets
-  - Primary and secondary metrics used
+1. **Title & Context** — "Meta Creative Test Round [#] – [Client] – [Date Range]". Include objective, in-scope campaigns, primary/secondary metrics.
 
-#### 2. Executive Summary (1 page)
-- 3-5 bullets covering:
-  - What was tested (channels, number of concepts, formats)
-  - Top 1-2 winning concepts and their performance vs benchmark
-  - The biggest creative learning (e.g., "social proof + X angle wins")
-  - Actions already taken in the account
-  - What's planned for the next round
+2. **Executive Summary** (1 page) — 3-5 bullets: what was tested, top winning concepts vs benchmark, biggest creative learning, actions taken, next round plans.
 
-#### 3. Methodology
-- Brief explanation:
-  - How you defined the round (campaigns/ad sets, date range)
-  - Primary metric and source of truth (Meta vs Funnel)
-  - Benchmarks and winner/loser criteria
+3. **Methodology** — How the round was defined, primary metric, source of truth, benchmarks, winner/loser criteria.
 
-#### 4. Performance Overview
-- High-level chart/table:
-  - Overall test performance vs evergreen/benchmark on primary metric
-  - Winners vs non-winners breakdown:
-    - Spend
-    - Conversions
-    - CPA/CPL
+4. **Performance Overview** — Overall test performance vs evergreen/benchmark. Winners vs non-winners by spend, conversions, CPA/CPL.
 
-#### 5. Winners Section
+5. **Winners Section** — For each winner, include:
+   - **Creative visual** (required) — Use `meta_ads_preview_ads` or embed downloaded assets. Always download locally — Meta URLs expire.
+   - **Key metrics** — Spend, conversions, CPA vs benchmark (e.g., "$12.50 CPA — 30% better than $18.00 benchmark")
+   - **Why it worked** — Specific hook, angle, visual style insights referencing the creative
+   - **Action taken** — Where graduated, with what budget
 
-**CRITICAL: Always include actual creative visuals for winners.**
+6. **Losers / Inconclusive** — For top 2-3 losers with sufficient volume:
+   - **Creative visual** (required) — Show what didn't work
+   - **Metrics** — Gap vs benchmark (e.g., "$45.00 CPA — 2.5x worse")
+   - **What didn't work** — Specific failure points (weak hook, unclear message, bad creative-to-LP match)
+   - **Inconclusive:** Note insufficient data; don't include visuals for these
 
-For each key winner:
+7. **Next Steps** — Account changes already made, next test plans, client asks (UGC, approvals, etc.)
 
-**Creative Visual (Required):**
-- **Slides/PowerPoint:** Insert downloaded image/video on slide
-  - Use large, prominent placement (half to full slide)
-  - For videos: Use thumbnail + "Watch Video" indicator, or embed if presenting live
-- **PDF:** Embed downloaded image
-  - Size appropriately (3-5 inches wide/tall)
-  - For videos: Use thumbnail + note "Video available at [link]"
-- **Excel:** Link to image in Creative Previews tab
-  - Or embed thumbnail in cell using Insert > Image
+**Format tips:** Slides — limit to 3-5 bullets/slide, prominent creative visuals. PDF — embed images, keep <10MB. Excel — separate tabs (Summary, By Concept, By Ad, Charts, Raw Data), use conditional formatting.
 
-**Key metrics:**
-- Spend, conversions, CPA/CPL vs benchmark
-- CTR/CVR if they help explain performance
-- Format as: "$12.50 CPA (30% better than $18.00 benchmark)"
+### 9. QA and Present
 
-**Why it worked** (1-3 bullets):
-- Specific hook, angle, visual style insights
-- Reference what's visible in the creative preview
-- Examples:
-  - "Opens with '3 signs you need X' listicle format - immediately hooks viewer"
-  - "UGC format with creator holding product - feels authentic vs. polished brand content"
-  - "First 3 seconds show transformation - high thumb-stop rate"
-- Any quirks (e.g., best on mobile placements only, outperformed on Instagram vs. Facebook)
+**Before sharing, verify:**
+- Primary metric used consistently across executive summary, charts, tables, and winner/loser calls
+- All CPA/CPL/ROAS numbers labeled as platform or backend sourced
+- Campaigns/ad sets and date range match agreed scope; totals align with dashboards
+- All winners and top losers have creative visuals (downloaded, not external links)
+- Not overselling small improvements; counterintuitive results explained
 
-**Action taken:**
-- Where it has been graduated and with what budget or bid strategy
-- Example: "Moved to Evergreen campaign with 20% of daily budget ($200/day)"
-
-#### 6. Losers / Inconclusive Section
-
-**CRITICAL: Include creative visuals for top 2-3 losers to illustrate what didn't work.**
-
-Focus on instructive underperformers:
-
-**Creative Visual (Required for top losers):**
-- Use same format as Winners section
-- Include 2-3 worst performers that had sufficient spend/volume
-- Skip showing every single losing creative - focus on instructive examples
-
-**Metrics:**
-- Show enough to illustrate the gap vs benchmark
-- Format as: "$45.00 CPA (2.5x worse than $18.00 benchmark)"
-- Include CTR/CVR if they help explain why it failed
-
-**What didn't work** (1-2 bullets on failures and what to avoid):
-- Reference what's visible in the creative preview
-- Examples:
-  - "Opens with slow brand logo intro - 3-second drop-off rate was 65%"
-  - "Heavy text overlay makes product hard to see - low engagement"
-  - "Generic 'Buy now' messaging with no differentiation - high CPC, low CVR"
-
-**Inconclusive ads note:**
-- For ads with insufficient data: "Low spend/volume—no strong conclusion yet. Keeping in mind for future tests with more budget."
-- Do NOT include creative visuals for inconclusive ads (save space/focus)
-
-#### 7. Next Steps & Requests
-- **Account changes:**
-  - What you'll change immediately (already in motion or done)
-- **Next tests:**
-  - Number of new concepts, planned launch date, main hypotheses
-- **Client asks:**
-  - Needed UGC / brand approvals / product info (e.g., "We need 2 new creator scripts focused on X benefit.")
-
-### 9. QA Metrics and Alignment Before Sharing
-
-**Objective:** Ensure accuracy and consistency before presenting to client.
-
-**Steps:**
-
-1. **Metric consistency check:**
-   - Is the primary metric used consistently in:
-     - Executive summary
-     - Charts/tables
-     - Winner/loser calls
-   - Are all CPA/CPL/ROAS numbers clearly labeled as platform or backend sourced?
-
-2. **Scope sanity check:**
-   - Do the campaigns/ad sets and date range in the report match what you agreed on?
-   - Do totals roughly align with what they see in their dashboards?
-
-3. **Narrative consistency:**
-   - Does the executive summary accurately reflect which concepts truly won by the primary metric?
-   - Are you accurately representing the scale of impact (not overselling small improvements)?
-   - Are any surprising or counterintuitive results clearly explained?
-
-4. **Final clarifications if needed:**
-   - If you discover issues (e.g., platform vs backend mismatch, weird spikes), check with the user:
-     - "We're seeing [issue]. Do you want us to show both numbers and explain, or stick to [Meta/Funnel] for this round's report?"
-
-5. **Format-specific QA:**
-
-   **Universal - Creative Assets Check (ALL FORMATS):**
-   - ✓ Do ALL winners have creative visuals included?
-   - ✓ Do top 2-3 losers have creative visuals included?
-   - ✓ Are creative visuals actual downloaded assets (not broken external links)?
-   - ✓ Are images/videos high quality and clearly visible?
-   - ✓ Are captions accurate and include key metrics?
-
-   **For Slides/PowerPoint:**
-   - Does each slide have a clear title?
-   - Are images high-resolution and properly sized (min 1920x1080)?
-   - Are creative visuals embedded (not linked externally)?
-   - Is text readable (not too small)?
-   - Do animations/transitions work if used?
-   - Is the slide deck under 20 slides for executive summary?
-
-   **For PDF:**
-   - Do page breaks fall in logical places?
-   - Are all images embedded and visible (test by opening PDF)?
-   - Are creative visuals clear and appropriately sized?
-   - Is the file size reasonable (<10MB)?
-   - Does the table of contents have accurate page numbers?
-
-   **For Excel:**
-   - Do all formulas calculate correctly?
-   - Are tabs labeled clearly?
-   - Do filters and sorts work properly?
-   - Are pivot tables refreshing correctly?
-   - Is conditional formatting applied appropriately?
-   - Are creative preview images visible in Creative Previews tab?
-
-### 10. Present the Report and Capture Feedback
-
-**Objective:** Share findings and gather input for future rounds.
-
-**Steps:**
-
-1. **Walk through the report:**
-   - Objective → methodology → high-level results → winners/losers → what you've changed → what's next
-
-2. **Ask for reactions:**
-   - "What surprised you in these results?"
-   - "Are there angles or products you want us to emphasize more (or less) in the next round?"
-   - "Is there any additional metric or cut you'd like to see next time?"
-
-3. **Feed learnings back:**
-   - Update internal templates/SOPs with:
-     - Any new preferred metrics or views
-     - Client-specific preferences (e.g., "always show backend HQLs and CPA by geo")
+**When presenting:** Walk through objective → methodology → results → winners/losers → actions → next steps. Ask: "What surprised you?" and "Any additional metrics for next time?" Capture feedback for future rounds.
 
 ## Video-Specific Analysis
 
@@ -632,69 +370,14 @@ For video ads, include additional video performance metrics:
 
 ## Best Practices
 
-1. **ALWAYS use `meta_ads_get_ad_creative_report` as the primary data source** — This is the dedicated tool for creative analysis. Use `level: "ad_name"` (default) to compare creative concepts across ad sets; use `level: "ad_id"` for individual ad comparisons. The returned `ad_id` values work directly with `meta_ads_preview_ads`.
-
-2. **ALWAYS use `meta_ads_preview_ads` for creative review** — This MCP App renders a visual UI with actual images/videos and metrics side-by-side. It is the most powerful tool in this workflow. Use it:
-   - Whenever the user asks "what do my ads look like" or wants to review creative
-   - When presenting winners and losers — visual context makes insights actionable
-   - For A/B creative comparisons — seeing the creative alongside the number is essential
-   - Pass `ad_id` values from `meta_ads_get_ad_creative_report` directly — no need to call `meta_ads_list_ads` first
-
-3. **ALWAYS include creative visuals in reports** - Never present creative test results without showing the actual ads
-   - Winners and top losers must have images/videos included
-   - Always download assets locally first before embedding in reports (Meta URLs expire)
-   - Stakeholders need to see what worked/failed, not just read metrics
-   - Creative insights are meaningless without seeing the creative
-
-4. **Always confirm scope before pulling data** - Ambiguity leads to rework
-
-5. **Align on metrics early** - Primary metric should be clear from the start
-
-6. **Confirm output format upfront** - Ask what format they want (Slides, PDF, Excel) before building
-
-7. **Define benchmarks explicitly** - Don't rely on intuition for winner/loser calls
-
-8. **Review actual creatives, not just numbers** - The "why" comes from watching the ads
-   - Watch videos fully, don't just look at thumbnails
-   - Note first 3 seconds (hook quality), messaging, visual style, CTA placement
-
-9. **Be specific in insights** - "Social proof hooks work" is weak; "3-item listicle hooks doubled CTR" is strong
-   - Reference specific creative elements visible in the assets
-
-10. **Connect actions to expectations** - Tell the client what should happen next
-
-11. **QA rigorously** - Metric misalignment destroys credibility
-    - Verify all creative assets are displaying correctly before sharing
-
-12. **Capture feedback for next time** - Every round should improve your process
-
-## Common Pitfalls to Avoid
-
-- **Missing creative visuals** - NEVER present a creative test report without actual images/videos of the ads
-  - Showing only metrics without visuals makes insights impossible to understand
-  - Stakeholders can't learn what works if they can't see the creatives
-
-- **Using Meta URLs directly in reports** - These expire and break
-  - Always download assets locally first, then embed in your report
-  - Test that all images/videos are displaying before sharing report
-
-- **Showing every single ad** - Focus on winners and instructive losers
-  - Don't clutter report with 20+ mediocre creative examples
-  - Prioritize quality of insights over quantity of visuals
-
-- **Calling winners too early** - Ensure sufficient sample size (conversions, spend)
-
-- **Ignoring statistical significance** - Small differences may not be meaningful
-
-- **Mixing metrics** - Don't switch between Meta and backend metrics mid-report
-
-- **Overselling small wins** - 5% improvement is not "massive"
-
-- **Forgetting creative fatigue** - Today's winner may be tomorrow's loser
-
-- **Not documenting methodology** - Clients need to understand how you defined success
-
-- **Not confirming output format** - Building the wrong format wastes time
+1. **Use `meta_ads_get_ad_creative_report`** as the primary data source — `level: "ad_name"` for concept comparison, `level: "ad_id"` for individual ads. Returned `ad_id` values work directly with `meta_ads_preview_ads`.
+2. **Use `meta_ads_preview_ads`** for all creative reviews — renders visual UI with images/videos and metrics. Pass ad IDs from the creative report directly.
+3. **Always include creative visuals** — Never present creative results without showing the ads. Download assets locally (Meta URLs expire).
+4. **Confirm scope, metrics, and output format before pulling data** — Ambiguity leads to rework.
+5. **Define benchmarks explicitly** — Don't rely on intuition for winner/loser calls. Ensure sufficient sample size before declaring winners.
+6. **Be specific in insights** — "3-item listicle hooks doubled CTR" not "social proof works". Reference visible creative elements.
+7. **Don't mix metrics** — Use same source (Meta vs backend) consistently throughout the report.
+8. **Focus on winners and instructive losers** — Don't clutter with 20+ mediocre examples.
 
 ## See Also
 

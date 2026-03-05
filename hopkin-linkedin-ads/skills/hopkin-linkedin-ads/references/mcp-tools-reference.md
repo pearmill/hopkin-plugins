@@ -47,23 +47,7 @@ Configure the Hopkin LinkedIn Ads MCP as a hosted MCP service in your Claude set
 
 ## Authentication & Connection
 
-### Hopkin OAuth Flow
-
-Hopkin uses an OAuth flow for connecting to LinkedIn Ads accounts. After the MCP is configured, authenticate the user's LinkedIn Ads account:
-
-1. **Check auth status:**
-   ```json
-   {
-     "tool": "linkedin_ads_check_auth_status",
-     "parameters": {
-       "reason": "Checking if user is authenticated with LinkedIn Ads"
-     }
-   }
-   ```
-
-2. **If not authenticated:** Direct the user to connect their LinkedIn Ads account at https://app.hopkin.ai. The OAuth flow is completed through the Hopkin web app, not through an MCP tool.
-
-> **Token TTL:** LinkedIn provider tokens expire after **60 days**. If the user was previously authenticated but tools are returning auth errors, direct them to https://app.hopkin.ai to reconnect.
+Hopkin uses OAuth. If a tool call fails with an auth error, call `linkedin_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai to connect their LinkedIn Ads account. LinkedIn tokens expire after **60 days** — reconnect if auth errors appear.
 
 ---
 
@@ -464,6 +448,108 @@ List partner conversions configured for a LinkedIn Ads account. LinkedIn uses "p
 
 ---
 
+### Visualization Tools
+
+#### `linkedin_ads_render_chart`
+
+**MCP App.** Renders interactive data visualization charts from advertising data.
+
+**Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `reason` | string | Yes | Why you're rendering this chart |
+| `chart` | object | Yes | Chart configuration — must include `type` and type-specific fields |
+
+**Chart Types:**
+
+**bar** — Compare values across categories (campaign groups, demographics, industries).
+```json
+{
+  "type": "bar",
+  "data": [
+    {"label": "Q1 Lead Gen", "values": {"spend": 4521, "leads": 89}},
+    {"label": "Brand Awareness", "values": {"spend": 2100, "leads": 12}},
+    {"label": "Webinar Promo", "values": {"spend": 1800, "leads": 45}}
+  ],
+  "metric": {"field": "spend", "label": "Spend ($)"},
+  "colorBy": {"field": "leads", "label": "Leads"}
+}
+```
+Optional: `sort`, `orientation`, `table`, `referenceLines`.
+
+**timeseries** — Plot metrics over time with optional previous-period overlay and projections.
+```json
+{
+  "type": "timeseries",
+  "data": {
+    "current": [
+      {"date": "2026-02-24", "values": {"spend": 450}},
+      {"date": "2026-02-25", "values": {"spend": 520}},
+      {"date": "2026-02-26", "values": {"spend": 480}}
+    ]
+  },
+  "primaryAxis": {"field": "spend", "label": "Daily Spend ($)", "mark": "line"}
+}
+```
+Optional: `data.previous`, `data.projection`, `secondaryAxis`.
+
+**funnel** — Conversion stages from impressions to leads.
+```json
+{
+  "type": "funnel",
+  "data": {
+    "stages": ["Impressions", "Clicks", "Lead Gen Opens", "Leads"],
+    "volume": [500000, 15000, 4200, 890],
+    "costPer": [0.01, 0.33, 1.19, 5.62]
+  }
+}
+```
+
+**scatter** — Correlate two metrics across entities.
+```json
+{
+  "type": "scatter",
+  "data": [
+    {"label": "Q1 Lead Gen", "values": {"spend": 4521, "cpa": 50.80}},
+    {"label": "Brand Awareness", "values": {"spend": 2100, "cpa": 175}},
+    {"label": "Webinar Promo", "values": {"spend": 1800, "cpa": 40}}
+  ],
+  "x": {"field": "spend", "label": "Spend ($)"},
+  "y": {"field": "cpa", "label": "CPA ($)"}
+}
+```
+Optional: `color`, `size`, `referenceLines`, `table`.
+
+**waterfall** — Cumulative contribution with color encoding.
+```json
+{
+  "type": "waterfall",
+  "data": [
+    {"label": "Q1 Lead Gen", "value": 4521, "colorValue": 50.80},
+    {"label": "Brand Awareness", "value": 2100, "colorValue": 175},
+    {"label": "Webinar Promo", "value": 1800, "colorValue": 40}
+  ],
+  "valueLabel": "Spend ($)",
+  "colorLabel": "CPA ($)"
+}
+```
+
+**choropleth** — US state-level geographic heatmap.
+```json
+{
+  "type": "choropleth",
+  "data": [
+    {"state": "CA", "value": 12500},
+    {"state": "TX", "value": 8900},
+    {"state": "NY", "value": 7600}
+  ],
+  "valueLabel": "Spend ($)"
+}
+```
+Optional: `tip`, `colorScheme`, `colorType`.
+
+---
+
 ### Preference Tools
 
 Preferences allow persistent storage of settings and observations across sessions. Entity listing tools (e.g., `linkedin_ads_list_ad_accounts`) automatically attach stored preferences to each entity in the response as `_stored_preferences`. Use preferences to remember user choices, default accounts, and analytical observations.
@@ -634,6 +720,13 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 1. Complete the user's request as normal
 2. Call `linkedin_ads_developer_feedback` with `feedback_type: "new_tool"` or `"improvement"` describing what would have been faster
 3. Do NOT block the user's request — submit feedback after delivering the answer
+
+### Pattern 9: Data Visualization
+
+1. Fetch data with analytics tools (performance report, insights, etc.)
+2. Transform data into chart format (array of `{label, values}` objects)
+3. Call `linkedin_ads_render_chart` with the appropriate chart type
+4. Present chart alongside summary table and written insights
 
 ---
 

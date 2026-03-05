@@ -84,17 +84,7 @@ Ideal Daily Spend = Total Budget / Total Duration
 
 ### Step 4: Present Budget Overview
 
-```
-Budget & Pacing Report
-Ad Account: act_123456789
-Report Date: 2026-01-15
-
-| Campaign Name    | Budget    | Spend   | Remain  | Days Running | Days Left | Status     |
-|------------------|-----------|---------|---------|--------------|-----------|------------|
-| Summer Sale 2026 | $10,000   | $6,234  | $3,766  | 15/30 days   | 15 days   | On Track   |
-| Brand Awareness  | $500/day  | $7,125  | N/A     | 15 days      | Ongoing   | Ahead      |
-| Product Launch   | $5,000    | $4,892  | $108    | 28/30 days   | 2 days    | Near End   |
-```
+Present as a table with columns: Campaign Name, Budget (daily or lifetime), Spend to Date, Remaining, Days Running/Left, Pacing Status.
 
 ### Step 5: Provide Detailed Pacing Analysis
 
@@ -103,6 +93,32 @@ For each campaign, show detailed breakdown with calculated metrics.
 ### Step 6: Show Daily Spend Trend
 
 Display spend progression over time from the `meta_ads_get_insights` daily data.
+
+### Step 6a: Visualize Budget Trends
+
+Render a timeseries chart with daily spend data to show pacing visually:
+
+```json
+{
+  "tool": "meta_ads_render_chart",
+  "parameters": {
+    "reason": "Showing daily spend trend for budget pacing analysis",
+    "chart": {
+      "type": "timeseries",
+      "data": {
+        "current": [
+          {"date": "2026-03-01", "values": {"spend": 1250}},
+          {"date": "2026-03-02", "values": {"spend": 1180}},
+          {"date": "2026-03-03", "values": {"spend": 1320}}
+        ]
+      },
+      "primaryAxis": {"field": "spend", "label": "Daily Spend ($)", "mark": "line"}
+    }
+  }
+}
+```
+
+Use a waterfall chart to show spend contribution by campaign with CPA color encoding.
 
 ### Step 7: Provide Recommendations
 

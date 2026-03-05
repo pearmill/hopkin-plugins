@@ -168,84 +168,16 @@ Engineering Function CPA: $75
 Engineering Function Index: (75/50) × 100 = 150 (50% less efficient)
 ```
 
-### Example Table Structure
+### Table Structure
 
-**Job Function Breakdown:**
-```
-LinkedIn Demographic Insights — Job Function
-Ad Account: 123456789
-Date Range: Last 30 Days
+Present each pivot as a table with columns: Segment, Spend, Impressions, Clicks, CTR, Leads, CPA, Index. Sort by the primary metric (usually CPA or leads).
 
-| Job Function  | Spend  | Impressions | Clicks | CTR  | Leads | CPA    | Index |
-|---------------|--------|-------------|--------|------|-------|--------|-------|
-| Marketing     | $2,100 | 89,450      | 2,340  | 2.6% | 42    | $50.00 | 100   |
-| Technology    | $1,890 | 72,300      | 1,890  | 2.6% | 38    | $49.74 | 100   |
-| Sales         | $1,450 | 65,200      | 1,120  | 1.7% | 18    | $80.56 | 62    |
-| Operations    | $980   | 52,100      | 780    | 1.5% | 10    | $98.00 | 51    |
-| Engineering   | $1,200 | 78,900      | 1,450  | 1.8% | 15    | $80.00 | 63    |
-| Finance       | $890   | 48,300      | 910    | 1.9% | 22    | $40.45 | 124   |
-```
+## Actionable Insights
 
-**Seniority Level Breakdown:**
-```
-LinkedIn Demographic Insights — Seniority
-Ad Account: 123456789
-Date Range: Last 30 Days
-
-| Seniority | Spend  | Clicks | CTR  | Leads | CPA    | Index |
-|-----------|--------|--------|------|-------|--------|-------|
-| Director  | $3,400 | 2,890  | 3.2% | 67    | $50.75 | 100   |
-| VP        | $2,100 | 1,560  | 3.7% | 45    | $46.67 | 109   |
-| CXO       | $1,200 | 890    | 3.4% | 28    | $42.86 | 118   |
-| Manager   | $1,800 | 1,200  | 2.1% | 18    | $100   | 51    |
-| Senior    | $1,100 | 650    | 1.4% | 8     | $137.5 | 37    |
-```
-
-## Providing Actionable Insights
-
-### High-Performing Segments
-
-Identify and amplify:
-- Which job functions have the highest conversion rate and lowest CPA?
-- Which seniority levels drive the most leads at best cost efficiency?
-- Which industries are most receptive to the product/offer?
-
-### Underperforming Segments
-
-Flag for review or exclusion:
-- Segments with index < 50 (more than 50% worse than average) — consider excluding from targeting
-- Segments with very high spend but very low conversions — review creative relevance
-- Segments with high impressions but very low CTR — ad copy may not resonate
-
-### Targeting Optimization Recommendations
-
-Based on the analysis:
-
-1. **Increase bids for top-performing segments** — If Director-level is converting at 2x efficiency, consider increasing bids or budget for Director targeting
-2. **Exclude low-performing segments** — Add exclusions for segments consistently showing poor performance
-3. **Create segment-specific creative** — Develop tailored messaging for top-performing job functions or industries
-4. **Adjust campaign targeting** — Narrow targeting to focus on validated high-value segments
-
-## Example Insights Section
-
-```
-Key Insights — Job Function Analysis
-
-High-Value Segments:
-✓ Finance function: 124 index (24% more efficient than average) — $40 CPA vs $50 average
-✓ Marketing function: 100 index — Largest volume driver, performing at par
-✓ Technology function: 100 index — Strong volume with average efficiency
-
-Underperforming Segments:
-⚠ Operations function: 51 index (49% less efficient) — $98 CPA vs $50 average — consider excluding
-⚠ Sales function: 62 index — Unexpectedly low conversion for a sales-oriented product
-
-Targeting Recommendations:
-→ Prioritize Finance and Marketing/Technology functions for budget allocation
-→ Add Operations to exclusion list or reduce bids significantly
-→ Test Finance-specific creative with messaging around ROI and cost savings
-→ Review Sales messaging — may need to speak to different pain points for this function
-```
+- **High-performing segments** (index > 100) — Increase bids/budget, create segment-specific creative
+- **Underperforming segments** (index < 50) — Consider excluding from targeting or reducing bids
+- **High spend, low conversions** — Review creative relevance for that segment
+- **High impressions, low CTR** — Ad copy may not resonate with that audience
 
 ## Privacy & Data Limitations
 
@@ -264,6 +196,54 @@ LinkedIn demographic data has some important caveats:
 4. **Focus on top spenders** — Prioritize segments with meaningful spend ($200+) before drawing conclusions
 5. **Combine with campaign context** — Filter to specific campaigns when a campaign has distinct targeting (e.g., if you have a campaign already targeting Directors, the seniority breakdown will be skewed)
 6. **B2B attribution context** — LinkedIn campaigns often drive awareness and consideration; not all value shows up as immediate conversions
+
+## Visualize Demographic Data
+
+Render bar charts for each demographic dimension analyzed:
+
+**Job Function:**
+```json
+{
+  "tool": "linkedin_ads_render_chart",
+  "parameters": {
+    "reason": "Visualizing CPA by job function to identify high-value B2B segments",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "Finance", "values": {"cpa": 40.45, "spend": 890}},
+        {"label": "Marketing", "values": {"cpa": 50.00, "spend": 2100}},
+        {"label": "Engineering", "values": {"cpa": 80.00, "spend": 1200}},
+        {"label": "Operations", "values": {"cpa": 98.00, "spend": 980}}
+      ],
+      "metric": {"field": "cpa", "label": "CPA ($)"},
+      "sort": "asc"
+    }
+  }
+}
+```
+
+**Seniority:**
+```json
+{
+  "tool": "linkedin_ads_render_chart",
+  "parameters": {
+    "reason": "Visualizing CPA by seniority level to optimize for decision-makers",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "CXO", "values": {"cpa": 42.86, "leads": 28}},
+        {"label": "VP", "values": {"cpa": 46.67, "leads": 45}},
+        {"label": "Director", "values": {"cpa": 50.75, "leads": 67}},
+        {"label": "Manager", "values": {"cpa": 100, "leads": 18}}
+      ],
+      "metric": {"field": "cpa", "label": "CPA ($)"},
+      "sort": "asc"
+    }
+  }
+}
+```
+
+Render a chart for each MEMBER_* pivot analyzed. Charts make demographic comparisons immediately visual and actionable.
 
 ## See Also
 

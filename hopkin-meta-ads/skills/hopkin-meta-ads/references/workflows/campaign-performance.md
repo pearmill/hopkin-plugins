@@ -79,23 +79,32 @@ Sort campaigns by a relevant metric:
 
 ### Step 4: Present in Tabular Format
 
-Create a clear table with:
-- **Column headers** for all metrics
-- **Currency formatting** for spend and conversion_value (e.g., $1,234.56)
-- **Percentage formatting** for CTR and ROAS (e.g., 2.45%, 3.8x)
-- **Thousands separators** for large numbers (e.g., 1,234,567)
-- **Date range** in the report title
+Present as a table with columns: Campaign Name, Status, Spend, Impressions, Clicks, Conversions, ROAS, CTR, CPC. Use currency formatting, percentage formatting, and thousands separators.
 
-**Example Table Structure:**
-```
-Campaign Performance Report
-Date Range: [start_date] to [end_date]
-Ad Account: [account_id]
+### Step 4a: Visualize with Charts
 
-| Campaign Name | Status | Spend | Impr. | Clicks | Conv. | ROAS | CTR | CPC |
-|---------------|--------|-------|-------|--------|-------|------|-----|-----|
-| ...           | ...    | ...   | ...   | ...    | ...   | ...  | ... | ... |
+Render a bar chart comparing campaigns by spend or ROAS:
+
+```json
+{
+  "tool": "meta_ads_render_chart",
+  "parameters": {
+    "reason": "Comparing campaign performance by spend and ROAS",
+    "chart": {
+      "type": "bar",
+      "data": [
+        {"label": "Prospecting - LAL", "values": {"spend": 4521, "roas": 5.2}},
+        {"label": "Retargeting", "values": {"spend": 1800, "roas": 8.1}},
+        {"label": "Brand Awareness", "values": {"spend": 2100, "roas": 1.1}}
+      ],
+      "metric": {"field": "spend", "label": "Spend ($)"},
+      "colorBy": {"field": "roas", "label": "ROAS"}
+    }
+  }
+}
 ```
+
+For daily trend analysis, use a timeseries chart with daily spend data from Step 3. Present charts alongside the summary table and written insights.
 
 ### Step 5: Add Summary Statistics
 
