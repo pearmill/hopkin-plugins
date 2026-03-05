@@ -1,4 +1,4 @@
-# Pearmill Skills
+# Hopkin Skills
 
 Collection of Claude Skills for common workflows and integrations. Each skill is also a Claude Code plugin that ships with its MCP server.
 
@@ -12,9 +12,9 @@ Collection of Claude Skills for common workflows and integrations. Each skill is
 Add this repo as a plugin marketplace, then install individual plugins:
 
 ```bash
-/plugin marketplace add pearmill/claude-skills
-/plugin install hopkin-meta-ads@pearmill
-/plugin install hopkin-google-ads@pearmill
+/plugin marketplace add hopkin/claude-skills
+/plugin install hopkin-meta-ads@hopkin
+/plugin install hopkin-google-ads@hopkin
 ```
 
 Each plugin ships with the Hopkin MCP server configured automatically. Users authenticate through the MCP's built-in OAuth flow (via https://app.hopkin.ai).
@@ -51,7 +51,7 @@ releases/<skill-name>-v<version>.zip
 ## Directory Structure
 
 ```
-pearmill-skills/
+hopkin-skills/
 ├── .claude-plugin/
 │   └── marketplace.json             # Plugin marketplace catalog
 ├── README.md
