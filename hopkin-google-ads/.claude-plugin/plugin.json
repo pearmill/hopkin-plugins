@@ -2,6 +2,7 @@
   "name": "hopkin-google-ads",
   "version": "1.9.0",
   "description": "Generate Google Ads performance reports using the Hopkin Google Ads MCP",
+  "icon": "icon.png",
   "author": {
     "name": "Hopkin"
   },
