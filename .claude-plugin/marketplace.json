@@ -8,13 +8,13 @@
       "name": "hopkin-meta-ads",
       "source": "./hopkin-meta-ads",
       "description": "Build reports and analyze Meta Ads campaigns using the Hopkin Meta Ads MCP",
-      "version": "1.11.0"
+      "version": "1.12.0"
     },
     {
       "name": "hopkin-google-ads",
       "source": "./hopkin-google-ads",
       "description": "Generate Google Ads performance reports using the Hopkin Google Ads MCP",
-      "version": "1.9.0"
+      "version": "1.10.0"
     }
   ]
 }
