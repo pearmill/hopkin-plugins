@@ -14,7 +14,7 @@
       "name": "hopkin-google-ads",
       "source": "./hopkin-google-ads",
       "description": "Generate Google Ads performance reports using the Hopkin Google Ads MCP",
-      "version": "1.11.0"
+      "version": "1.13.0"
     },
     {
       "name": "hopkin-linkedin-ads",
