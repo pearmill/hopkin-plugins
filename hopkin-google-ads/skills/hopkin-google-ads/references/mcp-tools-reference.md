@@ -423,6 +423,98 @@ List all conversion actions configured for a Google Ads account. Call this tool 
 
 ---
 
+#### google_ads_get_asset_report
+Asset-level performance report across multiple hierarchy levels. Returns per-asset metrics with optional conversion action breakdowns and change history.
+
+**Hierarchy levels:**
+- `AD_GROUP` — RSA/App/Demand Gen assets via `ad_group_ad_asset_view` (includes `performance_label`) + `ad_group_asset` for gap-filling
+- `CAMPAIGN` — Standard campaigns via `campaign_asset` + PMax asset groups via `asset_group_asset` (automatically included when CAMPAIGN is specified)
+- `CUSTOMER` — Account-wide assets via `customer_asset`
+- `ASSET_GROUP` — PMax-only via `asset_group_asset`
+
+When `levels` is omitted, all levels are queried. Conversion breakdown is always fetched alongside main metrics unless disabled.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC
+- `date_preset` (string) — Date range preset (e.g., `"LAST_7_DAYS"`, `"LAST_30_DAYS"`, `"THIS_MONTH"`). Required if `date_range` not provided.
+- `date_range` (object) — Custom date range with `start_date` and `end_date` (YYYY-MM-DD). Required if `date_preset` not provided.
+- `levels` (array of strings, optional) — Hierarchy levels to query: `"CUSTOMER"`, `"CAMPAIGN"`, `"AD_GROUP"`, `"ASSET_GROUP"`. Defaults to all levels.
+- `campaign_ids` (array of strings, optional) — Filter to specific campaign IDs
+- `ad_group_ids` (array of strings, optional) — Filter to specific ad group IDs
+- `asset_ids` (array of strings, optional) — Filter to specific asset IDs
+- `asset_types` (array of strings, optional) — Filter by asset type: `TEXT`, `IMAGE`, `YOUTUBE_VIDEO`, `MEDIA_BUNDLE`, `SITELINK`, `CALLOUT`, `STRUCTURED_SNIPPET`, `CALL`, `PRICE`, `PROMOTION`, `LEAD_FORM`, etc.
+- `field_types` (array of strings, optional) — Filter by field type: `HEADLINE`, `DESCRIPTION`, `LONG_HEADLINE`, `BUSINESS_NAME`, `MARKETING_IMAGE`, `PORTRAIT_MARKETING_IMAGE`, `LOGO`, `YOUTUBE_VIDEO`, `SITELINK`, `CALLOUT`, `STRUCTURED_SNIPPET`, `CALL`, `PRICE`, etc.
+- `order_by` (string, optional) — Sort metric: `impressions` (default), `clicks`, `cost`, `conversions`, `ctr`
+- `limit` (number, optional) — Max rows to return, 1–1000 (default 20)
+- `include_change_history` (boolean, optional) — Include `added_at`/`last_modified_at` from `change_event` resource (default false). Uses a 29-day window.
+- `include_conversion_breakdown` (boolean, optional) — Include per-conversion-action breakdown on each asset row (default false). When false, significantly reduces response size.
+- `cursor` (string, optional) — Opaque pagination cursor from a previous response
+
+**Returns:**
+- `assets` — Array of `AssetReportRow` with `asset_id`, `asset_name`, `asset_type`, `content`, `field_type`, `performance_label`, `impressions`, `clicks`, `cost`, `ctr`, `cpc`, `conversions`, `conversion_rate`, `view_through_conversions`, `association_level`, `association_status`, `is_pmax`, hierarchy IDs/names, policy fields, optional `added_at`/`last_modified_at`, optional `conversion_breakdown`
+- `count` — Number of assets in this page
+- `nextCursor` — Opaque cursor for next page (absent if no more pages)
+- `date_range`, `filters`, `order_by`, `limit`, `include_conversion_breakdown`, `fetched_at` — Metadata
+
+**Note:** Video metrics are not available (prohibited by Google Ads API on asset resources).
+
+**Example — All assets last 30 days:**
+```json
+{
+  "tool": "google_ads_get_asset_report",
+  "parameters": {
+    "reason": "Review asset performance across all levels",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_30_DAYS"
+  }
+}
+```
+
+**Example — Top headlines by impressions:**
+```json
+{
+  "tool": "google_ads_get_asset_report",
+  "parameters": {
+    "reason": "Find top-performing headlines",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_7_DAYS",
+    "field_types": ["HEADLINE"],
+    "order_by": "impressions",
+    "limit": 20
+  }
+}
+```
+
+**Example — PMax asset groups:**
+```json
+{
+  "tool": "google_ads_get_asset_report",
+  "parameters": {
+    "reason": "Analyze PMax asset group performance",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_30_DAYS",
+    "levels": ["CAMPAIGN"]
+  }
+}
+```
+
+**Example — With change history:**
+```json
+{
+  "tool": "google_ads_get_asset_report",
+  "parameters": {
+    "reason": "Asset performance with change dates",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_30_DAYS",
+    "include_change_history": true
+  }
+}
+```
+
+---
+
 ### Keyword Tools
 
 #### google_ads_get_keyword_performance
@@ -478,6 +570,88 @@ Get search terms report showing which actual search queries triggered ads. Also 
     "campaign_id": "123456789",
     "order_by": "cost",
     "limit": 100
+  }
+}
+```
+
+---
+
+### Activity Tools
+
+#### google_ads_get_activities
+Retrieve change history (audit log) for a Google Ads account. Shows what changed, when it changed, which user made the change, and which fields were modified. Uses the `change_event` resource — data is always fetched fresh (no caching).
+
+**Limitations:**
+- Only changes within the past 30 days are available (Google Ads API limit)
+- Not all changes appear here — some automated or system-generated changes do not produce `change_event` entries
+- Changes may take up to 3 minutes to appear after they are made
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC
+- `start_date` (string, optional) — Start date in YYYY-MM-DD format (defaults to 7 days ago; must be within past 30 days)
+- `end_date` (string, optional) — End date in YYYY-MM-DD format (defaults to today)
+- `resource_type` (string, optional) — Filter to a specific resource type: `AD`, `AD_GROUP`, `AD_GROUP_AD`, `AD_GROUP_CRITERION`, `CAMPAIGN`, `CAMPAIGN_BUDGET`, `CAMPAIGN_CRITERION`, `ASSET`, `ASSET_SET`
+- `asset_ids` (array of strings, optional) — Filter to specific asset IDs (numeric). Automatically sets `resource_type` to `ASSET`. e.g. `["123456789", "987654321"]`
+- `limit` (number, optional) — Max results per page (1–1000, default 50)
+- `cursor` (string, optional) — Opaque pagination cursor from a previous response
+
+**Returns:**
+- `data` — Array of change events, each with:
+  - `changeDatetime`, `changeResourceType`, `resourceChangeOperation`, `changeResourceName`, `changedFields`, `userEmail`, `clientType`
+  - `description` (string, optional) — Human-readable summary for `CAMPAIGN_CRITERION` events (e.g., "Canada added to geo targeting (inclusion)"). When present, use this directly.
+  - `criterionNegative` (boolean, optional) — For `CAMPAIGN_CRITERION` events: `false` = inclusion, `true` = exclusion. Authoritative — do NOT infer from `changedFields`.
+  - `criterionType` (string, optional) — e.g., `"LOCATION"`, `"KEYWORD"`, `"PLACEMENT"`
+  - `criterionDisplayName` (string, optional) — Human-readable name, e.g., `"Canada"`, `"running shoes"`
+- `date_range` — The start/end dates queried
+- `pagination` — `{hasMore, nextCursor}`
+- `fetched_at` — ISO timestamp
+
+**Example — Recent account activity:**
+```json
+{
+  "tool": "google_ads_get_activities",
+  "parameters": {
+    "reason": "Review recent account changes",
+    "customer_id": "1234567890"
+  }
+}
+```
+
+**Example — Campaign changes only:**
+```json
+{
+  "tool": "google_ads_get_activities",
+  "parameters": {
+    "reason": "See recent campaign edits",
+    "customer_id": "1234567890",
+    "resource_type": "CAMPAIGN"
+  }
+}
+```
+
+**Example — Specific asset activity:**
+```json
+{
+  "tool": "google_ads_get_activities",
+  "parameters": {
+    "reason": "Check recent changes to specific assets",
+    "customer_id": "1234567890",
+    "asset_ids": ["123456789", "987654321"]
+  }
+}
+```
+
+**Example — Custom date range:**
+```json
+{
+  "tool": "google_ads_get_activities",
+  "parameters": {
+    "reason": "February activity audit",
+    "customer_id": "1234567890",
+    "start_date": "2026-02-01",
+    "end_date": "2026-02-28"
   }
 }
 ```
@@ -848,6 +1022,6 @@ Hopkin tools use cursor-based pagination:
 
 ---
 
-**Document Version:** 2.1
-**Last Updated:** 2026-02-24
+**Document Version:** 2.2
+**Last Updated:** 2026-03-06
 **Service:** Hopkin Google Ads MCP (https://app.hopkin.ai)

@@ -84,7 +84,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 - **What `login_customer_id` is:** The MCC/manager account ID used to authenticate access to a child (client) account. It tells the API which manager account is making the request on behalf of the child account.
 - **How to detect if it's needed:** If `google_ads_list_accounts` returns accounts with a `managerCustomerId` field, or if `google_ads_list_mcc_child_accounts` returns results, or if the user says they manage client accounts.
-- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_performance_report`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`
+- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_performance_report`, `google_ads_get_geo_performance`, `google_ads_get_asset_report`, `google_ads_get_activities`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`
 - **What happens without it:** Permission errors when trying to query accounts managed under an MCC. The error message will hint that `login_customer_id` is required.
 
 ## Available MCP Tools
@@ -120,6 +120,12 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_get_keyword_performance` — Keyword metrics with quality scores, match type filtering, and ordering
 - `google_ads_get_search_terms_report` — Search terms report with status filtering and ordering
 
+### Assets
+- `google_ads_get_asset_report` — Asset-level performance report across AD_GROUP, CAMPAIGN, CUSTOMER, and ASSET_GROUP hierarchy levels. Returns per-asset metrics, performance labels, optional conversion breakdowns, and optional change history.
+
+### Activity
+- `google_ads_get_activities` — Change history (audit log) for an account. Shows what changed, when, and by whom. Filter by resource type or specific `asset_ids` (automatically sets resource_type to ASSET).
+
 ### Visualization
 - `google_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
 
@@ -135,7 +141,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 ## Core Capabilities
 
-This skill supports four primary report types and a developer feedback workflow for write operations.
+This skill supports six primary report types and a developer feedback workflow for write operations.
 
 ### Report Types
 
@@ -144,6 +150,7 @@ This skill supports four primary report types and a developer feedback workflow 
 3. **Keyword Analysis Reports** — Keyword performance, quality scores, search terms, and optimization opportunities
 4. **Ad Performance Reports** — Individual ad performance, RSA analysis, and creative effectiveness
 5. **Budget & Spend Reports** — Budget tracking, spend pacing, cost analysis, and forecasting
+6. **Asset Reports** — Per-asset metrics across hierarchy levels (AD_GROUP, CAMPAIGN, CUSTOMER, PMax) with performance labels and optional conversion breakdowns
 
 ### Data Visualization
 
@@ -239,6 +246,29 @@ Monitor budget utilization and spending patterns, forecast end-of-period spend, 
 
 ---
 
+### Asset Report
+
+Analyze individual asset performance across all hierarchy levels — including RSA headline/description performance labels, PMax asset group assets, and account-wide assets. Identify top-performing creative assets, underperformers, and assets with policy issues.
+
+**Primary tool:** `google_ads_get_asset_report` — multi-level asset performance with optional conversion breakdowns and change history
+
+**Key parameters:**
+- `levels` — Limit to specific levels (e.g., `["AD_GROUP"]` for RSA assets, `["CAMPAIGN"]` for PMax)
+- `field_types` — Filter by creative type (e.g., `["HEADLINE", "DESCRIPTION"]` for RSA text assets)
+- `order_by` — Sort by `impressions`, `clicks`, `cost`, `conversions`, or `ctr`
+- `include_change_history: true` — Adds `added_at`/`last_modified_at` to each asset row
+- `include_conversion_breakdown: true` — Adds per-conversion-action breakdown (increases response size)
+
+**Common use cases:**
+- RSA headline/description performance: `levels: ["AD_GROUP"]`, `field_types: ["HEADLINE", "DESCRIPTION"]`
+- PMax creative analysis: `levels: ["CAMPAIGN"]` (automatically includes ASSET_GROUP queries)
+- Top assets by spend: `order_by: "cost"`, `limit: 50`
+- Audit asset change history: `include_change_history: true`
+
+**See detailed workflow:** **references/workflows/asset-report.md**
+
+---
+
 ## Workflow Process
 
 1. **Account Selection**: If no customer ID provided, use `google_ads_list_accounts` first and ask user which account to analyze
@@ -327,9 +357,10 @@ For more detailed information:
 - **references/workflows/keyword-analysis.md** — Detailed keyword analysis report workflow
 - **references/workflows/ad-performance.md** — Detailed ad performance report workflow
 - **references/workflows/budget-spend.md** — Detailed budget & spend report workflow
+- **references/workflows/asset-report.md** — Detailed asset report workflow
 
 ---
 
-**Skill Version:** 2.2
-**Last Updated:** 2026-03-05
+**Skill Version:** 2.3
+**Last Updated:** 2026-03-06
 **Requires:** Hopkin Google Ads MCP (https://app.hopkin.ai)
