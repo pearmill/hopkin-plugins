@@ -7,10 +7,11 @@ This document provides detailed reference information for the Hopkin Meta Ads MC
 1. [MCP Server Overview](#mcp-server-overview)
 2. [Authentication & Connection](#authentication--connection)
 3. [Core Tools](#core-tools)
-4. [Tool Usage Patterns](#tool-usage-patterns)
-5. [Response Format](#response-format)
-6. [Pagination](#pagination)
-7. [Error Handling](#error-handling)
+4. [Attribution Windows](#attribution-windows)
+5. [Tool Usage Patterns](#tool-usage-patterns)
+6. [Response Format](#response-format)
+7. [Pagination](#pagination)
+8. [Error Handling](#error-handling)
 
 ---
 
@@ -181,6 +182,7 @@ This tool always includes a full funnel of metrics: impressions, reach, frequenc
 - `time_increment` (number or string, optional) — Time grouping: `1` for daily, `7` for weekly, `"monthly"`, `"all_days"` for a single row over the entire range
 - `breakdowns` (array, optional) — Segment data by dimension (e.g., `["age", "gender"]`). Pass multiple values in a single call to get cross-tabulated rows — do NOT make separate calls per dimension.
 - `filtering` (array, optional) — Filters as `[{field, operator, value}]`
+- `attributionWindows` (array, optional) — Attribution window settings that control how conversions are counted. Each value specifies a click or view window (e.g., `["1d_click", "7d_click", "1d_view"]`). When omitted, Meta uses the account's default attribution window. See [Attribution Windows](#attribution-windows) for full details.
 
 **Example:**
 ```json
@@ -263,6 +265,7 @@ Flexible insights tool for custom metric and breakdown combinations. Supports da
 - `breakdowns` (array, optional) — Breakdown dimensions (e.g., `["age", "gender"]`, `["country"]`, `["device_platform"]`)
 - `action_breakdowns` (array, optional) — Action breakdown dimensions
 - `filtering` (array, optional) — Filters as `[{field, operator, value}]`
+- `attributionWindows` (array, optional) — Attribution window settings that control how conversions are counted. Each value specifies a click or view window (e.g., `["1d_click", "7d_click", "1d_view"]`). When omitted, Meta uses the account's default attribution window. See [Attribution Windows](#attribution-windows) for full details.
 
 **Example — Demographic Breakdown:**
 ```json
@@ -580,6 +583,83 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 
 ---
 
+## Attribution Windows
+
+Attribution windows define the time period after an ad interaction (click or view) during which a conversion is counted and credited to that ad.
+
+### Why Attribution Windows Matter
+
+Different attribution windows can report significantly different conversion counts for the same campaign. A 7-day click window will include conversions that happened up to 7 days after clicking an ad, while a 1-day click window only counts same-day conversions. Comparing results across windows helps you understand:
+
+- **How quickly your customers convert** — A large gap between 1-day and 7-day click conversions suggests a longer consideration cycle
+- **The true impact of view-through conversions** — View windows reveal whether ad exposure (without a click) influences purchases
+- **Accurate ROAS comparisons** — Advertisers using different window settings may report very different ROAS numbers for equivalent campaigns
+
+### Available Window Values
+
+| Value | Description |
+|-------|-------------|
+| `1d_click` | Conversions within 1 day of clicking the ad |
+| `7d_click` | Conversions within 7 days of clicking the ad (Meta default) |
+| `28d_click` | Conversions within 28 days of clicking the ad |
+| `1d_view` | Conversions within 1 day of viewing (not clicking) the ad |
+| `7d_view` | Conversions within 7 days of viewing (not clicking) the ad |
+
+### Usage
+
+Pass one or more values as an array. When multiple windows are specified, Meta returns results for each window — enabling side-by-side comparison.
+
+**Example — Compare 1-day vs 7-day click attribution:**
+```json
+{
+  "tool": "meta_ads_get_performance_report",
+  "parameters": {
+    "reason": "Comparing 1-day and 7-day click attribution to understand conversion lag",
+    "account_id": "act_123456789",
+    "level": "campaign",
+    "time_range": {"since": "2026-01-01", "until": "2026-01-31"},
+    "attributionWindows": ["1d_click", "7d_click"]
+  }
+}
+```
+
+**Example — Include view-through attribution:**
+```json
+{
+  "tool": "meta_ads_get_insights",
+  "parameters": {
+    "reason": "Analyzing view-through contribution alongside click-through conversions",
+    "account_id": "act_123456789",
+    "level": "campaign",
+    "date_preset": "last_30d",
+    "attributionWindows": ["7d_click", "1d_view"]
+  }
+}
+```
+
+**Example — Full window comparison for client report:**
+```json
+{
+  "tool": "meta_ads_get_insights",
+  "parameters": {
+    "reason": "Full attribution window comparison for quarterly review",
+    "account_id": "act_123456789",
+    "level": "campaign",
+    "time_range": {"since": "2026-01-01", "until": "2026-03-31"},
+    "attributionWindows": ["1d_click", "7d_click", "28d_click", "1d_view"]
+  }
+}
+```
+
+### When to Use Custom Attribution Windows
+
+- **Benchmarking against industry standards** — Many advertisers use 7-day click as the standard; use this to match external benchmarks
+- **Understanding conversion lag** — Compare 1-day vs. 7-day click to see how many conversions happen after the first day
+- **Evaluating brand awareness campaigns** — Add `1d_view` or `7d_view` to measure view-through conversions for top-of-funnel campaigns
+- **Reconciling discrepancies** — If reported ROAS differs from what the client expects, check which attribution window their account uses and match it
+
+---
+
 ## Tool Usage Patterns
 
 ### Pattern 1: Account Overview & Performance Report
@@ -726,6 +806,6 @@ Hopkin list tools use cursor-based pagination:
 
 ---
 
-**Document Version:** 2.1
-**Last Updated:** 2026-03-04
+**Document Version:** 2.2
+**Last Updated:** 2026-03-13
 **Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
