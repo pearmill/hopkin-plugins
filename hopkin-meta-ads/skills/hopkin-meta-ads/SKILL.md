@@ -109,9 +109,9 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 - `meta_ads_list_ads` — List ads for an account, campaign, or ad set (supports status filter, name search, lookup by ID, pagination)
 
 ### Analytics
-- `meta_ads_get_performance_report` — **Recommended for campaign/account/adset-level analysis.** Full-funnel performance report (always includes impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, quality rankings). Requires `time_range` with explicit since/until dates. Supports `level`: account (default), campaign, adset, ad.
+- `meta_ads_get_performance_report` — **Recommended for campaign/account/adset-level analysis.** Full-funnel performance report (always includes impressions, reach, frequency, spend, clicks, cpc, cpm, ctr, unique_clicks, actions, action_values, conversions, purchase_roas, quality rankings). Requires `time_range` with explicit since/until dates. Supports `level`: account (default), campaign, adset, ad. Supports `attributionWindows` to specify post-click and post-view attribution periods (e.g., `["1d_click", "7d_click", "1d_view"]`).
 - `meta_ads_get_ad_creative_report` — **Recommended for ad creative analysis.** Ad-level performance report with full funnel metrics and creative asset info (asset_type, asset_url, thumbnail_url). Supports two grouping modes via `level`: `ad_name` (default, aggregates ads with the same name across ad sets — returns a representative ad_id usable with `meta_ads_preview_ads`) or `ad_id` (one row per ad). Use this instead of `meta_ads_get_performance_report` with `level: "ad"` for creative analysis.
-- `meta_ads_get_insights` — Flexible insights with custom breakdowns, metrics, and date presets
+- `meta_ads_get_insights` — Flexible insights with custom breakdowns, metrics, and date presets. Supports `attributionWindows` to specify post-click and post-view attribution periods (e.g., `["1d_click", "7d_click", "1d_view"]`).
 
 ### Creative
 - `meta_ads_preview_ads` — **MCP App.** Renders a visual UI with actual ad creative (images/videos) and a configurable metrics overlay — not tabular data. Proactively offer this whenever the user asks "what do my ads look like", wants to review creative quality, or is doing A/B creative comparison. Takes a list of ad IDs with optional per-ad metric values.
@@ -246,6 +246,39 @@ Provide actionable optimization recommendations based on performance analysis:
 
 ## Best Practices
 
+### Attribution Windows
+
+Attribution windows define how long after an ad click or view a conversion is counted. Both `meta_ads_get_performance_report` and `meta_ads_get_insights` accept an `attributionWindows` array parameter.
+
+**Available values:**
+- `1d_click` — Conversions within 1 day of clicking
+- `7d_click` — Conversions within 7 days of clicking (Meta default)
+- `28d_click` — Conversions within 28 days of clicking
+- `1d_view` — Conversions within 1 day of viewing (without clicking)
+- `7d_view` — Conversions within 7 days of viewing (without clicking)
+
+**When to use custom attribution windows:**
+- Comparing campaign performance across different windows to understand conversion lag
+- Evaluating view-through contribution for brand/awareness campaigns (add `1d_view` or `7d_view`)
+- Matching a client's attribution setting to reconcile ROAS discrepancies
+- Benchmarking against the Meta platform default (7-day click)
+
+**Example — side-by-side attribution comparison:**
+```json
+{
+  "tool": "meta_ads_get_performance_report",
+  "parameters": {
+    "reason": "Comparing 1-day vs 7-day click attribution to understand conversion lag",
+    "account_id": "act_123456789",
+    "level": "campaign",
+    "time_range": {"since": "2026-01-01", "until": "2026-01-31"},
+    "attributionWindows": ["1d_click", "7d_click"]
+  }
+}
+```
+
+For full details see **references/mcp-tools-reference.md#attribution-windows**.
+
 ### Date Range Considerations
 
 - **Short-term (1-7 days):** Daily monitoring, recent changes, quick checks
@@ -315,6 +348,6 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 2.2
-**Last Updated:** 2026-03-05
+**Skill Version:** 2.3
+**Last Updated:** 2026-03-13
 **Requires:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
