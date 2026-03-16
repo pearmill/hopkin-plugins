@@ -5,101 +5,14 @@ on:
     branches:
       - main
     paths:
-      - '*/skills/**/SKILL.md'
-      - '*/skills/**/references/**'
-      - '*/.claude-plugin/**'
-      - '*/.mcp.json'
+      - 'hopkin/skills/**'
+      - 'hopkin/.claude-plugin/**'
+      - 'hopkin/.mcp.json'
   workflow_dispatch:
-    inputs:
-      skill_name:
-        description: 'Skill name to release (optional, leave empty to auto-detect)'
-        required: false
-        type: string
 
 jobs:
-  detect-changes:
+  release:
     runs-on: ubuntu-latest
-    outputs:
-      skills: ${{ steps.detect.outputs.skills }}
-      has_changes: ${{ steps.detect.outputs.has_changes }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect changed skills
-        id: detect
-        run: |
-          set -e
-
-          # Manual trigger with specific skill
-          if [ -n "${{ github.event.inputs.skill_name }}" ]; then
-            SKILL="${{ github.event.inputs.skill_name }}"
-            if [ -f "$SKILL/skills/$SKILL/SKILL.md" ]; then
-              echo "skills=[\"$SKILL\"]" >> $GITHUB_OUTPUT
-              echo "has_changes=true" >> $GITHUB_OUTPUT
-              echo "Manual trigger for skill: $SKILL"
-              exit 0
-            else
-              echo "Error: Skill '$SKILL' not found or missing skills/$SKILL/SKILL.md"
-              echo "skills=[]" >> $GITHUB_OUTPUT
-              echo "has_changes=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          fi
-
-          # Auto-detect changed skills from push
-          if [ "${{ github.event_name }}" = "push" ]; then
-            BEFORE="${{ github.event.before }}"
-            AFTER="${{ github.event.after }}"
-
-            # Get changed files
-            CHANGED_FILES=$(git diff --name-only $BEFORE..$AFTER)
-            echo "Changed files:"
-            echo "$CHANGED_FILES"
-
-            # Extract skill directories (plugin structure: skills/, .claude-plugin/, .mcp.json)
-            SKILLS=$(echo "$CHANGED_FILES" | grep -E '^[^/]+/(skills/|\.claude-plugin/|\.mcp\.json)' | cut -d'/' -f1 | sort -u)
-
-            if [ -z "$SKILLS" ]; then
-              echo "No skill changes detected"
-              echo "skills=[]" >> $GITHUB_OUTPUT
-              echo "has_changes=false" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-
-            # Verify SKILL.md exists for each detected skill (plugin structure)
-            VALID_SKILLS=""
-            for SKILL in $SKILLS; do
-              if [ -f "$SKILL/skills/$SKILL/SKILL.md" ]; then
-                VALID_SKILLS="$VALID_SKILLS $SKILL"
-              fi
-            done
-
-            if [ -z "$VALID_SKILLS" ]; then
-              echo "No valid skills with SKILL.md found"
-              echo "skills=[]" >> $GITHUB_OUTPUT
-              echo "has_changes=false" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-
-            # Convert to JSON array
-            JSON_SKILLS=$(echo $VALID_SKILLS | tr ' ' '\n' | jq -R -s -c 'split("\n") | map(select(length > 0))')
-            echo "Detected skills: $JSON_SKILLS"
-            echo "skills=$JSON_SKILLS" >> $GITHUB_OUTPUT
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-          fi
-
-  release-skill:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.has_changes == 'true'
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        skill: ${{ fromJson(needs.detect-changes.outputs.skills) }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -116,10 +29,8 @@ jobs:
         id: version
         run: |
           set -e
-          SKILL="${{ matrix.skill }}"
-          VERSION_FILE="$SKILL/.version"
+          VERSION_FILE="hopkin/.version"
 
-          # Read current version or default to 1.0.0
           if [ -f "$VERSION_FILE" ]; then
             CURRENT_VERSION=$(cat "$VERSION_FILE")
             echo "Current version: $CURRENT_VERSION"
@@ -131,26 +42,22 @@ jobs:
           # Bump minor version (X.Y.Z -> X.Y+1.0)
           MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
           MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
-          PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
 
-          # Increment minor version and reset patch to 0
           NEW_MINOR=$((MINOR + 1))
           NEW_VERSION="${MAJOR}.${NEW_MINOR}.0"
 
           echo "New version: $NEW_VERSION"
           echo "$NEW_VERSION" > "$VERSION_FILE"
 
-          # Output for next steps
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "tag=$SKILL-v$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "tag=hopkin-v$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "previous_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
       - name: Update plugin.json version
         run: |
           set -e
-          SKILL="${{ matrix.skill }}"
           VERSION="${{ steps.version.outputs.version }}"
-          PLUGIN_JSON="$SKILL/.claude-plugin/plugin.json"
+          PLUGIN_JSON="hopkin/.claude-plugin/plugin.json"
           if [ -f "$PLUGIN_JSON" ]; then
             jq --arg v "$VERSION" '.version = $v' "$PLUGIN_JSON" > tmp.json && mv tmp.json "$PLUGIN_JSON"
             echo "Updated $PLUGIN_JSON to version $VERSION"
@@ -175,10 +82,7 @@ jobs:
         id: last_tag
         run: |
           set -e
-          SKILL="${{ matrix.skill }}"
-
-          # Find the last tag for this skill
-          LAST_TAG=$(git tag -l "$SKILL-v*" | sort -V | tail -1 || echo "")
+          LAST_TAG=$(git tag -l "hopkin-v*" | sort -V | tail -1 || echo "")
 
           if [ -z "$LAST_TAG" ]; then
             echo "No previous release found - this is the initial release"
@@ -195,15 +99,13 @@ jobs:
         id: changelog
         run: |
           set -e
-          SKILL="${{ matrix.skill }}"
           LAST_TAG="${{ steps.last_tag.outputs.tag }}"
 
           echo "## Changes" > changelog.md
           echo "" >> changelog.md
 
           if [ "${{ steps.last_tag.outputs.found }}" = "true" ]; then
-            # Get commits since last tag
-            COMMITS=$(git log --pretty=format:"- %s (%h)" "$LAST_TAG..HEAD" -- "$SKILL/")
+            COMMITS=$(git log --pretty=format:"- %s (%h)" "$LAST_TAG..HEAD" -- "hopkin/")
 
             if [ -z "$COMMITS" ]; then
               echo "- No commit history available" >> changelog.md
@@ -211,11 +113,10 @@ jobs:
               echo "$COMMITS" >> changelog.md
             fi
           else
-            # Initial release - get all commits for this skill
-            COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD -- "$SKILL/")
+            COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD -- "hopkin/")
 
             if [ -z "$COMMITS" ]; then
-              echo "- Initial release of $SKILL skill" >> changelog.md
+              echo "- Initial release of hopkin plugin" >> changelog.md
             else
               echo "- Initial release" >> changelog.md
               echo "" >> changelog.md
@@ -230,35 +131,31 @@ jobs:
 
           cat changelog.md
 
-          # Store changelog for later steps
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           cat changelog.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Package skill
+      - name: Package plugin
         if: steps.check_release.outputs.exists == 'false'
         run: |
           set -e
-          SKILL="${{ matrix.skill }}"
           VERSION="${{ steps.version.outputs.version }}"
 
           mkdir -p releases
 
-          # Package only the skills/<name>/ subdirectory
           TEMP_DIR=$(mktemp -d)
-          cp -R "$SKILL/skills/$SKILL" "$TEMP_DIR/$SKILL"
+          cp -R "hopkin" "$TEMP_DIR/hopkin"
 
-          # Remove unnecessary files
-          find "$TEMP_DIR/$SKILL" -name ".DS_Store" -delete
+          find "$TEMP_DIR/hopkin" -name ".DS_Store" -delete
 
           cd "$TEMP_DIR"
-          zip -r -q "$SKILL.zip" "$SKILL"
+          zip -r -q "hopkin.zip" "hopkin"
           cd - > /dev/null
 
-          mv "$TEMP_DIR/$SKILL.zip" "releases/${SKILL}-v${VERSION}.zip"
+          mv "$TEMP_DIR/hopkin.zip" "releases/hopkin-v${VERSION}.zip"
           rm -rf "$TEMP_DIR"
 
-          PACKAGE_FILE="releases/${SKILL}-v${VERSION}.zip"
+          PACKAGE_FILE="releases/hopkin-v${VERSION}.zip"
           if [ ! -f "$PACKAGE_FILE" ]; then
             echo "Error: Package file not created at $PACKAGE_FILE"
             exit 1
@@ -277,9 +174,8 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          SKILL: ${{ matrix.skill }}
           VERSION: ${{ steps.version.outputs.version }}
-          PACKAGE_FILE: releases/${{ matrix.skill }}-v${{ steps.version.outputs.version }}.zip
+          PACKAGE_FILE: releases/hopkin-v${{ steps.version.outputs.version }}.zip
         run: |
           set -e
 
@@ -290,12 +186,11 @@ jobs:
             const fs = require('fs');
 
             async function upload() {
-              const skill = process.env.SKILL;
               const version = process.env.VERSION;
               const file = fs.readFileSync(process.env.PACKAGE_FILE);
 
               // Upload as latest
-              const latest = await put('skills/' + skill + '/latest.zip', file, {
+              const latest = await put('skills/hopkin/latest.zip', file, {
                 access: 'public',
                 addRandomSuffix: false,
                 allowOverwrite: true,
@@ -303,7 +198,7 @@ jobs:
               console.log('Uploaded latest:', latest.url);
 
               // Upload versioned copy
-              const versioned = await put('skills/' + skill + '/v' + version + '.zip', file, {
+              const versioned = await put('skills/hopkin/v' + version + '.zip', file, {
                 access: 'public',
                 addRandomSuffix: false,
                 allowOverwrite: true,
@@ -319,9 +214,9 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ matrix.skill }} v${{ steps.version.outputs.version }}
+          name: hopkin v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.changelog }}
-          files: releases/${{ matrix.skill }}-v${{ steps.version.outputs.version }}.zip
+          files: releases/hopkin-v${{ steps.version.outputs.version }}.zip
           draft: false
           prerelease: false
         env:
@@ -331,23 +226,17 @@ jobs:
         if: steps.check_release.outputs.exists == 'false'
         run: |
           set -e
-          SKILL="${{ matrix.skill }}"
           VERSION="${{ steps.version.outputs.version }}"
-          VERSION_FILE="$SKILL/.version"
 
-          # Add and commit the version and plugin.json files
-          git add "$VERSION_FILE"
-          git add "$SKILL/.claude-plugin/plugin.json"
-          git commit -m "chore: bump $SKILL version to $VERSION [skip ci]"
+          git add "hopkin/.version"
+          git add "hopkin/.claude-plugin/plugin.json"
+          git commit -m "chore: bump hopkin version to $VERSION [skip ci]"
 
-          # Push with retry logic to handle concurrent releases
           MAX_RETRIES=5
           RETRY_COUNT=0
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            # Pull latest changes (rebase to avoid merge commits)
             git pull --rebase origin main || true
 
-            # Try to push
             if git push origin main; then
               echo "Version file committed and pushed successfully"
               break
@@ -364,8 +253,7 @@ jobs:
           done
 
   update-marketplace:
-    needs: [detect-changes, release-skill]
-    if: needs.detect-changes.outputs.has_changes == 'true'
+    needs: release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -389,24 +277,21 @@ jobs:
             exit 0
           fi
 
-          UPDATED=false
-          for PLUGIN_DIR in */; do
-            PLUGIN="${PLUGIN_DIR%/}"
-            VERSION_FILE="$PLUGIN/.version"
-            if [ -f "$VERSION_FILE" ] && [ -f "$PLUGIN/.claude-plugin/plugin.json" ]; then
-              VERSION=$(cat "$VERSION_FILE")
-              CURRENT=$(jq -r --arg name "$PLUGIN" '.plugins[] | select(.name == $name) | .version' "$MARKETPLACE_JSON")
-              if [ "$CURRENT" != "$VERSION" ]; then
-                jq --arg name "$PLUGIN" --arg v "$VERSION" \
-                  '(.plugins[] | select(.name == $name)).version = $v' \
-                  "$MARKETPLACE_JSON" > tmp.json && mv tmp.json "$MARKETPLACE_JSON"
-                echo "Updated $PLUGIN in marketplace.json to $VERSION"
-                UPDATED=true
-              fi
-            fi
-          done
+          VERSION_FILE="hopkin/.version"
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "No version file found, skipping"
+            exit 0
+          fi
 
-          if [ "$UPDATED" = "true" ]; then
+          VERSION=$(cat "$VERSION_FILE")
+          CURRENT=$(jq -r '.plugins[] | select(.name == "hopkin") | .version' "$MARKETPLACE_JSON")
+
+          if [ "$CURRENT" != "$VERSION" ]; then
+            jq --arg v "$VERSION" \
+              '(.plugins[] | select(.name == "hopkin")).version = $v' \
+              "$MARKETPLACE_JSON" > tmp.json && mv tmp.json "$MARKETPLACE_JSON"
+            echo "Updated hopkin in marketplace.json to $VERSION"
+
             git add "$MARKETPLACE_JSON"
             git commit -m "chore: sync marketplace.json versions [skip ci]"
 
@@ -429,5 +314,5 @@ jobs:
               fi
             done
           else
-            echo "Marketplace versions already up to date"
+            echo "Marketplace version already up to date"
           fi

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Package Claude Code plugin to versioned zip file
-# Usage: ./package-plugin.sh <plugin-name> [version]
-# Example: ./package-plugin.sh hopkin-meta-ads
-# Example: ./package-plugin.sh hopkin-meta-ads 1.0.1
+# Package Hopkin Claude Code plugin to versioned zip file
+# Usage: ./package-plugin.sh [version]
+# Example: ./package-plugin.sh
+# Example: ./package-plugin.sh 1.0.1
 
 set -e
 
@@ -31,45 +31,32 @@ print_error() {
     echo -e "${RED}✗${NC} $1"
 }
 
-# Check if skill name is provided
-if [ -z "$1" ]; then
-    print_error "Usage: $0 <skill-name> [version]"
-    print_info "Example: $0 meta-ads"
-    print_info "Example: $0 meta-ads 1.0.1"
+PLUGIN_DIR="./hopkin"
+
+# Check if plugin directory exists
+if [ ! -d "$PLUGIN_DIR" ]; then
+    print_error "Plugin directory not found: $PLUGIN_DIR"
     exit 1
 fi
 
-SKILL_NAME="$1"
-SKILL_DIR="./${SKILL_NAME}"
-
-# Check if skill directory exists
-if [ ! -d "$SKILL_DIR" ]; then
-    print_error "Skill directory not found: $SKILL_DIR"
+# Check if at least one SKILL.md exists
+SKILL_COUNT=$(find "$PLUGIN_DIR/skills" -name "SKILL.md" | wc -l | tr -d ' ')
+if [ "$SKILL_COUNT" -eq 0 ]; then
+    print_error "No SKILL.md files found in $PLUGIN_DIR/skills/"
     exit 1
 fi
-
-# Check if SKILL.md exists (plugin structure: skills/<name>/SKILL.md)
-if [ ! -f "$SKILL_DIR/skills/$SKILL_NAME/SKILL.md" ]; then
-    print_error "SKILL.md not found in $SKILL_DIR/skills/$SKILL_NAME/"
-    exit 1
-fi
+print_info "Found $SKILL_COUNT skill(s)"
 
 # Determine version
-if [ -n "$2" ]; then
-    # Version provided as argument
-    VERSION="$2"
+if [ -n "$1" ]; then
+    VERSION="$1"
     print_info "Using provided version: $VERSION"
+elif [ -f "$PLUGIN_DIR/.version" ]; then
+    VERSION=$(cat "$PLUGIN_DIR/.version")
+    print_info "Using version from .version file: $VERSION"
 else
-    # Try to extract version from SKILL.md (plugin structure)
-    VERSION=$(grep -E "^\*\*Skill Version:\*\*" "$SKILL_DIR/skills/$SKILL_NAME/SKILL.md" | sed -E 's/.*Version:\*\* ([0-9.]+).*/\1/' | head -1)
-
-    if [ -z "$VERSION" ]; then
-        # Fallback to timestamp-based version
-        VERSION=$(date +"%Y%m%d-%H%M%S")
-        print_warning "No version found in SKILL.md, using timestamp: $VERSION"
-    else
-        print_info "Extracted version from SKILL.md: $VERSION"
-    fi
+    VERSION=$(date +"%Y%m%d-%H%M%S")
+    print_warning "No version found, using timestamp: $VERSION"
 fi
 
 # Store current directory as absolute path
@@ -80,7 +67,7 @@ RELEASES_DIR="${CURRENT_DIR}/releases"
 mkdir -p "$RELEASES_DIR"
 
 # Generate zip filename
-ZIP_FILENAME="${SKILL_NAME}-v${VERSION}.zip"
+ZIP_FILENAME="hopkin-v${VERSION}.zip"
 ZIP_PATH="${RELEASES_DIR}/${ZIP_FILENAME}"
 
 # Remove existing zip if it exists
@@ -89,23 +76,22 @@ if [ -f "$ZIP_PATH" ]; then
     rm "$ZIP_PATH"
 fi
 
-print_info "Packaging skill: $SKILL_NAME"
+print_info "Packaging plugin: hopkin"
 print_info "Version: $VERSION"
 print_info "Output: $ZIP_PATH"
 
 # Create temporary directory for clean packaging
 TEMP_DIR=$(mktemp -d)
-TEMP_SKILL_DIR="$TEMP_DIR/$SKILL_NAME"
+TEMP_PLUGIN_DIR="$TEMP_DIR/hopkin"
 
-# Copy skill directory to temp location
-print_info "Copying skill files..."
-cp -R "$SKILL_DIR" "$TEMP_SKILL_DIR"
+# Copy plugin directory to temp location
+print_info "Copying plugin files..."
+cp -R "$PLUGIN_DIR" "$TEMP_PLUGIN_DIR"
 
 # Clean up unnecessary files from temp directory
 print_info "Cleaning unnecessary files..."
-cd "$TEMP_SKILL_DIR"
+cd "$TEMP_PLUGIN_DIR"
 
-# Remove common unnecessary files/directories
 rm -rf .git
 rm -rf node_modules
 rm -rf .DS_Store
@@ -115,18 +101,16 @@ rm -rf .pytest_cache
 rm -rf .vscode
 rm -rf .idea
 
-# Return to original directory
 cd "$CURRENT_DIR"
 
 # Create zip file
 print_info "Creating zip archive..."
 cd "$TEMP_DIR"
-zip -r -q "$SKILL_NAME.zip" "$SKILL_NAME"
+zip -r -q "hopkin.zip" "hopkin"
 
 # Move zip to releases directory
-mv "$SKILL_NAME.zip" "$ZIP_PATH"
+mv "hopkin.zip" "$ZIP_PATH"
 
-# Return to original directory
 cd "$CURRENT_DIR"
 
 # Clean up temp directory
@@ -137,10 +121,11 @@ FILE_SIZE=$(du -h "$ZIP_PATH" | cut -f1)
 
 # Print success message
 echo ""
-print_success "Successfully packaged skill!"
+print_success "Successfully packaged plugin!"
 echo ""
-echo "  Skill:    $SKILL_NAME"
+echo "  Plugin:   hopkin"
 echo "  Version:  $VERSION"
+echo "  Skills:   $SKILL_COUNT"
 echo "  File:     $ZIP_FILENAME"
 echo "  Size:     $FILE_SIZE"
 echo "  Location: $ZIP_PATH"

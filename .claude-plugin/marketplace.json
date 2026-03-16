@@ -5,22 +5,10 @@
   },
   "plugins": [
     {
-      "name": "hopkin-meta-ads",
-      "source": "./hopkin-meta-ads",
-      "description": "Build reports and analyze Meta Ads campaigns using the Hopkin Meta Ads MCP",
-      "version": "1.15.0"
-    },
-    {
-      "name": "hopkin-google-ads",
-      "source": "./hopkin-google-ads",
-      "description": "Generate Google Ads performance reports using the Hopkin Google Ads MCP",
-      "version": "1.13.0"
-    },
-    {
-      "name": "hopkin-linkedin-ads",
-      "source": "./hopkin-linkedin-ads",
-      "description": "Build reports and analyze LinkedIn Ads campaigns using the Hopkin LinkedIn Ads MCP",
-      "version": "1.4.0"
+      "name": "hopkin",
+      "source": "./hopkin",
+      "description": "Analyze ad performance across Google, Meta, LinkedIn, and Reddit directly in Claude using Hopkin MCPs",
+      "version": "1.0.0"
     }
   ]
 }
