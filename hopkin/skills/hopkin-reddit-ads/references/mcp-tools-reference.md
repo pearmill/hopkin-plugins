@@ -11,6 +11,9 @@ This document provides detailed reference information for the Hopkin Reddit Ads 
 5. [Response Format](#response-format)
 6. [Pagination](#pagination)
 7. [Error Handling](#error-handling)
+8. [Visualization Tools](#visualization-tools)
+9. [Preference Tools](#preference-tools)
+10. [Feedback & Health Tools](#feedback--health-tools)
 
 ---
 
@@ -513,6 +516,174 @@ Hopkin list tools use cursor-based pagination:
 
 ---
 
-**Document Version:** 1.0
+## Visualization Tools
+
+### reddit_ads_render_chart
+Render a data visualization chart as an interactive MCP App UI. **Always call this when the user requests a chart, graph, map, or visualization** — never substitute a table or text summary. Fetch performance data first with reporting tools, then pass the structured data here.
+
+**Parameters:**
+- `reason` (string, required) — Brief explanation of the insight being shown
+- `chart` (object, required) — Chart configuration object containing:
+  - `type` (string, required) — Chart type: `bar`, `scatter`, `timeseries`, `funnel`, `waterfall`, `choropleth`
+  - Additional fields depend on chart type (datasets, axes, labels, etc.)
+
+**Supported Chart Types:**
+- `bar` — Bar chart for comparing values across categories
+- `scatter` — Scatter plot for correlations (e.g., spend vs. conversions)
+- `timeseries` — Time series for trends over date ranges
+- `funnel` — Funnel chart for conversion stages
+- `waterfall` — Waterfall chart for cumulative totals
+- `choropleth` — Geographic map for country/region breakdowns
+
+**Example — Timeseries chart:**
+```json
+{
+  "tool": "reddit_ads_render_chart",
+  "parameters": {
+    "reason": "Showing daily spend trend for the last 30 days",
+    "chart": {
+      "type": "timeseries",
+      "title": "Daily Spend",
+      "data": [
+        { "date": "2026-02-14", "spend": 123.45 },
+        { "date": "2026-02-15", "spend": 98.76 }
+      ]
+    }
+  }
+}
+```
+
+> The chart renderer renders entirely client-side as an MCP App resource. No data is sent externally — all rendering happens in the UI bundle.
+
+---
+
+## Preference Tools
+
+Preferences allow persistent, per-entity storage of recurring settings — metric preferences, alert thresholds, and analysis defaults. Preferences auto-attach to list tool responses as `_stored_preferences`.
+
+### reddit_ads_store_preference
+Store a persistent preference for a Reddit ad entity. Use when you infer a recurring preference from the conversation (e.g., a user always wants ROAS, not CTR).
+
+**Parameters:**
+- `reason` (string, required) — Reason for storing the preference
+- `entity_type` (string, required) — Entity level: `ad_account`, `campaign`, `ad_set` (ad groups), or `ad`
+- `entity_id` (string, required) — The entity's platform ID (e.g., `t2_abc123`)
+- `key` (string, required) — Preference key (e.g., `preferred_conversion_metric`, `budget_alert_threshold`)
+- `value` (any, required) — Value: string, number, boolean, or JSON object
+- `source` (string, optional) — Who set it: `agent` (default), `user`, `system`
+- `note` (string, optional) — Optional context about why this was set
+
+**Example:**
+```json
+{
+  "tool": "reddit_ads_store_preference",
+  "parameters": {
+    "reason": "User always asks for ROAS as the primary metric",
+    "entity_type": "ad_account",
+    "entity_id": "t2_abc123",
+    "key": "preferred_conversion_metric",
+    "value": "ROAS"
+  }
+}
+```
+
+---
+
+### reddit_ads_get_preferences
+Get all stored preferences for a Reddit ad entity.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `entity_type` (string, required) — Entity level: `ad_account`, `campaign`, `ad_set`, or `ad`
+- `entity_id` (string, required) — The entity's platform ID
+
+**Example:**
+```json
+{
+  "tool": "reddit_ads_get_preferences",
+  "parameters": {
+    "reason": "Checking stored preferences before generating report",
+    "entity_type": "ad_account",
+    "entity_id": "t2_abc123"
+  }
+}
+```
+
+---
+
+### reddit_ads_delete_preference
+Delete a stored preference by key. No-op if it doesn't exist.
+
+**Parameters:**
+- `reason` (string, required) — Reason for deleting
+- `entity_type` (string, required) — Entity level: `ad_account`, `campaign`, `ad_set`, or `ad`
+- `entity_id` (string, required) — The entity's platform ID
+- `key` (string, required) — The preference key to delete
+
+**Example:**
+```json
+{
+  "tool": "reddit_ads_delete_preference",
+  "parameters": {
+    "reason": "User no longer wants budget alerts",
+    "entity_type": "campaign",
+    "entity_id": "campaign_456",
+    "key": "budget_alert_threshold"
+  }
+}
+```
+
+---
+
+## Feedback & Health Tools
+
+### reddit_ads_developer_feedback
+Submit feedback about missing tools, improvements, bugs, or workflow gaps in the Reddit Ads MCP toolset. Use when the current tools cannot fulfill a user's request — not for user-facing auth or API errors.
+
+**Parameters:**
+- `reason` (string, required) — What triggered this feedback
+- `feedback_type` (string, required) — Category: `new_tool`, `improvement`, `bug`, `workflow_gap`
+- `title` (string, required) — Concise summary (5–200 characters)
+- `description` (string, required) — What is needed and why (20–2000 characters)
+- `priority` (string, optional) — `low`, `medium` (default), or `high`
+- `current_workaround` (string, optional) — Current workaround, if any
+
+**Example:**
+```json
+{
+  "tool": "reddit_ads_developer_feedback",
+  "parameters": {
+    "reason": "User asked to pause 10 ad groups at once",
+    "feedback_type": "workflow_gap",
+    "title": "Bulk ad group status toggle",
+    "description": "No way to pause or enable multiple ad groups at once. Must do one at a time via Reddit Ads Manager.",
+    "priority": "high",
+    "current_workaround": "Manually pause each ad group in Reddit Ads Manager"
+  }
+}
+```
+
+---
+
+### reddit_ads_ping
+Simple health check and connectivity test for the Reddit Ads MCP server.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the ping
+- `message` (string, optional) — Optional message to echo back
+
+**Example:**
+```json
+{
+  "tool": "reddit_ads_ping",
+  "parameters": {
+    "reason": "Verifying MCP server is reachable before starting session"
+  }
+}
+```
+
+---
+
+**Document Version:** 1.1
 **Last Updated:** 2026-03-16
 **Service:** Hopkin Reddit Ads MCP (https://app.hopkin.ai)

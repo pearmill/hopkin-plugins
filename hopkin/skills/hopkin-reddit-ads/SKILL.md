@@ -99,6 +99,18 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `reddit_ads_get_performance_report` — **Primary analytics tool.** Full-funnel report with breakdowns. Params: `account_id` (required), `date_start` (YYYY-MM-DD, required), `date_end` (YYYY-MM-DD, required), `campaign_ids?`, `ad_group_ids?`, `ad_ids?`, `breakdown?` (max 3 from: campaign, ad_group, ad, community, date, country, region, placement, device_os), `reason`
 - `reddit_ads_get_account_summary` — Account-level summary. Params: `account_id` (required), `date_start` (YYYY-MM-DD, required), `date_end` (YYYY-MM-DD, required), `reason`
 
+### Visualization
+- `reddit_ads_render_chart` — Render interactive data visualization charts as MCP App UI. **Always call this when the user requests a chart, graph, map, or visualization** — never substitute a table or text summary. Fetch data first, then pass it here. Params: `chart` (config with type + data), `reason`. Chart types: `bar`, `scatter`, `timeseries`, `funnel`, `waterfall`, `choropleth`
+
+### Preferences
+- `reddit_ads_store_preference` — Store a persistent preference for a Reddit ad entity (infer from recurring patterns). Params: `entity_type` (ad_account|campaign|ad_set|ad), `entity_id`, `key`, `value`, `reason`
+- `reddit_ads_get_preferences` — Get all stored preferences for an entity. Params: `entity_type`, `entity_id`, `reason`. Preferences also auto-attach to list tool responses as `_stored_preferences`.
+- `reddit_ads_delete_preference` — Delete a stored preference by key. No-op if it doesn't exist. Params: `entity_type`, `entity_id`, `key`, `reason`
+
+### Feedback & Health
+- `reddit_ads_developer_feedback` — Submit feedback about missing tools, improvements, bugs, or workflow gaps in the MCP toolset. Not for user-facing auth/API errors. Params: `feedback_type` (new_tool|improvement|bug|workflow_gap), `title`, `description`, `priority?`, `current_workaround?`, `reason`
+- `reddit_ads_ping` — Health check and connectivity test. Params: `message?`, `reason`
+
 > **Note:** Every tool call requires a `reason` (string) parameter for audit trail.
 
 ## Core Capabilities
@@ -135,8 +147,7 @@ The MCP is **read-only**. When a user requests write operations (pause campaigns
 
 1. Inform them write operations are not yet available via Hopkin
 2. Guide them to perform the action manually in **Reddit Ads Manager**
-
-> There is no `developer_feedback` tool for Reddit Ads yet. No feedback submission is available at this time.
+3. Use `reddit_ads_developer_feedback` with `feedback_type: "workflow_gap"` to report the gap to the development team
 
 ## Report Workflows
 
@@ -265,6 +276,6 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Skill Version:** 1.0
+**Skill Version:** 1.1
 **Last Updated:** 2026-03-16
 **Requires:** Hopkin Reddit Ads MCP (https://app.hopkin.ai)
