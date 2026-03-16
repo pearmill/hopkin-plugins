@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "hopkin-google-ads": {
+      "type": "http",
+      "url": "https://google.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-meta-ads": {
+      "type": "http",
+      "url": "https://meta.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-linkedin-ads": {
+      "type": "http",
+      "url": "https://linkedin.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-reddit-ads": {
+      "type": "http",
+      "url": "https://reddit.mcp.hopkin.ai/mcp"
+    }
+  }
+}

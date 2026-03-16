@@ -1,0 +1,20 @@
+{
+  "name": "hopkin",
+  "version": "1.0.0",
+  "description": "Analyze ad performance across Google, Meta, LinkedIn, and Reddit directly in Claude using Hopkin MCPs",
+  "author": {
+    "name": "Hopkin"
+  },
+  "homepage": "https://app.hopkin.ai",
+  "keywords": [
+    "google-ads",
+    "meta-ads",
+    "facebook-ads",
+    "linkedin-ads",
+    "reddit-ads",
+    "advertising",
+    "analytics",
+    "reporting",
+    "hopkin"
+  ]
+}

@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "hopkin-meta-ads": {
-      "type": "http",
-      "url": "https://meta.mcp.hopkin.ai/mcp"
-    }
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "hopkin-google-ads": {
-      "type": "http",
-      "url": "https://google.mcp.hopkin.ai/mcp"
-    }
-  }
-}
