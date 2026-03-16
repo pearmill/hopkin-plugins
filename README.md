@@ -22,8 +22,8 @@ Claude answers with real data from your accounts — no copy-pasting, no pivot t
 Add the Hopkin plugin marketplace to Claude Code, then install:
 
 ```bash
-/plugin marketplace add hopkin/hopkin-plugins
-/plugin install hopkin@hopkin
+/plugin marketplace add https://github.com/pearmill/hopkin-plugins.git
+/plugin install hopkin@hopkin-plugins
 ```
 
 One install gives you all supported platforms. After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai). No performance data is stored — read-only access only.
