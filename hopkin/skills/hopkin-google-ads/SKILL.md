@@ -84,7 +84,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 - **What `login_customer_id` is:** The MCC/manager account ID used to authenticate access to a child (client) account. It tells the API which manager account is making the request on behalf of the child account.
 - **How to detect if it's needed:** If `google_ads_list_accounts` returns accounts with a `managerCustomerId` field, or if `google_ads_list_mcc_child_accounts` returns results, or if the user says they manage client accounts.
-- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_performance_report`, `google_ads_get_geo_performance`, `google_ads_get_asset_report`, `google_ads_get_activities`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`
+- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_performance_report`, `google_ads_get_geo_performance`, `google_ads_get_asset_report`, `google_ads_get_activities`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`, `google_ads_list_negative_keywords`, `google_ads_list_negative_keyword_lists`, `google_ads_get_auto_applied_recommendations`
 - **What happens without it:** Permission errors when trying to query accounts managed under an MCC. The error message will hint that `login_customer_id` is required.
 
 ## Available MCP Tools
@@ -107,18 +107,25 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_list_ads` — List ads for an account, campaign, or ad group
 
 ### Analytics
-- `google_ads_get_performance_report` — **Recommended.** Full-funnel report with funnel metrics (impressions, clicks, cost, ROAS) plus conversion breakdown by conversion action name — runs two queries in parallel
+- `google_ads_get_performance_report` — **Recommended.** Full-funnel report with funnel metrics (impressions, clicks, cost, ROAS) plus conversion breakdown by conversion action name — runs two queries in parallel. Supports segments: `date`, `device`, `ad_network_type` (for Performance Max channel breakdown)
 - `google_ads_get_geo_performance` — Geographic performance breakdown by country, city, region, metro, or other geo levels. Uses `geographic_view` resource with automatic geo name resolution. Runs a parallel conversion breakdown query. **Only tool that supports geographic segments** — do not use `google_ads_get_insights` for geo data.
-- `google_ads_get_insights` — Custom analytics: full control over metrics, segments, and GAQL; use when `google_ads_get_performance_report` does not cover the required custom query
+- `google_ads_get_insights` — Custom analytics: full control over metrics, segments, and GAQL; use when `google_ads_get_performance_report` does not cover the required custom query. Supports segments including `date`, `device`, `ad_network_type`, and `conversion_action_name`
 
 ### Conversion Actions
 - `google_ads_get_conversion_actions` — List conversion actions by status — foundational for understanding what conversions are tracked before interpreting ROAS or conversion metrics
 
 > **Guidance:** Before analyzing conversion metrics or ROAS for any account, call `google_ads_get_conversion_actions` to establish which conversion actions are active and which are included in the aggregate "Conversions" metric.
 
+### Recommendations
+- `google_ads_get_auto_applied_recommendations` — Check which recommendation types Google is auto-applying to an account. Critical for understanding automated changes to campaigns (e.g., auto-adjusted bids, expanded keywords).
+
 ### Keywords
 - `google_ads_get_keyword_performance` — Keyword metrics with quality scores, match type filtering, and ordering
 - `google_ads_get_search_terms_report` — Search terms report with status filtering and ordering
+
+### Negative Keywords
+- `google_ads_list_negative_keywords` — List negative keywords at campaign or ad-group level. Filter by match type or scope to a specific campaign/ad group. Essential for search term audit workflows — cross-reference with `google_ads_get_search_terms_report` to find wasteful queries that should be negated.
+- `google_ads_list_negative_keyword_lists` — List shared negative keyword lists and their associated campaigns. Use to audit shared exclusion lists across campaigns.
 
 ### Assets
 - `google_ads_get_asset_report` — Asset-level performance report across AD_GROUP, CAMPAIGN, CUSTOMER, and ASSET_GROUP hierarchy levels. Returns per-asset metrics, performance labels, optional conversion breakdowns, and optional change history.
@@ -141,7 +148,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 ## Core Capabilities
 
-This skill supports six primary report types and a developer feedback workflow for write operations.
+This skill supports eight primary report types and a developer feedback workflow for write operations.
 
 ### Report Types
 
@@ -151,6 +158,8 @@ This skill supports six primary report types and a developer feedback workflow f
 4. **Ad Performance Reports** — Individual ad performance, RSA analysis, and creative effectiveness
 5. **Budget & Spend Reports** — Budget tracking, spend pacing, cost analysis, and forecasting
 6. **Asset Reports** — Per-asset metrics across hierarchy levels (AD_GROUP, CAMPAIGN, CUSTOMER, PMax) with performance labels and optional conversion breakdowns
+7. **Negative Keyword Audit** — Review negative keywords across campaigns and shared lists, cross-reference with search terms to identify gaps
+8. **Auto-Applied Recommendations Audit** — Review which recommendation types Google is automatically applying to the account
 
 ### Data Visualization
 
@@ -221,6 +230,8 @@ Analyze overall campaign performance, compare campaigns across an account, ident
 Evaluate keyword performance, analyze search terms, understand quality scores, identify negative keyword opportunities, and optimize keyword bidding strategies.
 
 **Primary tools:** `google_ads_get_keyword_performance` + `google_ads_get_search_terms_report`
+
+**Note:** The keyword analysis workflow supports cross-referencing with `google_ads_list_negative_keywords` to identify search terms that should be negated. After pulling search terms, compare against existing negative keywords to find gaps in your exclusion strategy.
 
 **See detailed workflow:** **references/workflows/keyword-analysis.md**
 
@@ -358,9 +369,10 @@ For more detailed information:
 - **references/workflows/ad-performance.md** — Detailed ad performance report workflow
 - **references/workflows/budget-spend.md** — Detailed budget & spend report workflow
 - **references/workflows/asset-report.md** — Detailed asset report workflow
+- **Negative keyword audit workflow** — Use `google_ads_list_negative_keywords` and `google_ads_list_negative_keyword_lists` alongside `google_ads_get_search_terms_report` to identify search term exclusion gaps
 
 ---
 
-**Skill Version:** 2.3
-**Last Updated:** 2026-03-06
+**Skill Version:** 2.4
+**Last Updated:** 2026-03-22
 **Requires:** Hopkin Google Ads MCP (https://app.hopkin.ai)

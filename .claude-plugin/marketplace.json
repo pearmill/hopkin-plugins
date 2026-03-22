@@ -7,7 +7,7 @@
     {
       "name": "hopkin",
       "source": "./hopkin",
-      "description": "Analyze ad performance across Google, Meta, LinkedIn, and Reddit directly in Claude using Hopkin MCPs",
+      "description": "Analyze ad performance across Google, Meta, LinkedIn, Reddit, and TikTok directly in Claude using Hopkin MCPs",
       "version": "1.2.0"
     }
   ]

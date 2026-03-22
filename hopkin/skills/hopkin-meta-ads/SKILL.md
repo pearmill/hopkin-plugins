@@ -15,6 +15,7 @@ This skill enables Claude to build comprehensive reports and analyze Meta Ads ca
 - Track budget pacing and forecasting
 - Preview ad creatives with performance data
 - Optimize ad performance based on data insights
+- Audit Meta Pixel health, CAPI integration status, and event diagnostics
 
 The skill provides structured workflows for common Meta Ads reporting tasks, with built-in best practices for data analysis and presentation.
 
@@ -113,6 +114,9 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 - `meta_ads_get_ad_creative_report` — **Recommended for ad creative analysis.** Ad-level performance report with full funnel metrics and creative asset info (asset_type, asset_url, thumbnail_url). Supports two grouping modes via `level`: `ad_name` (default, aggregates ads with the same name across ad sets — returns a representative ad_id usable with `meta_ads_preview_ads`) or `ad_id` (one row per ad). Use this instead of `meta_ads_get_performance_report` with `level: "ad"` for creative analysis.
 - `meta_ads_get_insights` — Flexible insights with custom breakdowns, metrics, and date presets. Supports `attributionWindows` to specify post-click and post-view attribution periods (e.g., `["1d_click", "7d_click", "1d_view"]`).
 
+### Pixel & Tracking
+- `meta_ads_get_pixel_health` — **Pixel health audit.** Check Meta Pixel and Conversions API (CAPI) integration status, event volumes, automatic advanced matching coverage, and event diagnostics. Use when users ask about tracking health, event firing, CAPI status, or data quality. Params: `account_id` (required), `pixel_id?`, `event_names?` (filter to specific events), `days_back?` (lookback window, default 7), `limit?`, `cursor?`
+
 ### Creative
 - `meta_ads_preview_ads` — **MCP App.** Renders a visual UI with actual ad creative (images/videos) and a configurable metrics overlay — not tabular data. Proactively offer this whenever the user asks "what do my ads look like", wants to review creative quality, or is doing A/B creative comparison. Takes a list of ad IDs with optional per-ad metric values.
 
@@ -131,7 +135,7 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 
 ## Core Capabilities
 
-This skill supports four primary report types and a developer feedback workflow for write operations.
+This skill supports five primary report types and a developer feedback workflow for write operations.
 
 ### Report Types
 
@@ -139,6 +143,7 @@ This skill supports four primary report types and a developer feedback workflow 
 2. **Ad Creative Performance Reports** — Individual ad performance, creative previews, and A/B testing insights
 3. **Audience Insights Reports** — Demographics, interests, and behavior breakdowns
 4. **Budget & Pacing Reports** — Budget tracking, spend pacing, and forecasting
+5. **Pixel Health & Tracking Audit** — Meta Pixel status, CAPI integration health, event volumes, automatic advanced matching, and diagnostic alerts
 
 ### Data Visualization
 
@@ -221,6 +226,26 @@ Monitor budget utilization and spending pace, forecast end-of-period spend, iden
 **Primary tools:** `meta_ads_list_campaigns` for budgets + `meta_ads_get_insights` with `time_increment: "1"` for daily trends
 
 **See detailed workflow:** **references/workflows/budget-pacing.md**
+
+---
+
+### Pixel Health & Tracking Audit
+
+Audit Meta Pixel implementation health, verify Conversions API (CAPI) integration, check event volumes and quality, and diagnose tracking issues.
+
+**Primary tool:** `meta_ads_get_pixel_health`
+
+**Common use cases:**
+- "Is my pixel firing correctly?"
+- "What's our CAPI coverage?"
+- "Are there any tracking issues?"
+- Pre-campaign audit to verify tracking is healthy before launching
+
+**Quick workflow:**
+1. Call `meta_ads_get_pixel_health` with the account ID
+2. Review pixel status, CAPI integration, event volumes
+3. Check for diagnostic alerts or issues
+4. Provide recommendations for improving tracking quality
 
 ---
 
@@ -345,9 +370,10 @@ For more detailed information:
 - **references/workflows/audience-insights.md** — Detailed audience insights report workflow
 - **references/workflows/budget-pacing.md** — Detailed budget & pacing report workflow
 - **references/workflows/common-actions.md** — Write operation feedback and optimization workflows
+- **Pixel health audit** — Use `meta_ads_get_pixel_health` for tracking diagnostics (no separate workflow file — tool is self-contained)
 
 ---
 
-**Skill Version:** 2.3
-**Last Updated:** 2026-03-13
+**Skill Version:** 2.4
+**Last Updated:** 2026-03-22
 **Requires:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
