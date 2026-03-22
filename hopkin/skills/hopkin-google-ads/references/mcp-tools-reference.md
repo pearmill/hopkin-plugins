@@ -219,7 +219,7 @@ This tool runs two parallel queries:
 - `date_preset` (string) — Date range preset (e.g., `"LAST_7_DAYS"`, `"LAST_30_DAYS"`, `"THIS_MONTH"`). Required if `date_range` not provided.
 - `date_range` (object) — Custom date range with `start_date` and `end_date` (YYYY-MM-DD). Required if `date_preset` not provided.
 - `level` (string, optional) — Aggregation level: `"ACCOUNT"`, `"CAMPAIGN"` (default), `"AD_GROUP"`, or `"AD"`
-- `segments` (array of strings, optional) — Additional breakdown dimensions: `"date"`, `"device"`, `"ad_network_type"`
+- `segments` (array of strings, optional) — Additional breakdown dimensions: `"date"`, `"device"`, `"ad_network_type"` (use `ad_network_type` for Performance Max channel breakdown)
 - `campaign_id` (string, optional) — Filter to a specific campaign
 - `ad_group_id` (string, optional) — Filter to a specific ad group
 
@@ -343,7 +343,7 @@ Custom analytics with full control over metrics, segments, and GAQL. Use when `g
 - `date_range` (object, optional) — Custom date range with `start_date` and `end_date` (YYYY-MM-DD)
 - `level` (string, optional) — Aggregation level: `"ACCOUNT"`, `"CAMPAIGN"`, `"AD_GROUP"`, `"AD"`
 - `metrics` (array, optional) — Specific metrics to include
-- `segments` (array, optional) — Segmentation dimensions (e.g., `["date"]`, `["device"]`, `["conversion_action_name"]`)
+- `segments` (array, optional) — Segmentation dimensions (e.g., `["date"]`, `["device"]`, `["ad_network_type"]`, `["conversion_action_name"]`)
 - `campaign_id` (string, optional) — Filter to specific campaign
 - `ad_group_id` (string, optional) — Filter to specific ad group
 - `limit` (number, optional) — Max results per page (1–100)
@@ -417,6 +417,25 @@ List all conversion actions configured for a Google Ads account. Call this tool 
     "reason": "Understanding which conversion actions are active before analyzing ROAS",
     "customer_id": "1234567890",
     "status": "ENABLED"
+  }
+}
+```
+
+#### google_ads_get_auto_applied_recommendations
+Check which recommendation types Google is automatically applying to the account. Returns a list of auto-applied recommendation types (e.g., auto-adjusted bids, expanded keywords, upgraded campaigns). Important for auditing automated account changes.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+
+**Example:**
+```json
+{
+  "tool": "google_ads_get_auto_applied_recommendations",
+  "parameters": {
+    "reason": "Auditing which recommendations Google auto-applies to this account",
+    "customer_id": "1234567890"
   }
 }
 ```
@@ -518,7 +537,7 @@ When `levels` is omitted, all levels are queried. Conversion breakdown is always
 ### Keyword Tools
 
 #### google_ads_get_keyword_performance
-Get keyword performance data with quality scores and all key metrics. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group.
+Get keyword performance data with quality scores and all key metrics. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group. Supports `ad_network_type` segment for network-level breakdown.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -547,7 +566,7 @@ Get keyword performance data with quality scores and all key metrics. Also runs 
 ```
 
 #### google_ads_get_search_terms_report
-Get search terms report showing which actual search queries triggered ads. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group.
+Get search terms report showing which actual search queries triggered ads. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group. Supports `ad_network_type` segment for network-level breakdown.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -570,6 +589,59 @@ Get search terms report showing which actual search queries triggered ads. Also 
     "campaign_id": "123456789",
     "order_by": "cost",
     "limit": 100
+  }
+}
+```
+
+#### google_ads_list_negative_keywords
+List negative keywords at campaign or ad-group level. Use for search term audit workflows — cross-reference with search terms report to identify wasteful queries. Filter by match type or scope to a specific level.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `campaign_id` (string, optional) — Filter to a specific campaign
+- `ad_group_id` (string, optional) — Filter to a specific ad group
+- `level` (string, optional) — Scope: `CAMPAIGN`, `AD_GROUP`, or `ALL` (default: `ALL`)
+- `match_type` (string, optional) — Filter by match type (e.g., `EXACT`, `PHRASE`, `BROAD`)
+- `limit` (number, optional) — Max results per page (1–100)
+- `cursor` (string, optional) — Pagination cursor
+
+**Example:**
+```json
+{
+  "tool": "google_ads_list_negative_keywords",
+  "parameters": {
+    "reason": "Auditing negative keywords for search term optimization",
+    "customer_id": "1234567890",
+    "campaign_id": "111222333",
+    "level": "CAMPAIGN"
+  }
+}
+```
+
+#### google_ads_list_negative_keyword_lists
+List shared negative keyword lists and their associations. Shows which campaigns use each shared list and optionally includes the keywords in each list.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `list_id` (string, optional) — Fetch a specific list by ID
+- `include_keywords` (boolean, optional) — Include the keywords in each list (default: false)
+- `include_campaign_associations` (boolean, optional) — Include campaigns using each list (default: false)
+- `limit` (number, optional) — Max results per page (1–100)
+- `cursor` (string, optional) — Pagination cursor
+
+**Example:**
+```json
+{
+  "tool": "google_ads_list_negative_keyword_lists",
+  "parameters": {
+    "reason": "Auditing shared negative keyword lists across campaigns",
+    "customer_id": "1234567890",
+    "include_keywords": true,
+    "include_campaign_associations": true
   }
 }
 ```
@@ -1022,6 +1094,6 @@ Hopkin tools use cursor-based pagination:
 
 ---
 
-**Document Version:** 2.2
-**Last Updated:** 2026-03-06
+**Document Version:** 2.3
+**Last Updated:** 2026-03-22
 **Service:** Hopkin Google Ads MCP (https://app.hopkin.ai)

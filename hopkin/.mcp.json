@@ -15,6 +15,10 @@
     "hopkin-reddit-ads": {
       "type": "http",
       "url": "https://reddit.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-tiktok-ads": {
+      "type": "http",
+      "url": "https://tiktok.mcp.hopkin.ai/mcp"
     }
   }
 }

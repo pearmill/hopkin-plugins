@@ -297,6 +297,60 @@ Flexible insights tool for custom metric and breakdown combinations. Supports da
 
 ---
 
+### Pixel & Tracking Tools
+
+#### meta_ads_get_pixel_health
+**Pixel health audit tool.** Check the health and integration status of Meta Pixels and Conversions API (CAPI) for an ad account. Returns pixel configuration, CAPI status, event volumes, automatic advanced matching coverage, and diagnostic alerts.
+
+Use this tool when users ask about:
+- "Is my pixel working?"
+- "What's our CAPI integration status?"
+- "Are events firing correctly?"
+- "What's our event match quality?"
+- Pre-campaign tracking audits
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `account_id` (string, required) — Ad account ID (with or without `act_` prefix)
+- `pixel_id` (string, optional) — Specific pixel ID to check (if the account has multiple pixels)
+- `event_names` (array, optional) — Filter to specific events (e.g., `["Purchase", "AddToCart", "Lead"]`)
+- `days_back` (number, optional) — Lookback window in days for volume data (default: 7)
+- `limit` (number, optional) — Max results per page
+- `cursor` (string, optional) — Pagination cursor
+
+**Example — Full pixel health check:**
+```json
+{
+  "tool": "meta_ads_get_pixel_health",
+  "parameters": {
+    "reason": "Auditing pixel health before launching new campaign",
+    "account_id": "act_123456789"
+  }
+}
+```
+
+**Example — Check specific events:**
+```json
+{
+  "tool": "meta_ads_get_pixel_health",
+  "parameters": {
+    "reason": "Checking Purchase and AddToCart event health for conversion campaign",
+    "account_id": "act_123456789",
+    "event_names": ["Purchase", "AddToCart"],
+    "days_back": 14
+  }
+}
+```
+
+**Key Fields in Response:**
+- **Pixel status** — Active/inactive, last fire time
+- **CAPI integration** — Whether Conversions API is connected, server event volume
+- **Event volumes** — Per-event counts over the lookback window (browser + server)
+- **Automatic Advanced Matching** — Which user data fields are being matched (email, phone, etc.)
+- **Diagnostics** — Alerts for missing events, low match quality, CAPI issues, etc.
+
+---
+
 ### Creative Tools
 
 #### meta_ads_preview_ads
@@ -711,6 +765,16 @@ Pass one or more values as an array. When multiple windows are specified, Meta r
 3. Call `meta_ads_render_chart` with the appropriate chart type
 4. Present chart alongside summary table and written insights
 
+### Pattern 9: Pixel Health Audit
+**Workflow:**
+1. Call `meta_ads_get_pixel_health` with the account ID
+2. Review pixel status: is it active? When did it last fire?
+3. Check CAPI integration: is server-side tracking configured?
+4. Review event volumes: are key events (Purchase, AddToCart, Lead) firing at expected rates?
+5. Check automatic advanced matching: which user fields are being matched?
+6. Review diagnostics for any alerts or issues
+7. Provide recommendations for improving tracking quality
+
 ### Pattern 7: Session Start with Preferences
 **When:** At the beginning of any new session before asking the user for account information.
 
@@ -806,6 +870,6 @@ Hopkin list tools use cursor-based pagination:
 
 ---
 
-**Document Version:** 2.2
-**Last Updated:** 2026-03-13
+**Document Version:** 2.3
+**Last Updated:** 2026-03-22
 **Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
