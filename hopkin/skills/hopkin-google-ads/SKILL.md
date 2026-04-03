@@ -111,6 +111,9 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_get_geo_performance` — Geographic performance breakdown by country, city, region, metro, or other geo levels. Uses `geographic_view` resource with automatic geo name resolution. Runs a parallel conversion breakdown query. **Only tool that supports geographic segments** — do not use `google_ads_get_insights` for geo data.
 - `google_ads_get_insights` — Custom analytics: full control over metrics, segments, and GAQL; use when `google_ads_get_performance_report` does not cover the required custom query. Supports segments including `date`, `device`, `ad_network_type`, and `conversion_action_name`
 
+### Charts & Visualization
+- `google_ads_render_chart` — **MCP App. ALWAYS use this when the user asks for any chart, graph, map, or visualization.** Do NOT substitute a table or text summary. Supports 6 types: `bar` (compare values across campaigns/placements), `scatter` (correlation between two metrics), `timeseries` (metrics over time), `funnel` (conversion stages), `waterfall` (cumulative contribution), `choropleth` (US state heatmap). Fetch the data first with insights or performance report tools, then pass the structured data here. This renders an interactive visual — it is the correct tool whenever a chart is explicitly requested.
+
 ### Conversion Actions
 - `google_ads_get_conversion_actions` — List conversion actions by status — foundational for understanding what conversions are tracked before interpreting ROAS or conversion metrics
 

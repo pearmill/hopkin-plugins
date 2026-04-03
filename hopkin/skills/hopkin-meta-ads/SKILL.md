@@ -117,6 +117,9 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 ### Pixel & Tracking
 - `meta_ads_get_pixel_health` — **Pixel health audit.** Check Meta Pixel and Conversions API (CAPI) integration status, event volumes, automatic advanced matching coverage, and event diagnostics. Use when users ask about tracking health, event firing, CAPI status, or data quality. Params: `account_id` (required), `pixel_id?`, `event_names?` (filter to specific events), `days_back?` (lookback window, default 7), `limit?`, `cursor?`
 
+### Charts & Visualization
+- `meta_ads_render_chart` — **MCP App. ALWAYS use this when the user asks for any chart, graph, map, or visualization.** Do NOT substitute a table or text summary. Supports 6 types: `bar` (compare values across campaigns/placements), `scatter` (correlation between two metrics), `timeseries` (metrics over time), `funnel` (conversion stages), `waterfall` (cumulative contribution), `choropleth` (US state heatmap). Fetch the data first with insights or performance report tools, then pass the structured data here. This renders an interactive visual — it is the correct tool whenever a chart is explicitly requested.
+
 ### Creative
 - `meta_ads_preview_ads` — **MCP App.** Renders a visual UI with actual ad creative (images/videos) and a configurable metrics overlay — not tabular data. Proactively offer this whenever the user asks "what do my ads look like", wants to review creative quality, or is doing A/B creative comparison. Takes a list of ad IDs with optional per-ad metric values.
 

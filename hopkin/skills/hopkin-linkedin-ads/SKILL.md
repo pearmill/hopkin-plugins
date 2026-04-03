@@ -101,6 +101,9 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `linkedin_ads_get_account_summary` — Account-level summary; runs three parallel API calls (account details, metrics, conversion breakdown)
 - `linkedin_ads_get_insights` — Flexible analytics; **the only tool supporting LinkedIn's unique MEMBER_* demographic pivots**
 
+### Charts & Visualization
+- `linkedin_ads_render_chart` — **MCP App. ALWAYS use this when the user asks for any chart, graph, map, or visualization.** Do NOT substitute a table or text summary. Supports 6 types: `bar` (compare values across campaigns/placements), `scatter` (correlation between two metrics), `timeseries` (metrics over time), `funnel` (conversion stages), `waterfall` (cumulative contribution), `choropleth` (US state heatmap). Fetch the data first with insights or performance report tools, then pass the structured data here. This renders an interactive visual — it is the correct tool whenever a chart is explicitly requested.
+
 ### Partner Conversions
 - `linkedin_ads_get_partner_conversions` — List partner conversions (LinkedIn's term for "conversion actions"); call before interpreting conversion metrics or ROAS
 
