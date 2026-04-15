@@ -1,6 +1,6 @@
 {
   "name": "hopkin",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Analyze ad performance and email marketing across Google, Meta, LinkedIn, Reddit, TikTok, and Mailchimp directly in Claude using Hopkin MCPs",
   "author": {
     "name": "Hopkin"
