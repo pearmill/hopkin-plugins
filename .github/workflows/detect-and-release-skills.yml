@@ -148,12 +148,12 @@ jobs:
 
           find "$TEMP_DIR/hopkin" -name ".DS_Store" -delete
 
+          # Create combined zip
           cd "$TEMP_DIR"
           zip -r -q "hopkin.zip" "hopkin"
           cd - > /dev/null
 
           mv "$TEMP_DIR/hopkin.zip" "releases/hopkin-v${VERSION}.zip"
-          rm -rf "$TEMP_DIR"
 
           PACKAGE_FILE="releases/hopkin-v${VERSION}.zip"
           if [ ! -f "$PACKAGE_FILE" ]; then
@@ -163,6 +163,31 @@ jobs:
 
           echo "Package created: $PACKAGE_FILE"
           ls -lh "$PACKAGE_FILE"
+
+          # Create per-skill zips
+          for SKILL_DIR in hopkin/skills/hopkin-*; do
+            if [ -d "$SKILL_DIR" ]; then
+              SKILL_FULL_NAME=$(basename "$SKILL_DIR")
+              # Strip "hopkin-" prefix to get the skill name (e.g. "google-ads", "mailchimp")
+              SKILL_NAME="${SKILL_FULL_NAME#hopkin-}"
+
+              SKILL_TEMP=$(mktemp -d)
+              cp -R "$SKILL_DIR" "$SKILL_TEMP/$SKILL_FULL_NAME"
+              find "$SKILL_TEMP" -name ".DS_Store" -delete
+
+              cd "$SKILL_TEMP"
+              zip -r -q "${SKILL_NAME}.zip" "$SKILL_FULL_NAME"
+              cd - > /dev/null
+
+              mv "$SKILL_TEMP/${SKILL_NAME}.zip" "releases/${SKILL_NAME}-v${VERSION}.zip"
+              rm -rf "$SKILL_TEMP"
+
+              echo "Skill package created: releases/${SKILL_NAME}-v${VERSION}.zip"
+              ls -lh "releases/${SKILL_NAME}-v${VERSION}.zip"
+            fi
+          done
+
+          rm -rf "$TEMP_DIR"
 
       - name: Setup Node.js
         if: steps.check_release.outputs.exists == 'false'
@@ -184,12 +209,14 @@ jobs:
           node -e "
             const { put } = require('@vercel/blob');
             const fs = require('fs');
+            const path = require('path');
 
             async function upload() {
               const version = process.env.VERSION;
+
+              // Upload combined plugin zip
               const file = fs.readFileSync(process.env.PACKAGE_FILE);
 
-              // Upload as latest
               const latest = await put('skills/hopkin/latest.zip', file, {
                 access: 'public',
                 addRandomSuffix: false,
@@ -197,13 +224,38 @@ jobs:
               });
               console.log('Uploaded latest:', latest.url);
 
-              // Upload versioned copy
               const versioned = await put('skills/hopkin/v' + version + '.zip', file, {
                 access: 'public',
                 addRandomSuffix: false,
                 allowOverwrite: true,
               });
               console.log('Uploaded versioned:', versioned.url);
+
+              // Upload per-skill zips
+              const releaseFiles = fs.readdirSync('releases');
+              for (const fileName of releaseFiles) {
+                // Skip the combined plugin zip (already uploaded above)
+                if (fileName.startsWith('hopkin-v')) continue;
+
+                // Extract skill name from filename like 'google-ads-v1.5.0.zip'
+                const skillName = fileName.replace('-v' + version + '.zip', '');
+
+                const skillFile = fs.readFileSync(path.join('releases', fileName));
+
+                const skillLatest = await put('skills/' + skillName + '/latest.zip', skillFile, {
+                  access: 'public',
+                  addRandomSuffix: false,
+                  allowOverwrite: true,
+                });
+                console.log('Uploaded ' + skillName + ' latest:', skillLatest.url);
+
+                const skillVersioned = await put('skills/' + skillName + '/v' + version + '.zip', skillFile, {
+                  access: 'public',
+                  addRandomSuffix: false,
+                  allowOverwrite: true,
+                });
+                console.log('Uploaded ' + skillName + ' versioned:', skillVersioned.url);
+              }
             }
 
             upload().catch(err => { console.error(err); process.exit(1); });
