@@ -2,7 +2,7 @@
 
 **Stop switching tabs. Get your ad performance inside Claude.**
 
-Hopkin connects your Meta, Google, LinkedIn, and Reddit Ads accounts directly to Claude — so you can ask questions, pull reports, and surface insights without touching a dashboard.
+Hopkin connects your Meta, Google, LinkedIn, Reddit, TikTok Ads, and Mailchimp accounts directly to Claude — so you can ask questions, pull reports, and surface insights without touching a dashboard.
 
 ## What You Can Do
 
@@ -32,7 +32,7 @@ One install gives you all supported platforms. After installing, Claude will wal
 
 Most ad teams repeat the same workflows every week: morning performance checks, cross-platform comparisons, creative ranking, client reporting. Hopkin turns those into one-line questions.
 
-- **Cross-platform in one conversation** — pull Meta, Google, LinkedIn, and Reddit data side by side
+- **Cross-platform in one conversation** — pull Meta, Google, LinkedIn, Reddit, TikTok, and Mailchimp data side by side
 - **Creative performance** — rank ads by CPA or ROAS with demographic breakdowns
 - **Budget tracking** — spot underspend and overspend across 60+ accounts at once
 - **Trend analysis** — 3, 6, or 12-month views on demand
@@ -47,6 +47,8 @@ Most ad teams repeat the same workflows every week: morning performance checks, 
 | Google Ads | hopkin-google-ads |
 | LinkedIn Ads | hopkin-linkedin-ads |
 | Reddit Ads | hopkin-reddit-ads |
+| TikTok Ads | hopkin-tiktok-ads |
+| Mailchimp | hopkin-mailchimp |
 
 ## Get an Account
 
