@@ -1,0 +1,65 @@
+name: Publish Claude Plugin
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'hopkin/**'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Package plugin
+        run: |
+          set -e
+
+          TEMP_DIR=$(mktemp -d)
+          cp -R "hopkin" "$TEMP_DIR/hopkin"
+          find "$TEMP_DIR/hopkin" -name ".DS_Store" -delete
+
+          cd "$TEMP_DIR"
+          zip -r -q "claude-plugin.zip" "hopkin"
+          cd - > /dev/null
+
+          mv "$TEMP_DIR/claude-plugin.zip" "claude-plugin.zip"
+          rm -rf "$TEMP_DIR"
+
+          echo "Package created: claude-plugin.zip"
+          ls -lh "claude-plugin.zip"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Upload to Vercel Blob
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+        run: |
+          set -e
+
+          npm install @vercel/blob
+
+          node -e "
+            const { put } = require('@vercel/blob');
+            const fs = require('fs');
+
+            async function upload() {
+              const file = fs.readFileSync('claude-plugin.zip');
+
+              const result = await put('plugins/claude-plugin.zip', file, {
+                access: 'public',
+                addRandomSuffix: false,
+                allowOverwrite: true,
+              });
+              console.log('Uploaded claude-plugin.zip:', result.url);
+            }
+
+            upload().catch(err => { console.error(err); process.exit(1); });
+          "
