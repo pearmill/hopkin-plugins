@@ -8,7 +8,7 @@
       "name": "hopkin",
       "source": "./hopkin",
       "description": "Analyze ad performance across Google, Meta, LinkedIn, Reddit, and TikTok directly in Claude using Hopkin MCPs",
-      "version": "1.4.0"
+      "version": "1.5.0"
     }
   ]
 }
