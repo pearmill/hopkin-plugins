@@ -19,6 +19,10 @@
     "hopkin-tiktok-ads": {
       "type": "http",
       "url": "https://tiktok.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-mailchimp": {
+      "type": "http",
+      "url": "https://mailchimp.mcp.hopkin.ai/mcp"
     }
   }
 }
