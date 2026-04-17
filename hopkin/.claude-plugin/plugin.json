@@ -1,7 +1,7 @@
 {
   "name": "hopkin",
   "version": "1.6.0",
-  "description": "Analyze ad performance and email marketing across Google, Meta, LinkedIn, Reddit, TikTok, and Mailchimp directly in Claude using Hopkin MCPs",
+  "description": "Analyze ad performance, email marketing, and search console data across Google, Meta, LinkedIn, Reddit, TikTok, Mailchimp, and Google Search Console directly in Claude using Hopkin MCPs",
   "author": {
     "name": "Hopkin"
   },
@@ -14,6 +14,8 @@
     "reddit-ads",
     "tiktok-ads",
     "mailchimp",
+    "google-search-console",
+    "seo",
     "email-marketing",
     "advertising",
     "analytics",
