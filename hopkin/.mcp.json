@@ -23,6 +23,10 @@
     "hopkin-mailchimp": {
       "type": "http",
       "url": "https://mailchimp.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-google-search-console": {
+      "type": "http",
+      "url": "https://gcs.mcp.hopkin.ai/mcp"
     }
   }
 }
