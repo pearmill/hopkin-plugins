@@ -8,7 +8,7 @@
       "name": "hopkin",
       "source": "./hopkin",
       "description": "Analyze ad performance, email marketing, and search console data across Google, Meta, LinkedIn, Reddit, TikTok, Mailchimp, and Google Search Console directly in Claude using Hopkin MCPs",
-      "version": "1.6.0"
+      "version": "1.7.0"
     }
   ]
 }
