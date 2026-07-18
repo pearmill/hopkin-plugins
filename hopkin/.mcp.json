@@ -27,6 +27,10 @@
     "hopkin-google-search-console": {
       "type": "http",
       "url": "https://gcs.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-google-analytics": {
+      "type": "http",
+      "url": "https://ga4.mcp.hopkin.ai/mcp"
     }
   }
 }
