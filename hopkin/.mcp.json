@@ -31,6 +31,10 @@
     "hopkin-google-analytics": {
       "type": "http",
       "url": "https://ga4.mcp.hopkin.ai/mcp"
+    },
+    "hopkin-chatgpt-ads": {
+      "type": "http",
+      "url": "https://chatgpt.mcp.hopkin.ai/mcp"
     }
   }
 }
