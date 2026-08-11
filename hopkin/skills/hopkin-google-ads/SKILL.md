@@ -1,6 +1,6 @@
 ---
 name: hopkin-google-ads
-description: Generate Google Ads performance reports and analytics using the Hopkin Google Ads MCP. Includes prerequisite checks, authentication flow, report generation workflows, keyword analysis, and developer feedback for unsupported write operations.
+description: Generate Google Ads account summaries, performance reports and analytics using the Hopkin Google Ads MCP. Includes prerequisite checks, authentication flow, report generation workflows, keyword analysis, and developer feedback for unsupported write operations.
 ---
 
 # Google Ads Reports Skill
@@ -84,7 +84,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 - **What `login_customer_id` is:** The MCC/manager account ID used to authenticate access to a child (client) account. It tells the API which manager account is making the request on behalf of the child account.
 - **How to detect if it's needed:** If `google_ads_list_accounts` returns accounts with a `managerCustomerId` field, or if `google_ads_list_mcc_child_accounts` returns results, or if the user says they manage client accounts.
-- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_performance_report`, `google_ads_get_geo_performance`, `google_ads_get_asset_report`, `google_ads_get_activities`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`, `google_ads_list_negative_keywords`, `google_ads_list_negative_keyword_lists`, `google_ads_get_auto_applied_recommendations`
+- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_account_summary`, `google_ads_get_performance_report`, `google_ads_get_geo_performance`, `google_ads_get_asset_report`, `google_ads_get_activities`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`, `google_ads_list_negative_keywords`, `google_ads_list_negative_keyword_lists`, `google_ads_get_auto_applied_recommendations`
 - **What happens without it:** Permission errors when trying to query accounts managed under an MCC. The error message will hint that `login_customer_id` is required.
 
 ## Available MCP Tools
@@ -107,7 +107,8 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_list_ads` — List ads for an account, campaign, or ad group
 
 ### Analytics
-- `google_ads_get_performance_report` — **Recommended.** Full-funnel report with funnel metrics (impressions, clicks, cost, ROAS) plus conversion breakdown by conversion action name — runs two queries in parallel. Supports segments: `date`, `device`, `ad_network_type` (for Performance Max channel breakdown)
+- `google_ads_get_account_summary` — **Recommended for a quick account-level overview.** Standardized, cross-platform-comparable account totals (spend, impressions, clicks, CTR, CPC, conversions, CPA, ROAS) plus the Demand Gen Platform Comparable conversion family and a per-conversion-action breakdown, in one call. Use this whenever the user asks how an account is doing overall, for a performance summary, or for account totals over a date range; use `google_ads_get_performance_report` only when they need a level or segment breakdown.
+- `google_ads_get_performance_report` — **Recommended for segmented / multi-level analysis.** Full-funnel report with funnel metrics (impressions, clicks, cost, ROAS) plus conversion breakdown by conversion action name — runs two queries in parallel. Supports segments: `date`, `device`, `ad_network_type` (for Performance Max channel breakdown)
 - `google_ads_get_geo_performance` — Geographic performance breakdown by country, city, region, metro, or other geo levels. Uses `geographic_view` resource with automatic geo name resolution. Runs a parallel conversion breakdown query. **Only tool that supports geographic segments** — do not use `google_ads_get_insights` for geo data.
 - `google_ads_get_insights` — Custom analytics: full control over metrics, segments, and GAQL; use when `google_ads_get_performance_report` does not cover the required custom query. Supports segments including `date`, `device`, `ad_network_type`, and `conversion_action_name`
 
@@ -115,7 +116,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_render_chart` — **MCP App. ALWAYS use this when the user asks for any chart, graph, map, or visualization.** Do NOT substitute a table or text summary. Supports 6 types: `bar` (compare values across campaigns/placements), `scatter` (correlation between two metrics), `timeseries` (metrics over time), `funnel` (conversion stages), `waterfall` (cumulative contribution), `choropleth` (US state heatmap). Fetch the data first with insights or performance report tools, then pass the structured data here. This renders an interactive visual — it is the correct tool whenever a chart is explicitly requested.
 
 ### Conversion Actions
-- `google_ads_get_conversion_actions` — List conversion actions by status — foundational for understanding what conversions are tracked before interpreting ROAS or conversion metrics
+- `google_ads_get_conversion_actions` — List conversion actions by status — foundational for understanding what conversions are tracked before interpreting ROAS or conversion metrics. Reports configuration and recent firing volume only; it carries no conversion *value*. For per-conversion-action performance (counts plus value, filterable by campaign and date range), use `google_ads_get_performance_report` and read its `conversion_breakdown` field.
 
 > **Guidance:** Before analyzing conversion metrics or ROAS for any account, call `google_ads_get_conversion_actions` to establish which conversion actions are active and which are included in the aggregate "Conversions" metric.
 
