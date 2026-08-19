@@ -267,6 +267,4 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 1.0
-**Last Updated:** 2026-04-14
 **Requires:** Hopkin Mailchimp MCP (https://app.hopkin.ai)

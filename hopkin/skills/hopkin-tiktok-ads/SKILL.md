@@ -325,6 +325,4 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Skill Version:** 1.0
-**Last Updated:** 2026-03-22
 **Requires:** Hopkin TikTok Ads MCP (https://app.hopkin.ai)

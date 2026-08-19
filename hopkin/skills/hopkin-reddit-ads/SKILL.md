@@ -286,6 +286,4 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Skill Version:** 1.1
-**Last Updated:** 2026-03-16
 **Requires:** Hopkin Reddit Ads MCP (https://app.hopkin.ai)

@@ -387,6 +387,4 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 2.4
-**Last Updated:** 2026-03-22
 **Requires:** Hopkin Meta Ads MCP (https://app.hopkin.ai)

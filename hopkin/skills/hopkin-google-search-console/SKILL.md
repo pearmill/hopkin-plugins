@@ -322,6 +322,4 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 1.0
-**Last Updated:** 2026-04-17
 **Requires:** Hopkin Google Search Console MCP (https://app.hopkin.ai)
