@@ -206,6 +206,16 @@ Evaluate individual creative effectiveness — headlines, copy, CTR, and engagem
 
 ---
 
+### Client-Side Tracking Audit (Browser)
+
+When the numbers point at a tracking problem rather than a media problem, the audit can be run against the user's own site. The **Hopkin Tag Inspector** Chrome extension exposes a page API that reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. On LinkedIn this catches an Insight Tag that loads on the site but never fires its conversion event on the form submit, which leaves `linkedin_ads_get_partner_conversions` at zero with no way to tell a broken tag from genuinely zero demand.
+
+This runs in the browser, not on the MCP server — it requires that you have browser control and that the user has the Hopkin Tag Inspector extension installed. Hopkin's servers cannot observe client-side tag behavior on their own.
+
+**Read the MCP resource `hopkin://tag-inspector/tracking-audit` before running one.** It is the canonical playbook — API reference, operational traps, and safety rules. Do not improvise the calls from this summary.
+
+---
+
 ## Workflow Process
 
 1. **Account Selection** — Check preferences for stored default; use `linkedin_ads_list_ad_accounts` if needed
