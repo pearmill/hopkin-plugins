@@ -131,6 +131,16 @@ All tools use the `ga4_` prefix.
 - **Event audit:** dimensions `[eventName]`, metrics `[eventCount]`
 - **Tag verification (realtime):** `ga4_run_realtime_report` with dimensions `[eventName]`, metrics `[eventCount]`
 
+### Client-Side Tracking Audit (Browser)
+
+When the numbers point at a tracking problem rather than a media problem, the audit can be run against the user's own site. The **Hopkin Tag Inspector** Chrome extension exposes a page API that reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. For GA4 this catches the two failures a report structurally cannot show: an event that never reached the property at all, and an event that fired while consent was denied. A report can only describe what arrived.
+
+This runs in the browser, not on the MCP server — it requires that you have browser control and that the user has the Hopkin Tag Inspector extension installed. Hopkin's servers cannot observe client-side tag behavior on their own.
+
+**Read the MCP resource `hopkin://tag-inspector/tracking-audit` before running one.** It is the canonical playbook — API reference, operational traps, and safety rules. Do not improvise the calls from this summary.
+
+---
+
 ### Write Operations (Unsupported — Developer Feedback)
 
 The Hopkin Google Analytics MCP is **read-only**. When a user requests write operations (create key events, edit data streams, change retention settings, link Google Ads, etc.):
@@ -224,6 +234,4 @@ For more detailed information:
 
 ---
 
-**Skill Version:** 1.0
-**Last Updated:** 2026-07-18
 **Requires:** Hopkin Google Analytics MCP (https://app.hopkin.ai)
