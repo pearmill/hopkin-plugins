@@ -209,6 +209,16 @@ Evaluate ad group targeting effectiveness, bid strategy performance, and budget 
 
 ---
 
+### Client-Side Tracking Audit (Browser)
+
+When the numbers point at a tracking problem rather than a media problem, the audit can be run against the user's own site. The **Hopkin Tag Inspector** Chrome extension exposes a page API that reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. On TikTok this catches a Pixel that fires `Pageview` but never `CompletePayment` or `SubmitForm` on the conversion step, so the conversions in `tiktok_ads_get_performance_report` undercount for a reason no ads-side tool can surface.
+
+This runs in the browser, not on the MCP server — it requires that you have browser control and that the user has the Hopkin Tag Inspector extension installed. Hopkin's servers cannot observe client-side tag behavior on their own.
+
+**Read the MCP resource `hopkin://tag-inspector/tracking-audit` before running one.** It is the canonical playbook — API reference, operational traps, and safety rules. Do not improvise the calls from this summary.
+
+---
+
 ## Workflow Process
 
 1. **Advertiser Selection** — Use `tiktok_ads_list_advertisers` to find and confirm the advertiser
@@ -315,6 +325,4 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Skill Version:** 1.0
-**Last Updated:** 2026-03-22
 **Requires:** Hopkin TikTok Ads MCP (https://app.hopkin.ai)
