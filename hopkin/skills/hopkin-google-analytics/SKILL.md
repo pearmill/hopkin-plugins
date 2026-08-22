@@ -133,11 +133,29 @@ All tools use the `ga4_` prefix.
 
 ### Client-Side Tracking Audit (Browser)
 
-When the numbers point at a tracking problem rather than a media problem, the audit can be run against the user's own site. The **Hopkin Tag Inspector** Chrome extension exposes a page API that reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. For GA4 this catches the two failures a report structurally cannot show: an event that never reached the property at all, and an event that fired while consent was denied. A report can only describe what arrived.
+When the numbers point at a tracking problem rather than a media problem, audit the site itself. The **Hopkin Tag Inspector** Chrome extension reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. For GA4 this catches the two failures a report structurally cannot show: a key event configured under a name the site never emits (an event name containing a space is rejected outright), and events arriving server-side with no campaign parameters, which GA4 then stamps as Direct.
 
-This runs in the browser, not on the MCP server — it requires that you have browser control and that the user has the Hopkin Tag Inspector extension installed. Hopkin's servers cannot observe client-side tag behavior on their own.
+This runs in the browser, not on the MCP server: it needs browser control, and Hopkin's servers cannot observe client-side tag behavior on their own.
 
-**Read the MCP resource `hopkin://tag-inspector/tracking-audit` before running one.** It is the canonical playbook — API reference, operational traps, and safety rules. Do not improvise the calls from this summary.
+**Step 1 — is the extension there?** Run this in the page:
+
+```js
+typeof window.__hopkinTagInspector
+```
+
+**If `"object"` — one call does it.** The session is already recording (every capturable page starts one on navigation):
+
+```js
+await window.__hopkinTagInspector.getAudit()
+```
+
+Returns `events.total`, `vendors[]` (`vendor`, `eventCount`, `droppedCount`), `findings[]` (`severity`, `ruleId`), `coverage.missing` — the conversions expected and never fired, which is the highest-value field — and `redacted`. Also available: `status()`, `startRecording({ reset })`, `queryEvents({ vendor, eventName, limit })`. There is deliberately no `stopRecording`, and redaction cannot be disabled from the page.
+
+If it returns `undefined`, **reload once and re-probe** — the API is absent until a reload after install. Still `undefined` means: not installed, this origin not granted, or a page Chrome refuses to let extensions script. Say which.
+
+**If not installed:** https://chromewebstore.google.com/detail/hopkin-tag-inspector/ahgjbbnglgnladgimapeecjmhlhmacgg — free, no account. Send the user that link; retrying will not fix it.
+
+**Fuller playbook** — safety rules, operational traps, and three canned probes for auditing *without* the extension (inventory, config diff, safe conversion replay): read the MCP resource `hopkin://tag-inspector/tracking-audit`, or if you cannot read MCP resources, fetch https://www.hopkin.ai/tag-inspector. Prefer it when you can reach it; the summary above is enough to start.
 
 ---
 
