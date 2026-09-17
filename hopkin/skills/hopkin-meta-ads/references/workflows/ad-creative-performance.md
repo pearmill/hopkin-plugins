@@ -13,7 +13,7 @@ This workflow is particularly useful when:
 
 ## Primary Tools
 
-- `meta_ads_get_ad_creative_report` — **Recommended for creative analysis.** Ad-level performance report with full funnel metrics plus creative asset info (asset_type, asset_url, thumbnail_url). Use `level: "ad_name"` (default) to aggregate ads by name across ad sets — returns a representative `ad_id` per creative that can be passed directly to `meta_ads_preview_ads`. Use `level: "ad_id"` to compare distinct individual ads.
+- `meta_ads_get_ad_creative_report` — **Recommended for creative analysis.** Ad-level performance report with full funnel metrics plus creative asset info (asset_type, asset_url, thumbnail_url, listed once per ad under `assets`). Use `level: "ad_name"` (default) to aggregate ads by name across ad sets — returns a representative `ad_id` per creative that can be passed directly to `meta_ads_preview_ads`. Use `level: "ad_id"` to compare distinct individual ads. Rows are ranked by spend and compact by default (`full_detail: true` adds per-type costs); follow `nextCursor` to get every page.
 - `meta_ads_preview_ads` — **Crown jewel of creative reporting.** An MCP App that renders a visual UI showing actual ad images/videos with a configurable metrics overlay — not tabular data. This is the definitive way to review creative quality. Proactively offer it whenever the user asks "what do my ads look like", wants to review creative quality, is doing A/B creative comparison, or when presenting winners/losers. The `ad_id` values from `meta_ads_get_ad_creative_report` can be passed directly — no need to call `meta_ads_list_ads` first.
 - `meta_ads_get_insights` with `level: "ad"` — For custom fields or breakdowns not available in the creative report
 - `meta_ads_list_ads` — Use only if you need to look up specific ad IDs before running `meta_ads_get_ad_creative_report` with `level: "ad_id"` filtering
@@ -67,12 +67,13 @@ Gather and confirm before pulling data:
    - Use `level: "ad_name"` (default) to aggregate ads sharing the same name across ad sets — the response includes a representative `ad_id` per creative for use with `meta_ads_preview_ads`
    - Use `level: "ad_id"` if you need one row per individual ad
    - Use `meta_ads_get_insights` only for custom fields or breakdowns not available in the creative report
-   - The response includes these fields automatically:
+   - Each row includes these fields automatically:
      - **Ad Details:** ad_id, ad_name, ad_count (ad_name mode only)
-     - **Creative Asset:** asset_type (image/video/unknown), asset_url (GCS URL), thumbnail_url (GCS URL, videos only)
      - **Engagement:** impressions, reach, clicks, ctr, cpc, cpm
      - **Spend:** spend
-     - **All conversion types** individually with counts, costs, and values
+     - **All conversion types** individually with counts and values. Per-type costs (cost_per_action_type, cost_per_conversion, cost_per_thruplay) are left out of the default compact rows; compute them as spend ÷ count, or pass `full_detail: true`
+   - **Creative Asset:** under the response's top-level `assets`, keyed by each row's `ad_id`: asset_type (image/video/unknown), asset_url (GCS URL), thumbnail_url (GCS URL, videos only)
+   - **Paging:** rows come back highest spend first, one page at a time. When `nextCursor` is present, call again with `cursor` set to it until it is absent to see every creative. `truncated` and `truncation` say when a response does not hold every row
      - **Secondary Events:** All action types with counts and values
 
 2. **Pull additional creative metadata from Motion or BI (if available):**

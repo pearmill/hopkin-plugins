@@ -204,7 +204,7 @@ Supports two grouping modes via the `level` parameter:
 - **`ad_name`** (default): aggregates all ads sharing the same name across ad sets, returns a representative `ad_id` (highest impressions) that can be passed directly to `meta_ads_preview_ads` — ideal for comparing the same creative running in multiple ad sets. Omits non-aggregatable fields (`frequency`, quality rankings, ROAS).
 - **`ad_id`**: one row per ad — use when comparing distinct individual ads.
 
-All conversion types are shown individually, not collapsed into a single number. Always fetches fresh data.
+All conversion types are shown individually, not collapsed into a single number. Rows come back highest spend first. Rows are compact by default: the per-type cost arrays (`cost_per_action_type`, `cost_per_conversion`, `cost_per_thruplay`) are left out, since each is spend ÷ that type's count; pass `full_detail: true` to include them. Each response is one page of at most 50,000 characters (or `limit` rows): when `nextCursor` is present, pass it as `cursor` to get the next page, and repeat until it is absent. A call without `cursor` always reads fresh data; cursor pages served by the same server instance reuse that read for up to 15 minutes.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -214,15 +214,22 @@ All conversion types are shown individually, not collapsed into a single number.
 - `time_increment` (number or string, optional) — Time grouping: `1` for daily, `7` for weekly, `"monthly"`, `"all_days"` for a single row over the entire range
 - `breakdowns` (array, optional) — Segment data by dimension (e.g., `["age", "gender"]`). Available: age, gender, country, region, device_platform, publisher_platform, platform_position, impression_device, dma
 - `filtering` (array, optional) — Filters as `[{field, operator, value}]`
+- `full_detail` (boolean, optional) — Include the per-type cost arrays (default `false`: compact rows)
+- `limit` (number, optional) — Maximum rows per page (1–500); a page also ends at the response size limit
+- `cursor` (string, optional) — `nextCursor` from the previous response, to get the next page
 
 **Returns:**
-- `ad_id` — the ad ID (or representative ad_id in `ad_name` mode)
-- `ad_name` — the ad name
-- `ad_count` — number of ads aggregated (only in `ad_name` mode)
-- `asset_type` — `'image'` | `'video'` | `'unknown'`
-- `asset_url` — GCS URL to the creative asset
-- `thumbnail_url` — GCS URL to thumbnail (videos only)
-- Full delivery, engagement, action, and conversion metrics
+- `data` — one page of rows, highest spend first. Each row has:
+  - `ad_id` — the ad ID (or representative ad_id in `ad_name` mode)
+  - `ad_name` — the ad name
+  - `ad_count` — number of ads aggregated (only in `ad_name` mode)
+  - Full delivery, engagement, action, and conversion metrics (per-type costs only with `full_detail: true`)
+- `assets` — creative media keyed by `ad_id`, listed once per ad:
+  - `asset_type` — `'image'` | `'video'` | `'unknown'`
+  - `asset_url` — GCS URL to the creative asset
+  - `thumbnail_url` — GCS URL to thumbnail (videos only)
+- `nextCursor` — present when more rows remain; pass it as `cursor`
+- `truncated` / `truncation` — when a response does not hold every row: `reasons` (`response_size` or `limit`: more pages remain; `row_limit`: Meta had more ad-level rows than the tool reads, so narrow the request; `report_changed`: live numbers moved rows between pages, so start again without `cursor`), `total_rows`, `returned_rows`, `remaining_rows`, `remaining_spend`, and with `row_limit` an approximate `unread_spend`
 
 **Example — Creative round analysis by name:**
 ```json
