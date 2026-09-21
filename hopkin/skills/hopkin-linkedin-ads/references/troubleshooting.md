@@ -11,6 +11,7 @@ This guide provides solutions to common issues encountered when using the Linked
 5. [API Error Codes](#api-error-codes)
 6. [Performance & Rate Limiting](#performance--rate-limiting)
 7. [Data Quality Issues](#data-quality-issues)
+8. [Competitor Research & Ad Library](#competitor-research--ad-library)
 
 ---
 
@@ -182,7 +183,7 @@ LinkedIn provider tokens expire after **60 days**. Unlike Meta and Google, Linke
   "tool": "linkedin_ads_get_insights",
   "parameters": {
     "reason": "Demographic analysis by job function",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivot": "MEMBER_JOB_FUNCTION",
     "date_preset": "LAST_30_DAYS"
   }
@@ -280,6 +281,69 @@ MEMBER_* demographic data (job title, industry, etc.) is based on LinkedIn membe
 
 ---
 
+## Competitor Research & Ad Library
+
+The ad-library and competitor tools need **no LinkedIn connection**. Auth advice (reconnect LinkedIn, check scopes) never applies to them. See **references/workflows/competitor-research.md** for the full workflow.
+
+### "Nothing was tracked" — a candidate list came back
+
+**Cause:** No advertiser is named *exactly* what was passed. LinkedIn's advertiser search is fuzzy, so similar names come back as candidates.
+
+**Solution:** Retry `linkedin_ads_track_competitor` with the candidate whose name exactly matches the company the user meant. Use `organization_id` when it has a numeric ID, otherwise `name` exactly as listed. If none matches exactly, ask the user. Never track a differently named company.
+
+### "LinkedIn's Ad Library has no ads from an advertiser named …"
+
+**Cause:** The live lookup found no advertiser with that name in those countries.
+
+**Solutions:**
+1. Tell the user plainly that nothing was tracked. Do not invent ads or track a lookalike.
+2. Check the name exactly as it appears on the company's LinkedIn page.
+3. If the company may advertise elsewhere, retry with `countries: ["ALL"]`.
+
+### Tracking by company URL found nothing
+
+**Cause:** A vanity slug (`linkedin.com/company/acmeanalytics`) is only a guess at the company's name, and LinkedIn's Ad Library is searched by name.
+
+**Solution:** Retry with `name` set to the real display name ("Acme Analytics"), or ask the user to confirm it.
+
+### "Cannot be searched by organization ID"
+
+**Cause:** `organization_id` (or `organization_ids` on search) only works for advertisers that have already been collected.
+
+**Solution:** Use `name` (tracking) or `advertiser_name` (search).
+
+### Newly tracked competitor shows no ads (or only a few)
+
+**Cause:** Tracking starts a full collection in the background (`full_scrape: "started"`). It finishes within minutes, not in the same call.
+
+**Solution:** Tell the user the full inventory, including employee posts the company pays for, is still arriving, and check again shortly with `linkedin_ads_list_competitor_ads`. Do **not** report that the company has no ads.
+
+### Search results show other companies' ads
+
+**Cause:** `search_terms` searches ad **copy**. A company's name in `search_terms` finds ads that mention it, mostly from other advertisers.
+
+**Solution:** Use `advertiser_name` for one company's ads.
+
+### A tracked competitor is marked `stale` or has a `scrape_warning`
+
+**Cause:** No successful collection in the last 48 hours, or the last collection reported a problem (`blocked`, `schema_error`, `empty`).
+
+**Solution:** Present its ads as possibly out of date and mention the warning. The daily collection retries on its own.
+
+### Ad copy ends mid-sentence
+
+**Cause:** `linkedin_ads_search_ad_library` clips `primary_text` at 300 characters. Separately, an ad with `copy_truncated: true` only has LinkedIn's "see more" preview stored.
+
+**Solution:** Open the ad with `linkedin_ads_get_competitor_ad` for the full stored copy. If `copy_truncated` is true, say that ad's copy is a preview.
+
+### "Tracked-competitor limit reached"
+
+**Cause:** The plan's tracked-competitor limit, which is shared with Meta competitor tracking, is used up.
+
+**Solution:** Relay the message and offer to untrack a competitor with `linkedin_ads_untrack_competitor`.
+
+---
+
 ## Debugging Checklist
 
 When encountering issues, work through this checklist:
@@ -300,7 +364,7 @@ When encountering issues, work through this checklist:
 
 - [ ] **Request Parameters**
   - [ ] All required parameters are provided (including `reason`)
-  - [ ] `account_id` is a numeric value (no URN prefix)
+  - [ ] `account_id` is a numeric ID passed as a string (no URN prefix)
   - [ ] Date ranges are valid YYYY-MM-DD format
   - [ ] Using `linkedin_ads_get_insights` (not `get_performance_report`) for MEMBER_* pivots
 
@@ -333,6 +397,12 @@ When encountering issues, work through this checklist:
 
 **"Rate limit exceeded"**
 → Check: Request frequency, implement backoff, use cached data where possible
+
+**"Nothing was tracked" / "no ads from an advertiser named …"**
+→ Check: Exact company name as on its LinkedIn page; retry with the exact candidate, or tell the user plainly
+
+**"New competitor has no ads yet"**
+→ The background full collection is still running; check back shortly, don't report "no ads"
 
 ---
 

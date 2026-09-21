@@ -1,6 +1,6 @@
 ---
 name: hopkin-linkedin-ads
-description: Generate LinkedIn Ads performance reports and analytics using the Hopkin LinkedIn Ads MCP. Includes prerequisite checks, authentication flow, report generation workflows, demographic insights using LinkedIn's unique MEMBER_* pivots, and developer feedback for unsupported write operations.
+description: Generate LinkedIn Ads performance reports and analytics, and research competitors' LinkedIn ads, using the Hopkin LinkedIn Ads MCP. Includes prerequisite checks, authentication and connection management, report generation workflows, demographic insights using LinkedIn's unique MEMBER_* pivots, LinkedIn Ad Library search and name-based competitor tracking (real creative, video frames, employee posts a company pays for, EU transparency data — no LinkedIn connection needed), and developer feedback for unsupported write operations.
 ---
 
 # LinkedIn Ads Skill
@@ -13,6 +13,7 @@ This skill enables Claude to build comprehensive reports and analyze LinkedIn Ad
 - Analyze campaign metrics, ROAS, and spending patterns
 - Leverage LinkedIn's unique professional demographic audience (job title, seniority, industry, etc.)
 - Analyze creative effectiveness
+- Research competitors: see any company's LinkedIn ads, track competitors by name, and read their actual creative — no LinkedIn connection needed
 
 ## Prerequisites
 
@@ -54,18 +55,24 @@ Pause execution until the user confirms, then re-verify.
 
 > **Note:** LinkedIn tokens have a **60-day TTL**. If a previously-authenticated user gets auth errors, direct them to https://app.hopkin.ai to reconnect.
 
-### Quick Start with Preferences
-
-At session start, call `linkedin_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "default"`. If a `default_account_id` exists, use it automatically: "Using your saved account [X]. Use a different one? Let me know." Otherwise, look up the account ID.
+> **Competitor research needs no LinkedIn connection.** The ad-library and competitor tools work with Hopkin sign-in alone — never ask the user to connect LinkedIn for them.
 
 ### Required Information
 
-- **Ad Account ID** — Numeric ID (e.g., `123456789`). Use `linkedin_ads_list_ad_accounts` to look up by company name.
+- **Ad Account ID** — Numeric ID passed as a string (e.g., `"123456789"`). Use `linkedin_ads_list_ad_accounts` to look up by company name.
 - **Date Range** — Use `date_preset` (e.g., `LAST_30_DAYS`) or `start_date`/`end_date` (YYYY-MM-DD)
 
 ### Multi-Account Selection
 
-When `linkedin_ads_list_ad_accounts` returns multiple accounts, present them as a numbered list, ask the user to confirm, then offer to save the selection via `linkedin_ads_store_preference` (`entity_type: "ad_account"`, `entity_id: "default"`, `key: "default_account_id"`).
+When `linkedin_ads_list_ad_accounts` returns multiple accounts, present them as a numbered list and ask the user to confirm which one to analyze.
+
+### Connections
+
+A user can have more than one LinkedIn connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection.
+
+- `linkedin_ads_list_connections` shows each connection's name, ID, whether it is the default, and whether it is owned or shared
+- Pass `connection_id` to target a specific one
+- `linkedin_ads_set_default_connection` changes which one is used when `connection_id` is omitted — call it only when the user asks
 
 ## LinkedIn Ads Hierarchy
 
@@ -107,13 +114,23 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 ### Partner Conversions
 - `linkedin_ads_get_partner_conversions` — List partner conversions (LinkedIn's term for "conversion actions"); call before interpreting conversion metrics or ROAS
 
-### Preferences
-- `linkedin_ads_store_preference` — Store a persistent preference for a LinkedIn Ads entity
-- `linkedin_ads_get_preferences` — Retrieve stored preferences for an entity
-- `linkedin_ads_delete_preference` — Delete a stored preference by key
+### Budget & Bid Planning
+- `linkedin_ads_get_budget_pricing` — Recommended bid ranges and daily budget limits for a campaign type and audience
 
-### Visualization
-- `linkedin_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or demographic data — do not substitute a table or text summary when a chart is requested.
+### Connections
+- `linkedin_ads_list_connections` — List LinkedIn connections available to you (owned and org-shared), with their IDs
+- `linkedin_ads_set_default_connection` — Set the default connection for subsequent LinkedIn Ads tool calls
+- `linkedin_ads_share_connection` / `linkedin_ads_unshare_connection` — Share/unshare an owned connection with your organization (unshare is destructive — confirm with the user first)
+- `linkedin_ads_rename_connection` — Rename an owned connection's display name
+- `linkedin_ads_revoke_connection` — Revoke an owned connection (destructive — confirm with the user first)
+
+### Competitor Research & Ad Library (no LinkedIn connection needed)
+- `linkedin_ads_search_ad_library` — Search the LinkedIn Ad Library for any advertiser's ads with real creative. **One company's ads → `advertiser_name`**; keyword search over ad copy → `search_terms`. `countries` is required
+- `linkedin_ads_track_competitor` — Track an advertiser for daily collection, **by `name`** (exact match only; optional per-track `countries`)
+- `linkedin_ads_untrack_competitor` — Stop tracking an advertiser
+- `linkedin_ads_list_tracked_competitors` — Tracked advertisers with ad counts, `payer_ad_count`, countries and scrape health
+- `linkedin_ads_list_competitor_ads` — A tracked advertiser's ads with full copy, including employee posts it paid for (`attribution: "payer"`)
+- `linkedin_ads_get_competitor_ad` — One ad in full: copy, inline images, video frames, transcript, transparency data
 
 ### Feedback
 - `linkedin_ads_developer_feedback` — Submit feature requests and workflow gap reports
@@ -128,6 +145,7 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 2. **Campaign Performance** — Targeting-level performance, audience efficiency, bidding analysis
 3. **Creative Performance** — Ad effectiveness, headline/copy analysis, CTR and engagement
 4. **Demographic Insights** — LinkedIn's unique professional audience pivots: job function, seniority, industry, company size, and more
+5. **Competitor Research** — Any company's LinkedIn ads from the Ad Library: current creative, messaging themes, format mix, employee posts a company pays for, EU transparency data
 
 ### LinkedIn-Unique: MEMBER_* Demographic Pivots
 
@@ -139,8 +157,7 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - **MEMBER_INDUSTRY** — By industry vertical
 - **MEMBER_COMPANY** — By company
 - **MEMBER_COMPANY_SIZE** — By headcount range
-- **MEMBER_COUNTRY** / **MEMBER_REGION** — Geographic breakdown
-- **MEMBER_AGE** — By age group
+- **MEMBER_COUNTRY_V2** / **MEMBER_REGION_V2** / **MEMBER_COUNTY** — Geographic breakdown
 
 > **MEMBER_* pivots only work with `linkedin_ads_get_insights`** — not `linkedin_ads_get_performance_report`.
 
@@ -160,7 +177,7 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The MCP is **read-only**. When a user requests write operations:
+The MCP is **read-only toward LinkedIn** — it cannot create, change, pause, or delete campaigns, budgets, bids, creatives, or targeting. (It can change Hopkin-side state only: which competitors are tracked, and your LinkedIn connections.) When a user requests a LinkedIn write operation:
 
 1. Inform them write operations are not yet available via Hopkin
 2. Call `linkedin_ads_developer_feedback` with `feedback_type: "workflow_gap"`, a descriptive `title`, `description` of what was requested, and appropriate `priority`
@@ -206,6 +223,25 @@ Evaluate individual creative effectiveness — headlines, copy, CTR, and engagem
 
 ---
 
+### Competitor Research (LinkedIn Ad Library)
+
+See what other companies run on LinkedIn — real copy, CTAs, landing pages, formats, video frames — and track competitors so their ads keep being collected. **No LinkedIn connection is needed.**
+
+**Primary tools:** `linkedin_ads_search_ad_library` (look without tracking), `linkedin_ads_track_competitor` → `linkedin_ads_list_competitor_ads` → `linkedin_ads_get_competitor_ad`
+
+The rules that matter most:
+
+- **LinkedIn's Ad Library is searched by advertiser NAME**, exactly as shown on the company's LinkedIn page. To see one company's ads, pass `advertiser_name` to `linkedin_ads_search_ad_library` — `search_terms` searches ad *copy*, which rarely names the advertiser. To track, pass `name` to `linkedin_ads_track_competitor`.
+- **Exact match only.** A name not yet collected is looked up live (about 20–40 s) and tracked in the same call only if one advertiser has exactly that name. Near misses come back as **candidates with nothing tracked** — retry with the exact one (its `organization_id`, or `name` exactly as listed) or ask the user; never track a differently named company. No ads under that name → say so plainly.
+- **A vanity slug is not a name.** `linkedin.com/company/acmeanalytics` is only a guess at "Acme Analytics"; if it misses, retry with `name`. A numeric `organization_id` works only for advertisers already collected.
+- **`countries`** (ISO codes such as `["US", "GB", "DE"]`, or `["ALL"]`) sets where a competitor is tracked, in one call; omit it for the default tracking countries. It is **required** on `linkedin_ads_search_ad_library`.
+- **Employee posts** a company pays for are listed with `attribution: "payer"` and `posted_by` (the person) — report them as employee posts, never as company-page ads. `linkedin_ads_list_tracked_competitors` shows `payer_ad_count`.
+- **Tracking starts a background full collection that finishes later** (`seeded`, `full_scrape: "started"`). If a new track shows few or no ads yet, say the rest is still arriving — do not report "no ads".
+
+**See detailed workflow:** **references/workflows/competitor-research.md**
+
+---
+
 ### Client-Side Tracking Audit (Browser)
 
 When the numbers point at a tracking problem rather than a media problem, audit the site itself. The **Hopkin Tag Inspector** Chrome extension reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. On LinkedIn this catches an Insight Tag that loads but never fires its conversion on submit, leaving `linkedin_ads_get_partner_conversions` at zero with no way to tell a broken tag from genuinely zero demand.
@@ -236,7 +272,7 @@ If it returns `undefined`, **reload once and re-probe** — the API is absent un
 
 ## Workflow Process
 
-1. **Account Selection** — Check preferences for stored default; use `linkedin_ads_list_ad_accounts` if needed
+1. **Account Selection** — Use `linkedin_ads_list_ad_accounts` if no account ID was given (competitor research needs no account)
 2. **Date Range** — Default to last 30 days if not specified
 3. **Report Type** — Match user intent to the appropriate report type
 4. **Report Generation** — Use the appropriate tool
@@ -271,8 +307,8 @@ Before interpreting conversion metrics or ROAS, call `linkedin_ads_get_partner_c
 
 ### Account IDs and URNs
 
-LinkedIn account IDs are **numeric only** — strip any URN prefix before API calls:
-- **Correct:** `123456789`
+LinkedIn account IDs are **numeric only** — strip any URN prefix, and pass the ID as a string:
+- **Correct:** `"123456789"`
 - **Incorrect:** `urn:li:sponsoredAccount:123456789`
 
 Most Hopkin tools accept numeric IDs. `linkedin_ads_list_creatives` accepts both URN and numeric format for `creative_id`.
@@ -289,7 +325,8 @@ Most Hopkin tools accept numeric IDs. `linkedin_ads_list_creatives` accepts both
 2. **Account not found** — Ensure ID is numeric, no URN prefix
 3. **Invalid pivot** — MEMBER_* pivots require `linkedin_ads_get_insights`
 4. **No data** — Verify date range and campaign activity
-5. See **references/troubleshooting.md** for more
+5. **Competitor tracked but no ads yet** — The background full collection is still running; say so and check back, don't report "no ads"
+6. See **references/troubleshooting.md** for more
 
 ---
 
@@ -303,6 +340,8 @@ See **references/troubleshooting.md** for full guidance.
 - **"Account not found"** — Account ID must be numeric (no URN prefix)
 - **"No data"** — Check date range and campaign activity
 - **"Invalid pivot"** — MEMBER_* pivots only work with `linkedin_ads_get_insights`
+- **"Nothing was tracked" / candidates** — No advertiser has exactly that name; retry with the exact candidate or ask the user
+- **Competitor ads look like another company's** — Use `advertiser_name`, not `search_terms`, for one company's ads
 
 ---
 
@@ -313,6 +352,8 @@ See **references/troubleshooting.md** for full guidance.
 - **references/workflows/campaign-performance.md** — Campaign group & campaign performance
 - **references/workflows/demographic-insights.md** — MEMBER_* demographic insights
 - **references/workflows/creative-performance.md** — Creative performance
+- **references/workflows/competitor-research.md** — Ad Library search and competitor tracking
+- **references/workflows/budget-pacing.md** — Budget pacing and bid planning
 - **references/workflows/common-actions.md** — Write operation feedback and optimization
 
 ---
