@@ -125,7 +125,7 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `linkedin_ads_revoke_connection` — Revoke an owned connection (destructive — confirm with the user first)
 
 ### Competitor Research & Ad Library (no LinkedIn connection needed)
-- `linkedin_ads_search_ad_library` — Search the LinkedIn Ad Library for any advertiser's ads with real creative. **One company's ads → `advertiser_name`**; keyword search over ad copy → `search_terms`. `countries` is required
+- `linkedin_ads_search_ad_library` — Search the LinkedIn Ad Library for any advertiser's ads with real creative, returned under `data`. **One company's ads → `advertiser_name`**; keyword search over ad copy → `search_terms`. `countries` is required
 - `linkedin_ads_track_competitor` — Track an advertiser for daily collection, **by `name`** (exact match only; optional per-track `countries`)
 - `linkedin_ads_untrack_competitor` — Stop tracking an advertiser
 - `linkedin_ads_list_tracked_competitors` — Tracked advertisers with ad counts, `payer_ad_count`, countries and scrape health
@@ -237,6 +237,7 @@ The rules that matter most:
 - **`countries`** (ISO codes such as `["US", "GB", "DE"]`, or `["ALL"]`) sets where a competitor is tracked, in one call; omit it for the default tracking countries. It is **required** on `linkedin_ads_search_ad_library`.
 - **Employee posts** a company pays for are listed with `attribution: "payer"` and `posted_by` (the person) — report them as employee posts, never as company-page ads. `linkedin_ads_list_tracked_competitors` shows `payer_ad_count`.
 - **Tracking starts a background full collection that finishes later** (`seeded`, `full_scrape: "started"`). If a new track shows few or no ads yet, say the rest is still arriving — do not report "no ads".
+- **A live search answers from the first page and collects the rest in the background.** While `linkedin_ads_search_ad_library` returns a `collection` block, the list is partial and has **no cursor**. Relay its `message`, don't paginate or call the list complete, and search again later with the same parameters and no cursor. An ad with `details_status: "pending"` hasn't had its full copy, run dates or landing page fetched yet, so don't present its preview as the full ad.
 
 **See detailed workflow:** **references/workflows/competitor-research.md**
 

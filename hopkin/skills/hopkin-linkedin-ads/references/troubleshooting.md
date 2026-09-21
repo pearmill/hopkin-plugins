@@ -326,15 +326,21 @@ The ad-library and competitor tools need **no LinkedIn connection**. Auth advice
 
 ### A tracked competitor is marked `stale` or has a `scrape_warning`
 
-**Cause:** No successful collection in the last 48 hours, or the last collection reported a problem (`blocked`, `schema_error`, `empty`).
+**Cause:** No successful collection in the last 48 hours, or the last collection reported a problem: `blocked`, `schema_error` or `empty`, or `partial` / `incomplete` (only the first page of ads is stored, and the rest is still being collected or never started).
 
 **Solution:** Present its ads as possibly out of date and mention the warning. The daily collection retries on its own.
 
 ### Ad copy ends mid-sentence
 
-**Cause:** `linkedin_ads_search_ad_library` clips `primary_text` at 300 characters. Separately, an ad with `copy_truncated: true` only has LinkedIn's "see more" preview stored.
+**Cause:** `linkedin_ads_search_ad_library` clips `primary_text` at 300 characters. Separately, an ad with `copy_truncated: true` only has LinkedIn's "see more" preview stored. A search result with `details_status: "pending"` hasn't had its detail page read yet, which is where the full copy, run dates and landing page come from.
 
-**Solution:** Open the ad with `linkedin_ads_get_competitor_ad` for the full stored copy. If `copy_truncated` is true, say that ad's copy is a preview.
+**Solution:** Open the ad with `linkedin_ads_get_competitor_ad` for the full stored copy. If `copy_truncated` is true, say that ad's copy is a preview. For `details_status: "pending"`, say the full details are still being fetched and search again after the collection finishes. Don't present the preview as the whole ad, and don't say its run dates are missing.
+
+### Search returned only a few ads and no cursor
+
+**Cause:** The search went to the live Ad Library. It answered from the first page and is collecting the rest in the background. The response carries a `collection` block (`status: "in_progress"`), and no cursor is issued while it runs.
+
+**Solution:** Relay `collection.message` and tell the user these are only the first results. Don't paginate, and don't call the list complete. Call `linkedin_ads_search_ad_library` again later (usually 3–5 minutes) with the **same parameters and no cursor**. An empty `data` with `collection` means the ads haven't landed yet, not that there are none.
 
 ### "Tracked-competitor limit reached"
 

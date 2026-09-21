@@ -81,9 +81,21 @@ If a freshly tracked competitor shows few or **zero ads**, say the full collecti
 - Filter by format with `display_format` and by language with `languages` (language **names** such as `"English"`).
 - Pass either `advertiser_name` or `organization_ids`, not both.
 
-The result is JSON: `ads[]`, `source` (`"corpus"` = already collected, `"live_scrape"` = fetched just now), `pagination` (`hasMore`, `nextCursor`), plus `warnings` and `note` when present. **Relay `warnings` and `note`.** A `note` explains an empty result, for example that the name was checked recently and nothing matched.
+The result is JSON. The ads are in `data`. The other fields are `source` (`"corpus"` = already collected, `"live_scrape"` = fetched just now) and `pagination` (`hasMore`, `nextCursor`). `collection`, `warnings` and `note` appear when they apply. **Relay `warnings` and `note`.** A `note` explains an empty result, for example that the name was checked recently and nothing matched. A warning that only the first page was collected means the list is incomplete. Say so.
 
-Search results clip `primary_text` at 300 characters (ending in `…`). To quote the **full** copy, open the ad with `linkedin_ads_get_competitor_ad` using its `id`.
+**When `collection` is present, the list is only the first results.** When a search has to go to the live Ad Library (typically a keyword search nothing has collected yet), it answers from the first page of results. It then collects the rest in the background, usually in about 3–5 minutes. While that runs, the response carries `collection` (`status: "in_progress"`, `started_at`, `message`) and **no cursor**. `pagination.hasMore` is then `false` even though more ads are coming, so it does **not** mean the list is complete. Later searches with the same parameters also carry `collection` until the background run finishes, sometimes with an empty `data`. That means the ads haven't landed yet, not that there are none. When you see `collection`:
+
+- Relay its `message`, and tell the user these are only the first results.
+- **Don't** paginate, and don't conclude the list is complete or that there are no more ads.
+- For the full set, call again later with the **same parameters and no cursor**.
+
+**Each LinkedIn search result has a `details_status`.** An ad's full copy, run dates, CTA and landing page come only from its detail page:
+
+- `"complete"`: the detail page was read.
+- `"pending"`: it hasn't been read yet. The background collection may still fill it in. Until then, don't present the preview copy as the full text. Don't say the ad has no run dates or landing page either: they just haven't been fetched. Search again after the collection finishes, or say the details are still loading.
+- `"unavailable"`: it wasn't read and won't be. `copy_truncated` tells you whether the copy is only a preview. Missing run dates here mean unknown, not absent.
+
+Search results also clip `primary_text` at 300 characters (ending in `…`). To quote the **full** stored copy, open the ad with `linkedin_ads_get_competitor_ad` using its `id`.
 
 ### Scenario B: Track a competitor
 
@@ -123,7 +135,7 @@ If the call errors because the live lookup failed or timed out, **nothing was tr
 }
 ```
 
-Each row has `advertiser_id`, an `advertiser` object (`name`, `platform_advertiser_id` = the organization ID, `last_scraped_at`, `last_scrape_status`), `countries` (null = default tracking countries), `ad_count`, `payer_ad_count` and `created_at` (tracked since). Rows with no successful collection in 48 hours are flagged `stale`. A problem status (`blocked`, `schema_error`, `empty`) carries a `scrape_warning`. For flagged rows, say the data may be out of date.
+Each row has `advertiser_id`, an `advertiser` object (`name`, `platform_advertiser_id` = the organization ID, `last_scraped_at`, `last_scrape_status`), `countries` (null = default tracking countries), `ad_count`, `payer_ad_count` and `created_at` (tracked since). Rows with no successful collection in 48 hours are flagged `stale`. A problem status carries a `scrape_warning`. The statuses are `blocked`, `schema_error` and `empty`, plus `partial` (only the first page is stored and the rest is still being collected) and `incomplete` (only the first page is stored and collecting the rest never started). For flagged rows, say the data may be out of date.
 
 2. **List their ads**
 
@@ -196,10 +208,10 @@ This removes only the user's tracking. Ads already collected stay available. Unt
 
 1. **Show real creative, not links.** Quote headlines, primary text, CTAs and landing URLs, and name the format. A list of Ad Library links is not an answer.
 2. **One advertiser means one advertiser.** When the user asked about a company, every ad you describe must be that company's own ad or an employee post it paid for, labelled as such. Never mix in lookalike advertisers.
-3. **Say when copy is incomplete.** If an ad has `copy_truncated: true`, its stored body is only the preview cut at LinkedIn's "see more" fold. Say so for that ad instead of presenting it as the full text.
-4. **Say when data is still arriving.** A new track, `full_scrape: "started"`, or a `stale` row means "more is coming" or "may be out of date", not "nothing exists".
-5. **Relay `warnings` and `note`** from `linkedin_ads_search_ad_library` whenever they explain a filter or an empty result.
-6. **Dates**: `first_seen_at` / `last_seen_at` are when the ad was observed. `started_running_at` / `stopped_running_at` are LinkedIn's run dates, when known. A null `is_active` means unknown, not stopped.
+3. **Say when copy is incomplete.** If an ad has `copy_truncated: true`, its stored body is only the preview cut at LinkedIn's "see more" fold. Say so for that ad instead of presenting it as the full text. The same applies to a search result with `details_status: "pending"`: its detail page hasn't been read yet.
+4. **Say when data is still arriving.** A new track, `full_scrape: "started"`, a search response with `collection`, or a `stale` row means "more is coming" or "may be out of date", not "nothing exists" or "that's everything".
+5. **Relay `warnings`, `note` and `collection.message`** from `linkedin_ads_search_ad_library` whenever they explain a filter, a partial list or an empty result.
+6. **Dates**: `first_seen_at` / `last_seen_at` are when the ad was observed. `started_running_at` / `stopped_running_at` are LinkedIn's run dates, when known. A null run date on an ad whose `details_status` isn't `"complete"` means not fetched, not absent. A null `is_active` means unknown, not stopped.
 
 ## Common Mistakes
 
@@ -211,6 +223,8 @@ This removes only the user's tracking. Ads already collected stay available. Unt
 | Calling `track_competitor` once per country | One call with `countries: ["US", "GB", "DE"]` |
 | Passing the organization ID to `list_competitor_ads` | Pass the Hopkin `advertiser_id` |
 | "They have no ads" right after tracking | "The full collection is still running — check back in a few minutes" |
+| Treating a search with `collection` as the complete list, or hunting for a cursor | Relay `collection.message`; call again later with the same parameters and no cursor |
+| Quoting a `details_status: "pending"` preview as the full ad | Say the full copy and dates are still being fetched |
 | Asking the user to connect a LinkedIn account | None of these tools needs one |
 
 ## See Also

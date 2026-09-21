@@ -618,12 +618,12 @@ Three things shape how they behave:
 - **Employee posts a company pays for** (posts from employees' personal profiles, promoted by the company) are included for the paying company and labelled `attribution: "payer"` with `posted_by` (`name`, `profile_url`). The company's own ads are `attribution: "advertiser"`.
 - **Two IDs:** `advertiser_id` is Hopkin's ID for an advertiser (a UUID — use it with `list_competitor_ads` / `untrack_competitor`); `organization_id` / `platform_advertiser_id` is LinkedIn's numeric organization ID. A `platform_advertiser_id` starting with `name:` means no organization ID is known yet — use `name` for it.
 
-**Ad fields** (listed and search results): `id` (the ad's ID for `get_competitor_ad`), `advertiser_id`, `library_ad_id`, `permalink`, `primary_text`, `headline`, `description`, `cta_text`, `cta_type`, `landing_url`, `display_format`, `languages`, `started_running_at` / `stopped_running_at` (LinkedIn's run dates, when known), `is_active` (null = unknown, not stopped), `copy_truncated` (true = the stored body is only the preview cut at LinkedIn's "see more" fold — say so), `first_seen_at` / `last_seen_at`, `raw_data`, and `attribution` / `posted_by`.
+**Ad fields** (listed and search results): `id` (the ad's ID for `get_competitor_ad`), `advertiser_id`, `library_ad_id`, `permalink`, `primary_text`, `headline`, `description`, `cta_text`, `cta_type`, `landing_url`, `display_format`, `languages`, `started_running_at` / `stopped_running_at` (LinkedIn's run dates, when known), `is_active` (null = unknown, not stopped), `copy_truncated` (true = the stored body is only the preview cut at LinkedIn's "see more" fold — say so), `first_seen_at` / `last_seen_at`, `raw_data`, and `attribution` / `posted_by`. Search results also carry `details_status` (see `linkedin_ads_search_ad_library`).
 
 **Display formats** seen in the library: `sponsored_status_update` (single image), `sponsored_video`, `sponsored_update_linkedin_article`, `sponsored_message`, `sponsored_update_native_document` (document ads), `sponsored_update_event`. The vocabulary is LinkedIn's own and open-ended; `display_format` filters are case-insensitive.
 
 #### linkedin_ads_search_ad_library
-Search the LinkedIn Ad Library for any advertiser's ads. Served from the collected library; when it has nothing for a query, the public Ad Library is searched live on demand (a keyword search can take 60–90 seconds). No tracking needed.
+Search the LinkedIn Ad Library for any advertiser's ads. Served from the collected library. When the library has nothing for a keyword query, the public Ad Library is searched live: the first page of results comes back in the same call (usually well under a minute), and the rest is collected in the background (see `collection` below). No tracking needed.
 
 **To see ONE company's ads, pass `advertiser_name`** — `search_terms` reads ad *copy*, which rarely names the advertiser, so a keyword search for a company name returns other companies' ads.
 
@@ -643,7 +643,22 @@ Search the LinkedIn Ad Library for any advertiser's ads. Served from the collect
 
 At least one of `advertiser_name`, `search_terms` or `organization_ids` is required.
 
-**Returns** (JSON): `ads[]` (ad fields above, plus `media[]` and `media_status`), `source` (`corpus` = already collected, `live_scrape` = fetched just now), `pagination` (`hasMore`, `nextCursor`), and — when present — `warnings` (filters that could not be applied exactly) and `note` (why a result is empty, e.g. the query was checked recently). Relay `warnings` and `note` to the user. `primary_text` is clipped at 300 characters here; open the ad with `linkedin_ads_get_competitor_ad` for the full copy.
+**Returns** (JSON):
+- `data[]`: the ads (ad fields above, plus `media[]`, `media_status`, and `details_status`)
+- `source`: `corpus` = already collected, `live_scrape` = fetched just now
+- `pagination`: `hasMore`, `nextCursor`
+- `collection`, only while a background collection for this search is running: `status: "in_progress"`, `started_at`, and a `message` for you. **These are only the first results. No cursor is issued, and `hasMore` is `false` even though more ads are coming.** Relay the `message`, don't paginate or call the list complete, and call again later (usually 3–5 minutes) with the **same parameters and no cursor** for the full set. An empty `data` with `collection` means the ads haven't landed yet, not that there are none
+- `warnings`: filters that could not be applied exactly, or a note that only the first page was collected, which means the list is incomplete
+- `note`: why a result is empty, e.g. the query was checked recently
+
+Relay `warnings`, `note` and `collection.message` to the user.
+
+**`details_status`** (LinkedIn): the full copy, run dates, CTA and landing page come only from an ad's detail page.
+- `complete`: the detail page was read.
+- `pending`: not read yet, and the running collection may still fill it in. Don't present the preview as the full text, and don't say run dates or a landing page are absent. They haven't been fetched yet.
+- `unavailable`: not read, and it won't be. `copy_truncated` says whether the copy is only a preview, and missing run dates mean unknown.
+
+`primary_text` is also clipped at 300 characters here. Open the ad with `linkedin_ads_get_competitor_ad` for the full stored copy.
 
 **Example — one company's current ads:**
 ```json
@@ -709,7 +724,7 @@ List the advertisers you track.
 - `limit` (number, optional) — Per page (default: 20, max: 100)
 - `cursor` (string, optional) — Pagination cursor
 
-**Returns:** `data[]` — per row: `advertiser_id`, `advertiser` (`name`, `platform_advertiser_id`, `last_scraped_at`, `last_scrape_status`), `countries` (null = default tracking countries), `ad_count`, `payer_ad_count` (employee posts it paid for), `created_at` (tracked since), `stale` (no successful collection in 48 hours) and `scrape_warning` (present only when something needs attention) — plus `count` and `nextCursor`. Treat stale or warned rows' data as possibly out of date.
+**Returns:** `data[]` — per row: `advertiser_id`, `advertiser` (`name`, `platform_advertiser_id`, `last_scraped_at`, `last_scrape_status`), `countries` (null = default tracking countries), `ad_count`, `payer_ad_count` (employee posts it paid for), `created_at` (tracked since), `stale` (no successful collection in 48 hours) and `scrape_warning` — plus `count` and `nextCursor`. `scrape_warning` is present only when something needs attention, e.g. `last_scrape_status` `blocked`, `schema_error` or `empty`, or `partial` / `incomplete`: only the first page of ads is stored, and the rest is still being collected or never started. Treat stale or warned rows' data as possibly out of date.
 
 #### linkedin_ads_list_competitor_ads
 List one advertiser's ads with the full copy — its own ads plus the employee posts it paid for, each labelled by `attribution`.
@@ -876,8 +891,9 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 ### Pattern 10: "What is Company X running on LinkedIn?" (no tracking)
 **Workflow:**
 1. Call `linkedin_ads_search_ad_library` with `advertiser_name` (the company's name exactly as on its LinkedIn page) and the required `countries` (e.g. `["ALL"]`)
-2. Report real copy, CTAs, landing URLs and formats; relay any `warnings` / `note`
-3. For an ad's full copy or media, call `linkedin_ads_get_competitor_ad` with its `id`
+2. Report real copy, CTAs, landing URLs and formats from `data`; relay any `warnings` / `note`
+3. If `collection` is present, say these are only the first results, relay its `message`, and search again later with the same parameters and no cursor. Don't paginate. Don't present `details_status: "pending"` previews as full copy
+4. For an ad's full copy or media, call `linkedin_ads_get_competitor_ad` with its `id`
 
 ### Pattern 11: Track a Competitor
 **Workflow:**
@@ -933,7 +949,7 @@ Machine-readable JSON data for programmatic processing.
 Hopkin list tools use cursor-based pagination:
 
 - **`limit`** (1–100) — Number of results per page (default 20; `linkedin_ads_search_ad_library` defaults to 25, max 50)
-- **`cursor`** — Opaque cursor string returned in the response to fetch the next page. List tools return it as a top-level `nextCursor` (absent on the last page); `linkedin_ads_search_ad_library` returns it as `pagination.nextCursor` with `pagination.hasMore`
+- **`cursor`** — Opaque cursor string returned in the response to fetch the next page. List tools return it as a top-level `nextCursor` (absent on the last page); `linkedin_ads_search_ad_library` returns it as `pagination.nextCursor` with `pagination.hasMore`. It issues none while its `collection` block is present, so call again with no cursor instead
 
 **Example — Paginating through campaigns:**
 ```json
