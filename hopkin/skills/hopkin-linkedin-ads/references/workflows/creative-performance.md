@@ -6,7 +6,7 @@ Use this workflow to evaluate LinkedIn ad creative effectiveness, compare differ
 
 ## Required Information
 
-- **Ad Account ID** — Numeric (e.g., `123456789`)
+- **Ad Account ID** — Numeric ID passed as a string (e.g., `"123456789"`)
 - **Date range** — Preset or custom (minimum 14 days recommended for reliable CTR data)
 - **Optional:** Campaign IDs to filter to specific campaigns
 
@@ -14,16 +14,15 @@ Use this workflow to evaluate LinkedIn ad creative effectiveness, compare differ
 
 ### Step 1: List Creatives and Their Content
 
-Use `linkedin_ads_list_creatives` with `resolve_content: true` to get both creative IDs and their actual ad copy:
+Use `linkedin_ads_list_creatives` to get both creative IDs and their actual ad copy — the copy is always resolved from the linked posts, so no extra flag is needed:
 
 ```json
 {
   "tool": "linkedin_ads_list_creatives",
   "parameters": {
     "reason": "Listing active creatives with ad copy content for creative analysis",
-    "account_id": 123456789,
-    "status": "ACTIVE",
-    "resolve_content": true
+    "account_id": "123456789",
+    "status": ["ACTIVE"]
   }
 }
 ```
@@ -34,9 +33,8 @@ Use `linkedin_ads_list_creatives` with `resolve_content: true` to get both creat
   "tool": "linkedin_ads_list_creatives",
   "parameters": {
     "reason": "Listing creatives for the Q1 Lead Gen campaign",
-    "account_id": 123456789,
-    "campaign_ids": ["111222333"],
-    "resolve_content": true
+    "account_id": "123456789",
+    "campaign_ids": ["111222333"]
   }
 }
 ```
@@ -57,7 +55,7 @@ Use `linkedin_ads_get_performance_report` with `pivots: ["CREATIVE"]`:
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Getting creative-level performance metrics for creative analysis",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["CREATIVE"],
     "date_preset": "LAST_30_DAYS"
   }
@@ -70,7 +68,7 @@ Use `linkedin_ads_get_performance_report` with `pivots: ["CREATIVE"]`:
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Creative performance for the Lead Gen campaign",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["CREATIVE"],
     "date_preset": "LAST_30_DAYS",
     "campaign_ids": ["111222333"]
@@ -185,7 +183,7 @@ Using `time_granularity: "DAILY"`:
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Tracking CTR trend for a creative to detect fatigue",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["CREATIVE"],
     "date_preset": "LAST_30_DAYS",
     "time_granularity": "DAILY",
@@ -198,7 +196,7 @@ A steady CTR decline over time with stable impression volume is a strong creativ
 
 ## Best Practices
 
-1. **Use `resolve_content: true`** — Always pass this when listing creatives to get actual ad copy, not just IDs
+1. **Join copy with metrics** — `linkedin_ads_list_creatives` returns the resolved ad copy; join it to `pivots: ["CREATIVE"]` metrics by creative ID
 2. **Match creatives to campaigns** — Use `campaign_ids` filter in both tools for apples-to-apples comparison
 3. **Account for learning period** — New creatives need 7–14 days and sufficient impressions before performance stabilizes
 4. **Consider format differences** — Don't compare video CTR to static image CTR directly; they have different benchmarks

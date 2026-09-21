@@ -6,7 +6,7 @@ Use this workflow to analyze LinkedIn Ads campaign group and campaign performanc
 
 ## Required Information
 
-- **Ad Account ID** — Numeric (e.g., `123456789`)
+- **Ad Account ID** — Numeric ID passed as a string (e.g., `"123456789"`)
 - **Date range** — Preset (e.g., `LAST_30_DAYS`) or custom (`start_date`/`end_date`)
 - **Optional:** Campaign group IDs or campaign IDs to filter to specific entities
 
@@ -31,7 +31,7 @@ For a quick high-level overview, start with `linkedin_ads_get_account_summary`:
   "tool": "linkedin_ads_get_account_summary",
   "parameters": {
     "reason": "Getting account-level performance summary to orient analysis",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "date_preset": "LAST_30_DAYS"
   }
 }
@@ -48,7 +48,7 @@ Use `linkedin_ads_get_performance_report` with `pivots: ["CAMPAIGN_GROUP"]` for 
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Generating campaign group performance report for last 30 days",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["CAMPAIGN_GROUP"],
     "date_preset": "LAST_30_DAYS"
   }
@@ -61,7 +61,7 @@ Use `linkedin_ads_get_performance_report` with `pivots: ["CAMPAIGN_GROUP"]` for 
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Campaign group performance with per-conversion breakdown",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["CAMPAIGN_GROUP"],
     "date_preset": "LAST_30_DAYS",
     "include_conversion_breakdown": true
@@ -75,7 +75,7 @@ Use `linkedin_ads_get_performance_report` with `pivots: ["CAMPAIGN_GROUP"]` for 
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Campaign group performance for Q1 2026",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["CAMPAIGN_GROUP"],
     "start_date": "2026-01-01",
     "end_date": "2026-03-31"
@@ -92,7 +92,7 @@ To see targeting-level breakdown within a specific campaign group:
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Breaking down performance by campaign within the Lead Gen campaign group",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["CAMPAIGN"],
     "date_preset": "LAST_30_DAYS",
     "campaign_group_ids": ["987654321"]
@@ -109,7 +109,7 @@ Before interpreting ROAS or conversion numbers, understand what's being measured
   "tool": "linkedin_ads_get_partner_conversions",
   "parameters": {
     "reason": "Understanding which conversion actions are tracked for this account",
-    "account_id": 123456789
+    "account_id": "123456789"
   }
 }
 ```
@@ -121,7 +121,7 @@ Also use `linkedin_ads_list_campaign_groups` to get budget and objective informa
   "tool": "linkedin_ads_list_campaign_groups",
   "parameters": {
     "reason": "Getting budget and objective details for each campaign group",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "status": ["ACTIVE", "PAUSED"]
   }
 }
@@ -199,7 +199,7 @@ For trend analysis, use `time_granularity: "DAILY"`:
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Daily spend trend for the account over the last 30 days",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["ACCOUNT"],
     "date_preset": "LAST_30_DAYS",
     "time_granularity": "DAILY"

@@ -2,7 +2,7 @@
 
 ## Write Operations (Unsupported)
 
-The Hopkin LinkedIn Ads MCP is **read-only**. When users request write operations, follow the workflow below.
+The Hopkin LinkedIn Ads MCP is **read-only toward LinkedIn**: it cannot create, change, pause, or delete anything in Campaign Manager. The only things it can change are on the Hopkin side — which competitors you track (`linkedin_ads_track_competitor` / `linkedin_ads_untrack_competitor`) and your LinkedIn connections (`linkedin_ads_set_default_connection` and the other connection tools). When users request LinkedIn write operations, follow the workflow below.
 
 ### Write Operation Feedback Workflow
 
@@ -132,7 +132,7 @@ After analyzing performance data, provide actionable recommendations based on th
 
 1. **Benchmark CPM:** Use `linkedin_ads_get_performance_report` with ACCOUNT pivot
 2. **Industry breakdown:** Use `MEMBER_INDUSTRY` to see where impressions are being served
-3. **Geographic analysis:** Use `MEMBER_COUNTRY` to see which markets are driving volume
+3. **Geographic analysis:** Use `MEMBER_COUNTRY_V2` to see which markets are driving volume
 4. **Budget bidding:** Use `linkedin_ads_get_budget_pricing` with `bid_type: "CPM"` to validate CPM competitiveness
 
 ### Website Traffic Optimization

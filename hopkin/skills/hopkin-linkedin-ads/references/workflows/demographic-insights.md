@@ -2,11 +2,11 @@
 
 ## When to Use
 
-Use this workflow to leverage LinkedIn's unique professional audience data. Analyze ad performance by job function, seniority, industry, company size, job title, geographic region, and age. This is LinkedIn's most powerful differentiator — professional demographic data unavailable on Meta or Google.
+Use this workflow to leverage LinkedIn's unique professional audience data. Analyze ad performance by job function, seniority, industry, company size, job title, company, and geography. This is LinkedIn's most powerful differentiator — professional demographic data unavailable on Meta or Google.
 
 ## Required Information
 
-- **Ad Account ID** — Numeric (e.g., `123456789`)
+- **Ad Account ID** — Numeric ID passed as a string (e.g., `"123456789"`)
 - **Date range** — Preset or custom (minimum 14–30 days recommended for meaningful sample sizes)
 - **Desired pivot dimension** — One MEMBER_* pivot per call
 
@@ -22,9 +22,9 @@ These pivots are exclusive to `linkedin_ads_get_insights` and represent LinkedIn
 | `MEMBER_COMPANY_SIZE` | Company headcount range (1-10, 11-50, etc.) | Target right company size segments |
 | `MEMBER_JOB_TITLE` | Specific job title | Most granular targeting signal |
 | `MEMBER_COMPANY` | Specific company | ABM performance analysis |
-| `MEMBER_COUNTRY` | Country | Geographic performance |
-| `MEMBER_REGION` | Region/state/province | Sub-country geographic detail |
-| `MEMBER_AGE` | Age group | Demographic age analysis |
+| `MEMBER_COUNTRY_V2` | Country | Geographic performance |
+| `MEMBER_REGION_V2` | Region/state/province | Sub-country geographic detail |
+| `MEMBER_COUNTY` | County | Finest-grained geographic detail |
 
 > **Important:** MEMBER_* pivots only work with `linkedin_ads_get_insights`. Do NOT use `linkedin_ads_get_performance_report` for demographic analysis.
 
@@ -39,7 +39,7 @@ Before analyzing demographics, establish baseline performance metrics:
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
     "reason": "Establishing baseline account performance before demographic analysis",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivots": ["ACCOUNT"],
     "date_preset": "LAST_30_DAYS"
   }
@@ -57,7 +57,7 @@ Identify which professional functions are most responsive:
   "tool": "linkedin_ads_get_insights",
   "parameters": {
     "reason": "Analyzing ad performance by job function to identify high-value B2B segments",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivot": "MEMBER_JOB_FUNCTION",
     "date_preset": "LAST_30_DAYS"
   }
@@ -73,7 +73,7 @@ Understand which decision-making levels drive the most value:
   "tool": "linkedin_ads_get_insights",
   "parameters": {
     "reason": "Identifying which seniority levels convert best to optimize targeting",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivot": "MEMBER_SENIORITY",
     "date_preset": "LAST_30_DAYS"
   }
@@ -100,7 +100,7 @@ Find which industries offer the best ROI:
   "tool": "linkedin_ads_get_insights",
   "parameters": {
     "reason": "Analyzing performance by industry to prioritize targeting",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivot": "MEMBER_INDUSTRY",
     "date_preset": "LAST_30_DAYS"
   }
@@ -116,7 +116,7 @@ Determine if SMB, mid-market, or enterprise targets perform differently:
   "tool": "linkedin_ads_get_insights",
   "parameters": {
     "reason": "Analyzing performance by company size to identify ideal customer profile",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivot": "MEMBER_COMPANY_SIZE",
     "date_preset": "LAST_30_DAYS"
   }
@@ -142,7 +142,7 @@ For granular analysis, filter to a specific campaign:
   "tool": "linkedin_ads_get_insights",
   "parameters": {
     "reason": "Job function breakdown for the Director+ targeting campaign",
-    "account_id": 123456789,
+    "account_id": "123456789",
     "pivot": "MEMBER_JOB_FUNCTION",
     "date_preset": "LAST_30_DAYS",
     "campaign_ids": ["111222333"]
