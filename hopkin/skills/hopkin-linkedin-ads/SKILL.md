@@ -125,7 +125,7 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `linkedin_ads_revoke_connection` — Revoke an owned connection (destructive — confirm with the user first)
 
 ### Competitor Research & Ad Library (no LinkedIn connection needed)
-- `linkedin_ads_search_ad_library` — Search the LinkedIn Ad Library for any advertiser's ads with real creative, returned under `data`. **One company's ads → `advertiser_name`**; keyword search over ad copy → `search_terms`. `countries` is required
+- `linkedin_ads_search_ad_library` — Search the LinkedIn Ad Library for any advertiser's ads with real creative, returned under `data`. **One company's ads → `organization_ids` (exact, works cold) or `advertiser_name`**; keyword search over ad copy → `search_terms`. `countries` is required
 - `linkedin_ads_track_competitor` — Track an advertiser for daily collection — **by `organization_id`** (or a pasted company / Ad Library URL) when you have it, else by `name` (exact match only; optional per-track `countries`)
 - `linkedin_ads_untrack_competitor` — Stop tracking an advertiser
 - `linkedin_ads_list_tracked_competitors` — Tracked advertisers with ad counts, `payer_ad_count`, countries and scrape health
@@ -232,7 +232,7 @@ See what other companies run on LinkedIn — real copy, CTAs, landing pages, for
 The rules that matter most:
 
 - **To track, prefer the organization ID.** Pass `organization_id` to `linkedin_ads_track_competitor` — the number in `linkedin.com/company/<id>` or in an Ad Library URL's `companyIds=` — or pass the URL the user pasted as `company_url`. The ID is exact and works cold: one never collected is looked up live (about 20–40 s) and tracked in the same call under its real name. A wrong ID gets "no ads", with nothing tracked.
-- **Use `name` when you only have a name**, exactly as shown on the company's LinkedIn page. To see one company's ads without tracking, pass `advertiser_name` to `linkedin_ads_search_ad_library` — `search_terms` searches ad *copy*, which rarely names the advertiser.
+- **Use `name` when you only have a name**, exactly as shown on the company's LinkedIn page. To see one company's ads without tracking, pass `organization_ids` to `linkedin_ads_search_ad_library` when you have the ID (exact; one never collected is looked up live, one ID per call) or `advertiser_name` — `search_terms` searches ad *copy*, which rarely names the advertiser.
 - **Names are exact match only.** A name not yet collected is looked up live and tracked in the same call only if one advertiser has exactly that name. Near misses come back as **candidates with nothing tracked** — retry with the exact one (its `organization_id`, or `name` exactly as listed) or ask the user; never track a differently named company. No ads under that name → say so plainly. Short or generic names ("Remote") can surface only lookalikes — then ask the user for the organization ID or the company's LinkedIn URL, or find it.
 - **A vanity slug is not a name.** `linkedin.com/company/acmeanalytics` is only a guess at "Acme Analytics"; if it misses, retry with `name` or the organization ID.
 - **`countries`** (ISO codes such as `["US", "GB", "DE"]`, or `["ALL"]`) sets where a competitor is tracked, in one call; omit it for the default tracking countries. It is **required** on `linkedin_ads_search_ad_library`.
@@ -343,7 +343,7 @@ See **references/troubleshooting.md** for full guidance.
 - **"No data"** — Check date range and campaign activity
 - **"Invalid pivot"** — MEMBER_* pivots only work with `linkedin_ads_get_insights`
 - **"Nothing was tracked" / candidates** — No advertiser has exactly that name; retry with the exact candidate or ask the user
-- **Competitor ads look like another company's** — Use `advertiser_name`, not `search_terms`, for one company's ads
+- **Competitor ads look like another company's** — Use `organization_ids` or `advertiser_name`, not `search_terms`, for one company's ads
 
 ---
 

@@ -614,7 +614,7 @@ These six tools read Hopkin's collected copy of the public **LinkedIn Ad Library
 
 Three things shape how they behave:
 
-- **Advertisers are addressed by organization ID, else by NAME.** `linkedin_ads_track_competitor` `organization_id` is exact and works for any organization, collected or not. A name is the company's display name as shown on its LinkedIn page, and LinkedIn's name search is fuzzy. An advertiser that has not been collected yet is looked up live (about 20–40 seconds), and for a name only an **exact** name match is ever used.
+- **Advertisers are addressed by organization ID, else by NAME.** `linkedin_ads_track_competitor` `organization_id` and `linkedin_ads_search_ad_library` `organization_ids` are exact and work for any organization, collected or not. A name is the company's display name as shown on its LinkedIn page, and LinkedIn's name search is fuzzy. An advertiser that has not been collected yet is looked up live (about 20–40 seconds), and for a name only an **exact** name match is ever used.
 - **Employee posts a company pays for** (posts from employees' personal profiles, promoted by the company) are included for the paying company and labelled `attribution: "payer"` with `posted_by` (`name`, `profile_url`). The company's own ads are `attribution: "advertiser"`.
 - **Two IDs:** `advertiser_id` is Hopkin's ID for an advertiser (a UUID — use it with `list_competitor_ads` / `untrack_competitor`); `organization_id` / `platform_advertiser_id` is LinkedIn's numeric organization ID. A `platform_advertiser_id` starting with `name:` means no organization ID is known yet — use `name` for it.
 
@@ -623,9 +623,9 @@ Three things shape how they behave:
 **Display formats** seen in the library: `sponsored_status_update` (single image), `sponsored_video`, `sponsored_update_linkedin_article`, `sponsored_message`, `sponsored_update_native_document` (document ads), `sponsored_update_event`. The vocabulary is LinkedIn's own and open-ended; `display_format` filters are case-insensitive.
 
 #### linkedin_ads_search_ad_library
-Search the LinkedIn Ad Library for any advertiser's ads. Served from the collected library. When the library has nothing for a keyword query, the public Ad Library is searched live: the first page of results comes back in the same call (usually well under a minute), and the rest is collected in the background (see `collection` below). No tracking needed.
+Search the LinkedIn Ad Library for any advertiser's ads. Served from the collected library. When the library has nothing for an organization ID, a name or a keyword query, the public Ad Library is searched live: the first page of results comes back in the same call (usually well under a minute), and the rest is collected in the background (see `collection` below). No tracking needed.
 
-**To see ONE company's ads, pass `advertiser_name`** — `search_terms` reads ad *copy*, which rarely names the advertiser, so a keyword search for a company name returns other companies' ads.
+**To see ONE company's ads, pass `organization_ids` with its organization ID (exact) when you know it, else `advertiser_name`** — `search_terms` reads ad *copy*, which rarely names the advertiser, so a keyword search for a company name returns other companies' ads.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -633,7 +633,7 @@ Search the LinkedIn Ad Library for any advertiser's ads. Served from the collect
 - `advertiser_name` (string, optional) — One company's ads, by its name exactly as shown on its LinkedIn page. Looked up live if not yet collected. Includes employee posts it paid for (`attribution: "payer"`). Not together with `organization_ids`
 - `search_terms` (string, optional) — Keywords over ad copy. Spaces act as AND. Use the language the ad is written in
 - `search_type` (string, optional) — `KEYWORD_UNORDERED` (default) or `KEYWORD_EXACT_PHRASE`
-- `organization_ids` (array of strings, optional) — Up to 10 numeric organization IDs of advertisers **already collected** (e.g. from `linkedin_ads_list_tracked_competitors`). An ID nobody has collected returns nothing, with a warning — use `advertiser_name` instead
+- `organization_ids` (array of strings, optional) — Up to 10 numeric LinkedIn organization IDs: the number in `linkedin.com/company/<id>`, in an Ad Library URL's `companyIds=`, or `platform_advertiser_id` from `linkedin_ads_list_tracked_competitors`. **Exact, and works for any organization**: one nobody has collected is looked up live, and the rest of its ads are collected in the background. **One live lookup per call**, on the first valid ID; `warnings` names the others, so call again with them. If some IDs are already collected, the answer comes from those, and `warnings` names the uncollected ones to search again alone. Only a clean ID is looked up (digits, no leading zero). A `name:` value from `list_tracked_competitors` is searched by its stored name. Not together with `advertiser_name`
 - `ad_active_status` (string, optional) — `ACTIVE` (default), `ALL`, or `INACTIVE` (approximated as `ALL`, with a warning)
 - `ad_delivery_date_min` / `ad_delivery_date_max` (string, optional) — Delivery date bounds (YYYY-MM-DD). LinkedIn shows run dates only on detail pages, so ads without a known start date are excluded by these bounds
 - `display_format` (string, optional) — Creative type filter (see Display formats above)
@@ -660,7 +660,19 @@ Relay `warnings`, `note` and `collection.message` to the user.
 
 `primary_text` is also clipped at 300 characters here. Open the ad with `linkedin_ads_get_competitor_ad` for the full stored copy.
 
-**Example — one company's current ads:**
+**Example — one company's ads, by organization ID (exact, works even if never collected):**
+```json
+{
+  "tool": "linkedin_ads_search_ad_library",
+  "parameters": {
+    "reason": "User pasted a competitor's LinkedIn company URL and wants to see its ads without tracking it",
+    "organization_ids": ["17955831"],
+    "countries": ["ALL"]
+  }
+}
+```
+
+**Example — one company's current ads, by name:**
 ```json
 {
   "tool": "linkedin_ads_search_ad_library",
@@ -901,7 +913,7 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 
 ### Pattern 10: "What is Company X running on LinkedIn?" (no tracking)
 **Workflow:**
-1. Call `linkedin_ads_search_ad_library` with `advertiser_name` (the company's name exactly as on its LinkedIn page) and the required `countries` (e.g. `["ALL"]`)
+1. Call `linkedin_ads_search_ad_library` with `organization_ids: ["<id>"]` if you know the organization ID (exact, works cold), else `advertiser_name` (the company's name exactly as on its LinkedIn page), and the required `countries` (e.g. `["ALL"]`)
 2. Report real copy, CTAs, landing URLs and formats from `data`; relay any `warnings` / `note`
 3. If `collection` is present, say these are only the first results, relay its `message`, and search again later with the same parameters and no cursor. Don't paginate. Don't present `details_status: "pending"` previews as full copy
 4. For an ad's full copy or media, call `linkedin_ads_get_competitor_ad` with its `id`

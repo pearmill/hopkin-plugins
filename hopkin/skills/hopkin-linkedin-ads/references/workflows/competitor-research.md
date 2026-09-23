@@ -10,7 +10,7 @@ These tools read Hopkin's collected copy of the public LinkedIn Ad Library. **No
 
 | Tool | Use it to |
 |---|---|
-| `linkedin_ads_search_ad_library` | See one company's ads by name (`advertiser_name`), or search ad copy by keyword (`search_terms`). No tracking needed |
+| `linkedin_ads_search_ad_library` | See one company's ads by **organization ID** (`organization_ids`) or by name (`advertiser_name`), or search ad copy by keyword (`search_terms`). No tracking needed |
 | `linkedin_ads_track_competitor` | Start (or update) daily tracking of an advertiser, by **organization ID** when you have it, else by **name** |
 | `linkedin_ads_list_tracked_competitors` | See who is tracked, their ad counts, countries and scrape health |
 | `linkedin_ads_list_competitor_ads` | Browse a tracked advertiser's ads, with the full copy |
@@ -24,7 +24,7 @@ These tools read Hopkin's collected copy of the public LinkedIn Ad Library. **No
 LinkedIn's Ad Library can look up an advertiser two ways: by its numeric **organization ID** (exact), or by its **display name**, the way it appears on its LinkedIn company page ("Acme Analytics"), which is a fuzzy search. So:
 
 - **To track, prefer `organization_id`** on `linkedin_ads_track_competitor`: the number in `linkedin.com/company/<id>`, or in an Ad Library URL's `companyIds=`. Or pass the URL the user pasted as `company_url`: a numeric company URL, or an Ad Library URL with one `companyIds=`, resolves exactly like the ID. An organization nobody has collected yet is **looked up live** (about 20–40 seconds) and tracked in the same call under its real name. An ID with no ads gets a plain "no ads" answer, and nothing is tracked.
-- **When you only have a name, pass `name`** to `linkedin_ads_track_competitor`. To see one company's ads without tracking, pass **`advertiser_name`** to `linkedin_ads_search_ad_library`.
+- **When you only have a name, pass `name`** to `linkedin_ads_track_competitor`. To see one company's ads without tracking, pass **`organization_ids`** to `linkedin_ads_search_ad_library` when you have the ID (exact, and looked up live if never collected), else **`advertiser_name`**.
 - A name nobody has collected yet is also looked up live. Only an **exact** name match is used. Similarly named advertisers come back as candidates. They are never tracked or shown as if they were the company. Short or generic names ("Remote") can surface only lookalikes: ask the user for the organization ID or the company's LinkedIn URL, or find it, and track by ID.
 - **A company-page vanity slug is not a name.** `linkedin.com/company/acmeanalytics` gives the slug `acmeanalytics`, which is only a guess at the name and often matches nothing, while "Acme Analytics" does. If a URL-based track finds nothing, retry with the organization ID or with `name` set to the company's real name. If you know neither, ask the user.
 
@@ -33,14 +33,14 @@ LinkedIn's Ad Library can look up an advertiser two ways: by its numeric **organ
 | Field | What it is | Where you use it |
 |---|---|---|
 | `advertiser_id` (the **Advertiser ID** line) | Hopkin's ID for the advertiser, a UUID | `list_competitor_ads`, `untrack_competitor` |
-| `organization_id` / `platform_advertiser_id` | LinkedIn's numeric organization ID | `track_competitor` `organization_id` (any organization), `search_ad_library` `organization_ids` |
+| `organization_id` / `platform_advertiser_id` | LinkedIn's numeric organization ID | `track_competitor` `organization_id`, `search_ad_library` `organization_ids` (both work for any organization) |
 | ad `id` | Hopkin's ID for one ad | `get_competitor_ad` `ad_id` |
 
 A candidate or tracked row whose `platform_advertiser_id` starts with `name:` has no LinkedIn organization ID yet. Retry it with `name`, not `organization_id`.
 
 ### `search_terms` reads ad copy, not the advertiser
 
-`search_terms` is a keyword search over ad **copy** (primary text, headline, description). Ads rarely mention their own advertiser's name, so a keyword search for a company name returns other companies' ads. **For "what is Company X running", use `advertiser_name`.** Keep `search_terms` for theme or topic research across advertisers ("which B2B ads mention 'free trial'").
+`search_terms` is a keyword search over ad **copy** (primary text, headline, description). Ads rarely mention their own advertiser's name, so a keyword search for a company name returns other companies' ads. **For "what is Company X running", use `organization_ids` if you have the ID, else `advertiser_name`.** Keep `search_terms` for theme or topic research across advertisers ("which B2B ads mention 'free trial'").
 
 ### Employee posts a company pays for ("payer" ads)
 
@@ -64,6 +64,21 @@ If a freshly tracked competitor shows few or **zero ads**, say the full collecti
 
 ### Scenario A: "What is Acme Analytics running on LinkedIn?" (no tracking)
 
+If you have the organization ID (from a `linkedin.com/company/<id>` or Ad Library `companyIds=` URL, or `platform_advertiser_id` in `linkedin_ads_list_tracked_competitors`), search by it. It is exact, and an organization nobody has collected is looked up live in the same call, with the rest of its ads collected in the background:
+
+```json
+{
+  "tool": "linkedin_ads_search_ad_library",
+  "parameters": {
+    "reason": "User wants to see one company's current LinkedIn ads without tracking it",
+    "organization_ids": ["17955831"],
+    "countries": ["ALL"]
+  }
+}
+```
+
+With only a name, pass `advertiser_name`:
+
 ```json
 {
   "tool": "linkedin_ads_search_ad_library",
@@ -80,6 +95,8 @@ If a freshly tracked competitor shows few or **zero ads**, say the full collecti
 - For "new this month", add `ad_delivery_date_min` (e.g. `"2026-09-01"`). LinkedIn only shows run dates on an ad's detail page, so ads without a known start date are excluded by the date bounds. Relay that caveat when it appears in `warnings`.
 - Filter by format with `display_format` and by language with `languages` (language **names** such as `"English"`).
 - Pass either `advertiser_name` or `organization_ids`, not both.
+- **One live lookup per call.** With several IDs, only the first valid one is looked up live, and `warnings` names the others. If some IDs are already collected, the answer comes from those, and `warnings` names the uncollected ones. Call again with the named IDs to look them up. Don't report them as having no ads.
+- Only a clean organization ID is looked up (digits, no leading zero). A `name:` value from `list_tracked_competitors` is searched by its stored name.
 
 The result is JSON. The ads are in `data`. The other fields are `source` (`"corpus"` = already collected, `"live_scrape"` = fetched just now) and `pagination` (`hasMore`, `nextCursor`). `collection`, `warnings` and `note` appear when they apply. **Relay `warnings` and `note`.** A `note` explains an empty result, for example that the name was checked recently and nothing matched. A warning that only the first page was collected means the list is incomplete. Say so.
 
@@ -233,7 +250,7 @@ This removes only the user's tracking. Ads already collected stay available. Unt
 
 | Mistake | Instead |
 |---|---|
-| `search_terms: "Acme Analytics"` to see Acme's ads | `advertiser_name: "Acme Analytics"` |
+| `search_terms: "Acme Analytics"` to see Acme's ads | `organization_ids: ["<id>"]`, or `advertiser_name: "Acme Analytics"` |
 | Tracking by vanity slug and stopping when it misses | Retry with `name` set to the real company name |
 | Tracking a candidate whose name is only similar | Exact name only; otherwise ask the user |
 | Calling `track_competitor` once per country | One call with `countries: ["US", "GB", "DE"]` |
