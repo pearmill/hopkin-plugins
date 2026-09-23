@@ -289,7 +289,7 @@ The ad-library and competitor tools need **no LinkedIn connection**. Auth advice
 
 **Cause:** No advertiser is named *exactly* what was passed. LinkedIn's advertiser search is fuzzy, so similar names come back as candidates.
 
-**Solution:** Retry `linkedin_ads_track_competitor` with the candidate whose name exactly matches the company the user meant. Use `organization_id` when it has a numeric ID, otherwise `name` exactly as listed. If none matches exactly, ask the user. Never track a differently named company.
+**Solution:** Retry `linkedin_ads_track_competitor` with the candidate whose name exactly matches the company the user meant. Use `organization_id` when it has a numeric ID, otherwise `name` exactly as listed. If none matches exactly, ask the user for the company's organization ID or LinkedIn URL. Short or generic names ("Remote") often surface only lookalikes, and the ID is exact. Never track a differently named company.
 
 ### "LinkedIn's Ad Library has no ads from an advertiser named …"
 
@@ -297,20 +297,29 @@ The ad-library and competitor tools need **no LinkedIn connection**. Auth advice
 
 **Solutions:**
 1. Tell the user plainly that nothing was tracked. Do not invent ads or track a lookalike.
-2. Check the name exactly as it appears on the company's LinkedIn page.
+2. Check the name exactly as it appears on the company's LinkedIn page, or retry with its `organization_id` — that lookup is exact.
 3. If the company may advertise elsewhere, retry with `countries: ["ALL"]`.
+
+### "LinkedIn's Ad Library has no ads from organization …"
+
+**Cause:** The live lookup by organization ID found no ads from that organization in those countries. Nothing was tracked.
+
+**Solutions:**
+1. Check the ID: it is the number in `linkedin.com/company/<id>`, or in an Ad Library URL's `companyIds=`.
+2. If the company may advertise elsewhere, retry with `countries: ["ALL"]`.
+3. Otherwise say plainly that it has no ads there. Do not track a lookalike by name instead.
 
 ### Tracking by company URL found nothing
 
-**Cause:** A vanity slug (`linkedin.com/company/acmeanalytics`) is only a guess at the company's name, and LinkedIn's Ad Library is searched by name.
+**Cause:** A vanity slug (`linkedin.com/company/acmeanalytics`) is only a guess at the company's name. Numeric company URLs and Ad Library `companyIds=` URLs are exact; slugs are not.
 
-**Solution:** Retry with `name` set to the real display name ("Acme Analytics"), or ask the user to confirm it.
+**Solution:** Retry with the organization ID, or with `name` set to the real display name ("Acme Analytics"). If you have neither, ask the user.
 
-### "Cannot be searched by organization ID"
+### "Cannot be searched by organization ID" (ad-library search)
 
-**Cause:** `organization_id` (or `organization_ids` on search) only works for advertisers that have already been collected.
+**Cause:** `organization_ids` on `linkedin_ads_search_ad_library` only finds advertisers that have already been collected.
 
-**Solution:** Use `name` (tracking) or `advertiser_name` (search).
+**Solution:** Use `advertiser_name` to search, or track the organization with `linkedin_ads_track_competitor` `organization_id`, which works for any organization.
 
 ### Newly tracked competitor shows no ads (or only a few)
 

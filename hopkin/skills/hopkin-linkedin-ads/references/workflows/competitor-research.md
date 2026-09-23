@@ -11,7 +11,7 @@ These tools read Hopkin's collected copy of the public LinkedIn Ad Library. **No
 | Tool | Use it to |
 |---|---|
 | `linkedin_ads_search_ad_library` | See one company's ads by name (`advertiser_name`), or search ad copy by keyword (`search_terms`). No tracking needed |
-| `linkedin_ads_track_competitor` | Start (or update) daily tracking of an advertiser, by **name** |
+| `linkedin_ads_track_competitor` | Start (or update) daily tracking of an advertiser, by **organization ID** when you have it, else by **name** |
 | `linkedin_ads_list_tracked_competitors` | See who is tracked, their ad counts, countries and scrape health |
 | `linkedin_ads_list_competitor_ads` | Browse a tracked advertiser's ads, with the full copy |
 | `linkedin_ads_get_competitor_ad` | Open one ad: complete copy, media inline, video frames, transcript, transparency data |
@@ -19,21 +19,21 @@ These tools read Hopkin's collected copy of the public LinkedIn Ad Library. **No
 
 ## Key Concepts
 
-### LinkedIn's Ad Library is searched by advertiser NAME
+### Advertisers are addressed by organization ID, else by NAME
 
-LinkedIn only lets you look up an advertiser by its **display name**, the way it appears on its LinkedIn company page ("Acme Analytics"). It cannot be searched by organization ID. So:
+LinkedIn's Ad Library can look up an advertiser two ways: by its numeric **organization ID** (exact), or by its **display name**, the way it appears on its LinkedIn company page ("Acme Analytics"), which is a fuzzy search. So:
 
-- **Pass `name`** to `linkedin_ads_track_competitor`, and **`advertiser_name`** to `linkedin_ads_search_ad_library`. This is the reliable path for any company.
-- A name nobody has collected yet is **looked up live**, which takes about 20–40 seconds. Only an **exact** name match is used. Similarly named advertisers come back as candidates. They are never tracked or shown as if they were the company.
-- **A company-page vanity slug is not a name.** `linkedin.com/company/acmeanalytics` gives the slug `acmeanalytics`, which is only a guess at the name and often matches nothing, while "Acme Analytics" does. If a URL-based track finds nothing, retry with `name` set to the company's real name. If you don't know the exact name, ask the user to confirm it.
-- A **numeric** company URL (`linkedin.com/company/1234567`) or an `organization_id` only works for an advertiser that has **already been collected**, for example one from a candidate list. For a never-collected advertiser the call is refused, with a message to retry by name.
+- **To track, prefer `organization_id`** on `linkedin_ads_track_competitor`: the number in `linkedin.com/company/<id>`, or in an Ad Library URL's `companyIds=`. Or pass the URL the user pasted as `company_url`: a numeric company URL, or an Ad Library URL with one `companyIds=`, resolves exactly like the ID. An organization nobody has collected yet is **looked up live** (about 20–40 seconds) and tracked in the same call under its real name. An ID with no ads gets a plain "no ads" answer, and nothing is tracked.
+- **When you only have a name, pass `name`** to `linkedin_ads_track_competitor`. To see one company's ads without tracking, pass **`advertiser_name`** to `linkedin_ads_search_ad_library`.
+- A name nobody has collected yet is also looked up live. Only an **exact** name match is used. Similarly named advertisers come back as candidates. They are never tracked or shown as if they were the company. Short or generic names ("Remote") can surface only lookalikes: ask the user for the organization ID or the company's LinkedIn URL, or find it, and track by ID.
+- **A company-page vanity slug is not a name.** `linkedin.com/company/acmeanalytics` gives the slug `acmeanalytics`, which is only a guess at the name and often matches nothing, while "Acme Analytics" does. If a URL-based track finds nothing, retry with the organization ID or with `name` set to the company's real name. If you know neither, ask the user.
 
 ### Two kinds of ID
 
 | Field | What it is | Where you use it |
 |---|---|---|
 | `advertiser_id` (the **Advertiser ID** line) | Hopkin's ID for the advertiser, a UUID | `list_competitor_ads`, `untrack_competitor` |
-| `organization_id` / `platform_advertiser_id` | LinkedIn's numeric organization ID | `track_competitor` (retry from a candidate list), `search_ad_library` `organization_ids` |
+| `organization_id` / `platform_advertiser_id` | LinkedIn's numeric organization ID | `track_competitor` `organization_id` (any organization), `search_ad_library` `organization_ids` |
 | ad `id` | Hopkin's ID for one ad | `get_competitor_ad` `ad_id` |
 
 A candidate or tracked row whose `platform_advertiser_id` starts with `name:` has no LinkedIn organization ID yet. Retry it with `name`, not `organization_id`.
@@ -99,6 +99,21 @@ Search results also clip `primary_text` at 300 characters (ending in `…`). To 
 
 ### Scenario B: Track a competitor
 
+With the organization ID (or a pasted `linkedin.com/company/<id>` or Ad Library `companyIds=` URL, as `company_url`):
+
+```json
+{
+  "tool": "linkedin_ads_track_competitor",
+  "parameters": {
+    "reason": "User asked to start tracking a competitor whose LinkedIn organization ID we have",
+    "organization_id": "1234567",
+    "countries": ["US", "GB", "DE"]
+  }
+}
+```
+
+With only a name:
+
 ```json
 {
   "tool": "linkedin_ads_track_competitor",
@@ -113,14 +128,15 @@ Search results also clip `primary_text` at 300 characters (ending in `…`). To 
 - `countries` sets where this advertiser is tracked: ISO codes, or `["ALL"]`. **Omit it for the default tracking countries.** Several markets go in **one** call. Re-tracking with a different set updates it.
 - The tracked-competitor limit on the user's plan is **shared with Meta**. If it's reached, relay the error and offer to untrack someone.
 
-Read the response and report it truthfully. There are four outcomes:
+Read the response and report it truthfully. There are five outcomes:
 
 | Outcome | What you see | What to tell the user / do next |
 |---|---|---|
 | **Tracked** | "Now Tracking: …" with **Advertiser ID**, **Organization ID**, **Countries**, and `seeded`, `full_scrape`, `warnings` when present | Say it is tracked and in which countries. If `full_scrape` is `"started"`, the full inventory (employee posts included) is still arriving. `"not_needed"` means it was already tracked with those countries. `"failed"` means the next daily collection covers it: relay the warning |
-| **Candidates** ("Nothing Was Tracked") | `candidates[]` (`name`, `platform_advertiser_id`, `ad_count`, and `source: "ad_library"` for a similarly named advertiser found live) | **Nothing was tracked.** Retry only with the advertiser whose name is **exactly** what the user meant: `organization_id` when it has a numeric ID, otherwise `name` exactly as listed. If none is an exact match, ask the user. Never track a differently named company |
-| **No ads from that name** | An error saying LinkedIn's Ad Library has no ads from an advertiser with that name, and nothing was tracked | Say so plainly. Suggest checking the exact spelling on the company page, or retrying with `countries: ["ALL"]`. Do not track a lookalike or invent ads |
-| **Vanity-slug miss** | The "no ads" or candidates response, plus a note that the company-page slug is not necessarily the name | Retry with `name` set to the company's real name ("Acme Analytics", not "acmeanalytics"), or ask the user to confirm the name |
+| **Candidates** ("Nothing Was Tracked") | `candidates[]` (`name`, `platform_advertiser_id`, `ad_count`, and `source: "ad_library"` for a similarly named advertiser found live) | **Nothing was tracked.** Retry only with the advertiser whose name is **exactly** what the user meant: `organization_id` when it has a numeric ID, otherwise `name` exactly as listed. If none is an exact match, ask the user for the organization ID or the company's LinkedIn URL. Never track a differently named company |
+| **No ads from that name** | An error saying LinkedIn's Ad Library has no ads from an advertiser with that name, and nothing was tracked | Say so plainly. Suggest checking the exact spelling on the company page, retrying with the organization ID, or retrying with `countries: ["ALL"]`. Do not track a lookalike or invent ads |
+| **No ads from that organization** | An error saying LinkedIn's Ad Library has no ads from that organization ID, and nothing was tracked | Say so plainly. Suggest checking the ID, or retrying with `countries: ["ALL"]`. Do not fall back to tracking a similarly named company |
+| **Vanity-slug miss** | The "no ads" or candidates response, plus a note that the company-page slug is not necessarily the name | Retry with the organization ID, or with `name` set to the company's real name ("Acme Analytics", not "acmeanalytics"), or ask the user |
 
 If the call errors because the live lookup failed or timed out, **nothing was tracked**. Say it failed and that it's worth retrying shortly. A failed lookup is not evidence that the company has no ads.
 

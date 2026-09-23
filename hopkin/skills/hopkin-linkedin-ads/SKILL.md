@@ -13,7 +13,7 @@ This skill enables Claude to build comprehensive reports and analyze LinkedIn Ad
 - Analyze campaign metrics, ROAS, and spending patterns
 - Leverage LinkedIn's unique professional demographic audience (job title, seniority, industry, etc.)
 - Analyze creative effectiveness
-- Research competitors: see any company's LinkedIn ads, track competitors by name, and read their actual creative — no LinkedIn connection needed
+- Research competitors: see any company's LinkedIn ads, track competitors by organization ID or name, and read their actual creative — no LinkedIn connection needed
 
 ## Prerequisites
 
@@ -126,7 +126,7 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 
 ### Competitor Research & Ad Library (no LinkedIn connection needed)
 - `linkedin_ads_search_ad_library` — Search the LinkedIn Ad Library for any advertiser's ads with real creative, returned under `data`. **One company's ads → `advertiser_name`**; keyword search over ad copy → `search_terms`. `countries` is required
-- `linkedin_ads_track_competitor` — Track an advertiser for daily collection, **by `name`** (exact match only; optional per-track `countries`)
+- `linkedin_ads_track_competitor` — Track an advertiser for daily collection — **by `organization_id`** (or a pasted company / Ad Library URL) when you have it, else by `name` (exact match only; optional per-track `countries`)
 - `linkedin_ads_untrack_competitor` — Stop tracking an advertiser
 - `linkedin_ads_list_tracked_competitors` — Tracked advertisers with ad counts, `payer_ad_count`, countries and scrape health
 - `linkedin_ads_list_competitor_ads` — A tracked advertiser's ads with full copy, including employee posts it paid for (`attribution: "payer"`)
@@ -231,9 +231,10 @@ See what other companies run on LinkedIn — real copy, CTAs, landing pages, for
 
 The rules that matter most:
 
-- **LinkedIn's Ad Library is searched by advertiser NAME**, exactly as shown on the company's LinkedIn page. To see one company's ads, pass `advertiser_name` to `linkedin_ads_search_ad_library` — `search_terms` searches ad *copy*, which rarely names the advertiser. To track, pass `name` to `linkedin_ads_track_competitor`.
-- **Exact match only.** A name not yet collected is looked up live (about 20–40 s) and tracked in the same call only if one advertiser has exactly that name. Near misses come back as **candidates with nothing tracked** — retry with the exact one (its `organization_id`, or `name` exactly as listed) or ask the user; never track a differently named company. No ads under that name → say so plainly.
-- **A vanity slug is not a name.** `linkedin.com/company/acmeanalytics` is only a guess at "Acme Analytics"; if it misses, retry with `name`. A numeric `organization_id` works only for advertisers already collected.
+- **To track, prefer the organization ID.** Pass `organization_id` to `linkedin_ads_track_competitor` — the number in `linkedin.com/company/<id>` or in an Ad Library URL's `companyIds=` — or pass the URL the user pasted as `company_url`. The ID is exact and works cold: one never collected is looked up live (about 20–40 s) and tracked in the same call under its real name. A wrong ID gets "no ads", with nothing tracked.
+- **Use `name` when you only have a name**, exactly as shown on the company's LinkedIn page. To see one company's ads without tracking, pass `advertiser_name` to `linkedin_ads_search_ad_library` — `search_terms` searches ad *copy*, which rarely names the advertiser.
+- **Names are exact match only.** A name not yet collected is looked up live and tracked in the same call only if one advertiser has exactly that name. Near misses come back as **candidates with nothing tracked** — retry with the exact one (its `organization_id`, or `name` exactly as listed) or ask the user; never track a differently named company. No ads under that name → say so plainly. Short or generic names ("Remote") can surface only lookalikes — then ask the user for the organization ID or the company's LinkedIn URL, or find it.
+- **A vanity slug is not a name.** `linkedin.com/company/acmeanalytics` is only a guess at "Acme Analytics"; if it misses, retry with `name` or the organization ID.
 - **`countries`** (ISO codes such as `["US", "GB", "DE"]`, or `["ALL"]`) sets where a competitor is tracked, in one call; omit it for the default tracking countries. It is **required** on `linkedin_ads_search_ad_library`.
 - **Employee posts** a company pays for are listed with `attribution: "payer"` and `posted_by` (the person) — report them as employee posts, never as company-page ads. `linkedin_ads_list_tracked_competitors` shows `payer_ad_count`.
 - **Tracking starts a background full collection that finishes later** (`seeded`, `full_scrape: "started"`). If a new track shows few or no ads yet, say the rest is still arriving — do not report "no ads".
