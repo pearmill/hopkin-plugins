@@ -315,11 +315,17 @@ The ad-library and competitor tools need **no LinkedIn connection**. Auth advice
 
 **Solution:** Retry with the organization ID, or with `name` set to the real display name ("Acme Analytics"). If you have neither, ask the user.
 
-### "Cannot be searched by organization ID" (ad-library search)
+### Ad-library search by organization ID: some IDs "not looked up live"
 
-**Cause:** `organization_ids` on `linkedin_ads_search_ad_library` only finds advertisers that have already been collected.
+**Cause:** `linkedin_ads_search_ad_library` `organization_ids` is exact and works for any organization, but it runs **one live lookup per call**, on the first valid ID. The warning names the rest: "Only … was looked up live", or, when the answer came from IDs already collected, "… no ads in the corpus yet and … not looked up live".
 
-**Solution:** Use `advertiser_name` to search, or track the organization with `linkedin_ads_track_competitor` `organization_id`, which works for any organization.
+**Solution:** Call again with the named IDs, one at a time, to look each one up. Don't report that they have no ads.
+
+### Ad-library search: "none of them is a numeric LinkedIn organization ID"
+
+**Cause:** Only a clean organization ID is looked up: digits, no leading zero. A slug, a URL or a padded number (`0123`) is not.
+
+**Solution:** Pass the number from `linkedin.com/company/<id>` or an Ad Library URL's `companyIds=`, or use `advertiser_name` with the company's exact LinkedIn name.
 
 ### Newly tracked competitor shows no ads (or only a few)
 
@@ -331,7 +337,7 @@ The ad-library and competitor tools need **no LinkedIn connection**. Auth advice
 
 **Cause:** `search_terms` searches ad **copy**. A company's name in `search_terms` finds ads that mention it, mostly from other advertisers.
 
-**Solution:** Use `advertiser_name` for one company's ads.
+**Solution:** Use `organization_ids` (exact) or `advertiser_name` for one company's ads.
 
 ### A tracked competitor is marked `stale` or has a `scrape_warning`
 
