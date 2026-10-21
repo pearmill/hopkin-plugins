@@ -122,7 +122,7 @@ List child accounts under a Manager (MCC) account. When querying these child acc
 ### Campaign Tools
 
 #### google_ads_list_campaigns
-List campaigns for a Google Ads account.
+List campaigns for a Google Ads account. Each row also carries the campaign's serving settings: `networkSettings` under Google's names (`targetSearchNetwork` is the search partners setting, `targetContentNetwork` is the Display Network, `targetPartnerSearchNetwork` is the Google Partner Network, not search partners), `aiMax` `{ enabled, bundlingRequired }` (Search campaigns only), `assetAutomation[]`, and `finalUrlExpansion` `{ status, effective, source }`, where `source` is `explicit` (the campaign's own setting), `google_default` (Google's default: off for Search, on for Performance Max) or `unset` (an AI Max Search campaign that sets nothing, so `effective` is `null`). It also carries URL tracking (`tracking_url_template`, `final_url_suffix`, `url_custom_parameters`). A `null` setting means Google returned nothing or the setting does not apply, never "off". Ad schedules are never capped: a campaign with no `adSchedules` runs at all hours, unless `warnings` names it as a campaign whose criteria could not be fetched. For when and by whom a setting changed, use `google_ads_get_activities`.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -536,8 +536,36 @@ When `levels` is omitted, all levels are queried. Conversion breakdown is always
 
 ### Keyword Tools
 
+#### google_ads_list_keywords
+List keywords with their approval (policy) status, across the whole account or one campaign or ad group. Each row has the keyword text, match type, status, `approval_status` (APPROVED, DISAPPROVED, PENDING_REVIEW, UNDER_REVIEW), `disapproval_reasons` (Google's own wording, e.g. "Destination not working"), `system_serving_status` (ELIGIBLE, or RARELY_SERVED for low search volume), `final_urls`, and the campaign and ad group ids, names and statuses. Keywords in removed campaigns and ad groups are left out; keywords in paused ones are included. Always fetches live data, never cached. Negative keywords are not listed; use `google_ads_list_negative_keywords`. For clicks, cost, conversions and Quality Score use `google_ads_get_keyword_performance`.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
+- `campaign_id` (string, optional) — Only keywords in this campaign
+- `ad_group_id` (string, optional) — Only keywords in this ad group
+- `approval_status` (array of strings, optional) — `DISAPPROVED`, `UNDER_REVIEW`, `PENDING_REVIEW`, `APPROVED`
+- `system_serving_status` (array of strings, optional) — `RARELY_SERVED` or `ELIGIBLE`
+- `status` (array of strings, optional) — `ENABLED`, `PAUSED`, `REMOVED` (default `ENABLED` and `PAUSED`; removed keywords carry no approval or serving status)
+- `match_type` (array of strings, optional) — `EXACT`, `PHRASE`, `BROAD`
+- `limit` (number, optional) — Keywords per page (1–200, default 50)
+- `cursor` (string, optional) — The `nextCursor` value from the previous response, with otherwise identical parameters
+
+**Example — keywords with policy problems:**
+```json
+{
+  "tool": "google_ads_list_keywords",
+  "parameters": {
+    "reason": "Daily check for disapproved keywords",
+    "customer_id": "1234567890",
+    "approval_status": ["DISAPPROVED", "UNDER_REVIEW", "PENDING_REVIEW"]
+  }
+}
+```
+
 #### google_ads_get_keyword_performance
-Get keyword performance data with quality scores and all key metrics. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group. Supports `ad_network_type` segment for network-level breakdown.
+Get keyword performance data with quality scores and all key metrics. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group. Supports `ad_network_type` segment for network-level breakdown. Only keywords that served appear; for approval status use `google_ads_list_keywords`.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -642,6 +670,39 @@ List shared negative keyword lists and their associations. Shows which campaigns
     "customer_id": "1234567890",
     "include_keywords": true,
     "include_campaign_associations": true
+  }
+}
+```
+
+---
+
+### Landing Page Tools
+
+#### google_ads_get_landing_page_report
+Landing page performance from the `landing_page_view` resource: clicks, impressions, cost, conversions and `speed_score` grouped by landing page URL, with per-conversion-action breakdowns included automatically. `speed_score` is Google's mobile landing page speed score, 1–10 with 10 fastest, measured from mobile ad clicks. It is on every row and is `null` when Google has no measurement for that row (common on rows with little mobile traffic); `null` means not measured, not slow. It is the only landing page quality signal Google Ads still reports. Preferred tool for all landing page analysis.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
+- `date_preset` (string, optional) — e.g. `"LAST_30_DAYS"`; or `date_range` (`start_date`, `end_date`)
+- `segments` (array of strings, optional) — `date`, `device`, `ad_network_type`
+- `campaign_id` (string, optional) — Filter by campaign
+- `ad_group_id` (string, optional) — Filter by ad group
+- `url_contains` (string, optional) — Filter by URL substring
+- `order_by` (string, optional) — `impressions`, `clicks` (default), `cost`, `conversions`, `ctr`
+- `limit` (number, optional) — Rows per page (1–1000, default 25)
+- `cursor` (string, optional) — The `nextCursor` value from the previous response, with every other parameter unchanged
+
+**Example:**
+```json
+{
+  "tool": "google_ads_get_landing_page_report",
+  "parameters": {
+    "reason": "Product page performance",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_30_DAYS",
+    "url_contains": "/products/"
   }
 }
 ```
@@ -830,99 +891,6 @@ Optional: `tip`, `colorScheme`, `colorType`.
 
 ---
 
-### Preference Tools
-
-Preferences allow persistent storage of settings and observations across sessions. Entity listing tools (e.g., `google_ads_list_accounts`) automatically attach stored preferences to each entity in the response as `_stored_preferences`.
-
-**Session start pattern:** At the start of a session, call `google_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "global"` to retrieve stored defaults (e.g., `default_customer_id`, `default_login_customer_id`). If found, use them automatically.
-
-**After account selection:** Offer to store the selected account using `google_ads_store_preference` so it is available in future sessions.
-
-#### google_ads_store_preference
-Store a persistent preference or observation for a Google Ads entity.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Entity type: `"ad_account"`, `"campaign"`, `"ad_set"` (= ad group), or `"ad"`
-- `entity_id` (string, required) — The Google Ads entity ID (use `"global"` for account-level defaults)
-- `key` (string, required) — Preference key (e.g., `"default_customer_id"`, `"preferred_conversion_metric"`)
-- `value` (any, required) — The preference value — string, number, boolean, or object
-- `source` (string, optional) — Who set this: `"agent"` (default), `"user"`, or `"system"`
-- `note` (string, optional) — Context about why this preference was set
-
-**Example — Store default account:**
-```json
-{
-  "tool": "google_ads_store_preference",
-  "parameters": {
-    "reason": "User confirmed this is their default account",
-    "entity_type": "ad_account",
-    "entity_id": "global",
-    "key": "default_customer_id",
-    "value": "1234567890",
-    "note": "Set after user confirmed account selection"
-  }
-}
-```
-
-**Example — Store default MCC login:**
-```json
-{
-  "tool": "google_ads_store_preference",
-  "parameters": {
-    "reason": "Storing MCC ID for future managed account queries",
-    "entity_type": "ad_account",
-    "entity_id": "global",
-    "key": "default_login_customer_id",
-    "value": "9999999999"
-  }
-}
-```
-
-#### google_ads_get_preferences
-Retrieve all stored preferences for a Google Ads entity.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Entity type: `"ad_account"`, `"campaign"`, `"ad_set"` (= ad group), or `"ad"`
-- `entity_id` (string, required) — The Google Ads entity ID (use `"global"` for account-level defaults)
-
-**Example:**
-```json
-{
-  "tool": "google_ads_get_preferences",
-  "parameters": {
-    "reason": "Checking for stored default customer ID at session start",
-    "entity_type": "ad_account",
-    "entity_id": "global"
-  }
-}
-```
-
-#### google_ads_delete_preference
-Delete a specific stored preference by key.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Entity type: `"ad_account"`, `"campaign"`, `"ad_set"` (= ad group), or `"ad"`
-- `entity_id` (string, required) — The Google Ads entity ID
-- `key` (string, required) — The preference key to delete
-
-**Example:**
-```json
-{
-  "tool": "google_ads_delete_preference",
-  "parameters": {
-    "reason": "User wants to clear the stored default account",
-    "entity_type": "ad_account",
-    "entity_id": "global",
-    "key": "default_customer_id"
-  }
-}
-```
-
----
-
 ### Feedback Tools
 
 #### google_ads_developer_feedback
@@ -983,8 +951,9 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 **Workflow:**
 1. Use `google_ads_get_keyword_performance` for keyword metrics and quality scores
 2. Use `google_ads_get_search_terms_report` for search term data
-3. Identify top performers, underperformers, and negative keyword candidates
-4. Provide keyword optimization recommendations
+3. Use `google_ads_list_keywords` for policy status (disapproved, under review, rarely served)
+4. Identify top performers, underperformers, and negative keyword candidates
+5. Provide keyword optimization recommendations
 
 ### Pattern 3: Geographic Performance Analysis
 **Workflow:**
