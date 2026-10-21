@@ -67,10 +67,6 @@ After confirming the MCP is available, authenticate the user's Google Ads accoun
 1. **Check auth status:** Call `google_ads_check_auth_status` to see if the user is already authenticated
 2. **If not authenticated:** Inform the user that they need to connect their Google Ads account via https://app.hopkin.ai and follow the OAuth flow there
 
-### Quick Start with Preferences
-
-At the start of any session, call `google_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "global"` to check if the user has a stored default customer ID (and `login_customer_id` if applicable). If preferences are found, use them automatically without asking the user. After the user selects or confirms an account, offer to store it as a preference for future sessions using `google_ads_store_preference`.
-
 ### Required Information
 
 Before generating reports, confirm you have:
@@ -84,7 +80,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 - **What `login_customer_id` is:** The MCC/manager account ID used to authenticate access to a child (client) account. It tells the API which manager account is making the request on behalf of the child account.
 - **How to detect if it's needed:** If `google_ads_list_accounts` returns accounts with a `managerCustomerId` field, or if `google_ads_list_mcc_child_accounts` returns results, or if the user says they manage client accounts.
-- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_account_summary`, `google_ads_get_performance_report`, `google_ads_get_geo_performance`, `google_ads_get_asset_report`, `google_ads_get_activities`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`, `google_ads_list_negative_keywords`, `google_ads_list_negative_keyword_lists`, `google_ads_get_auto_applied_recommendations`
+- **Which tools accept it:** `google_ads_list_campaigns`, `google_ads_list_ad_groups`, `google_ads_list_ads`, `google_ads_get_insights`, `google_ads_get_account_summary`, `google_ads_get_performance_report`, `google_ads_get_geo_performance`, `google_ads_get_asset_report`, `google_ads_get_activities`, `google_ads_get_conversion_actions`, `google_ads_get_keyword_performance`, `google_ads_get_search_terms_report`, `google_ads_list_negative_keywords`, `google_ads_list_negative_keyword_lists`, `google_ads_get_auto_applied_recommendations`, `google_ads_list_keywords`, `google_ads_get_landing_page_report`
 - **What happens without it:** Permission errors when trying to query accounts managed under an MCC. The error message will hint that `login_customer_id` is required.
 
 ## Available MCP Tools
@@ -98,7 +94,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_list_mcc_child_accounts` — List child accounts under a Manager (MCC) account
 
 ### Campaigns
-- `google_ads_list_campaigns` — List campaigns for an account
+- `google_ads_list_campaigns` — List campaigns for an account. Each row also carries the campaign's serving settings: `networkSettings` under Google's names (`targetSearchNetwork` is the search partners setting, `targetContentNetwork` is the Display Network, `targetPartnerSearchNetwork` is the Google Partner Network, not search partners), `aiMax` `{ enabled, bundlingRequired }` (Search campaigns only), `assetAutomation[]`, and `finalUrlExpansion` `{ status, effective, source }`, where `source` is `explicit` (the campaign's own setting), `google_default` (Google's default: off for Search, on for Performance Max) or `unset` (an AI Max Search campaign that sets nothing, so `effective` is `null`). It also carries URL tracking (`tracking_url_template`, `final_url_suffix`, `url_custom_parameters`). A `null` setting means Google returned nothing or the setting does not apply, never "off". Ad schedules are never capped: a campaign with no `adSchedules` runs at all hours, unless `warnings` names it as a campaign whose criteria could not be fetched. **Route "what are this campaign's network, AI Max, final URL expansion or ad schedule settings" and "did a campaign setting change" here:** it shows the current value. For when and by whom a setting changed, use `google_ads_get_activities` with `resource_type: "CAMPAIGN"`.
 
 ### Ad Groups
 - `google_ads_list_ad_groups` — List ad groups for a campaign or account
@@ -124,12 +120,16 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_get_auto_applied_recommendations` — Check which recommendation types Google is auto-applying to an account. Critical for understanding automated changes to campaigns (e.g., auto-adjusted bids, expanded keywords).
 
 ### Keywords
-- `google_ads_get_keyword_performance` — Keyword metrics with quality scores, match type filtering, and ordering
+- `google_ads_list_keywords` — Keywords with their policy status: `approval_status` (APPROVED, DISAPPROVED, PENDING_REVIEW, UNDER_REVIEW), `disapproval_reasons` in Google's own wording, `system_serving_status` (ELIGIBLE, or RARELY_SERVED for low search volume), `final_urls`, and the campaign and ad group ids, names and statuses. Filters: `campaign_id`, `ad_group_id`, `status` (default ENABLED and PAUSED), `approval_status`, `system_serving_status`, `match_type`. Always live, never cached; paginated with `nextCursor`. Negative keywords are not listed (use `google_ads_list_negative_keywords`). **Route "which keywords are disapproved, under review or rarely served, and why" here.**
+- `google_ads_get_keyword_performance` — Keyword metrics with quality scores, match type filtering, and ordering. Only keywords that served appear, so it never shows a disapproved keyword; for policy status use `google_ads_list_keywords`.
 - `google_ads_get_search_terms_report` — Search terms report with status filtering and ordering
 
 ### Negative Keywords
 - `google_ads_list_negative_keywords` — List negative keywords at campaign or ad-group level. Filter by match type or scope to a specific campaign/ad group. Essential for search term audit workflows — cross-reference with `google_ads_get_search_terms_report` to find wasteful queries that should be negated.
 - `google_ads_list_negative_keyword_lists` — List shared negative keyword lists and their associated campaigns. Use to audit shared exclusion lists across campaigns.
+
+### Landing Pages
+- `google_ads_get_landing_page_report` — Clicks, impressions, cost, conversions (with a per-conversion-action breakdown) and `speed_score` for each landing page URL. `speed_score` is Google's mobile landing page speed score, 1–10 with 10 fastest, measured from mobile ad clicks; `null` means Google has no measurement for that row (common with little mobile traffic), not that the page is slow. It is the only landing page quality signal Google Ads still reports. Filter with `url_contains`, `campaign_id` or `ad_group_id`; segment by `date`, `device` or `ad_network_type`; paginated with `nextCursor`. **Preferred tool for any landing page question; do not use `google_ads_get_insights` or `google_ads_list_ads` for landing page data.**
 
 ### Assets
 - `google_ads_get_asset_report` — Asset-level performance report across AD_GROUP, CAMPAIGN, CUSTOMER, and ASSET_GROUP hierarchy levels. Returns per-asset metrics, performance labels, optional conversion breakdowns, and optional change history.
@@ -140,11 +140,6 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 ### Visualization
 - `google_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
 
-### Preferences
-- `google_ads_store_preference` — Store a persistent preference or observation for a Google Ads entity (account, campaign, ad group, or ad)
-- `google_ads_get_preferences` — Retrieve all stored preferences for a Google Ads entity
-- `google_ads_delete_preference` — Delete a specific stored preference by key
-
 ### Feedback
 - `google_ads_developer_feedback` — Submit feature requests and workflow gap reports
 
@@ -152,18 +147,19 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 ## Core Capabilities
 
-This skill supports eight primary report types and a developer feedback workflow for write operations.
+This skill supports nine primary report types and a developer feedback workflow for write operations.
 
 ### Report Types
 
 1. **Geographic Performance Reports** — Location-based performance by country, city, region, metro, or other geo levels
-2. **Campaign Performance Reports** — Overall campaign metrics, spending, ROAS, and performance analysis
-3. **Keyword Analysis Reports** — Keyword performance, quality scores, search terms, and optimization opportunities
+2. **Campaign Performance Reports** — Overall campaign metrics, spending, ROAS, and performance analysis, plus campaign settings (networks, AI Max, final URL expansion, ad schedules)
+3. **Keyword Analysis Reports** — Keyword performance, quality scores, search terms, policy (approval) status, and optimization opportunities
 4. **Ad Performance Reports** — Individual ad performance, RSA analysis, and creative effectiveness
 5. **Budget & Spend Reports** — Budget tracking, spend pacing, cost analysis, and forecasting
 6. **Asset Reports** — Per-asset metrics across hierarchy levels (AD_GROUP, CAMPAIGN, CUSTOMER, PMax) with performance labels and optional conversion breakdowns
 7. **Negative Keyword Audit** — Review negative keywords across campaigns and shared lists, cross-reference with search terms to identify gaps
 8. **Auto-Applied Recommendations Audit** — Review which recommendation types Google is automatically applying to the account
+9. **Landing Page Reports** — Per-URL clicks, cost, conversions and mobile speed score; find slow or non-converting pages
 
 ### Data Visualization
 
@@ -229,13 +225,23 @@ Analyze overall campaign performance, compare campaigns across an account, ident
 
 ---
 
+### Campaign Settings Audit
+
+Answer "is this campaign on search partners or the Display Network", "is AI Max or final URL expansion on", "when does it run" and "did a campaign setting change".
+
+**Primary tool:** `google_ads_list_campaigns` — every row carries the current `networkSettings`, `aiMax`, `assetAutomation`, `finalUrlExpansion` and ad schedules, whatever `include_criteria` is. A `null` setting is never "off". Pair it with `google_ads_get_activities` (`resource_type: "CAMPAIGN"`) for the date and author of a change.
+
+---
+
 ### Keyword Analysis Report
 
 Evaluate keyword performance, analyze search terms, understand quality scores, identify negative keyword opportunities, and optimize keyword bidding strategies.
 
-**Primary tools:** `google_ads_get_keyword_performance` + `google_ads_get_search_terms_report`
+**Primary tools:** `google_ads_get_keyword_performance` + `google_ads_get_search_terms_report`; `google_ads_list_keywords` for policy status
 
 **Note:** The keyword analysis workflow supports cross-referencing with `google_ads_list_negative_keywords` to identify search terms that should be negated. After pulling search terms, compare against existing negative keywords to find gaps in your exclusion strategy.
+
+**Policy status:** For "which keywords are disapproved or under review" or "why is this keyword not serving", use `google_ads_list_keywords` with `approval_status` set to `["DISAPPROVED", "UNDER_REVIEW", "PENDING_REVIEW"]`, or `system_serving_status` set to `["RARELY_SERVED"]`. Each row carries `disapproval_reasons`. Performance reports only contain keywords that served, so they cannot answer this.
 
 **See detailed workflow:** **references/workflows/keyword-analysis.md**
 
@@ -281,6 +287,14 @@ Analyze individual asset performance across all hierarchy levels — including R
 - Audit asset change history: `include_change_history: true`
 
 **See detailed workflow:** **references/workflows/asset-report.md**
+
+---
+
+### Landing Page Report
+
+Rank landing pages by clicks, cost, conversions and mobile speed, and find slow or non-converting pages.
+
+**Primary tool:** `google_ads_get_landing_page_report` — narrow with `url_contains` or `campaign_id`; add `segments: ["date"]` for a daily trend. Report `speed_score` as returned (1–10) and say "not measured" for `null`, never "slow".
 
 ---
 

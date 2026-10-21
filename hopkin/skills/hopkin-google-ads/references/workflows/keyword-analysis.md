@@ -102,9 +102,30 @@ Use `google_ads_get_keyword_performance` to get keyword-level data with quality 
 - Quality Score
 - Search impression share
 
+Only keywords that served appear here; a disapproved keyword never does (see Step 4b).
+
 ### Calculated Metrics
 - **CPA** = cost / conversions (leave undefined if conversions = 0)
 - **ROAS** = conversions_value / cost (only if both available and cost > 0)
+
+---
+
+## Step 4b: Check Keyword Policy Status
+
+Use `google_ads_list_keywords` to find keywords Google has disapproved or is still reviewing:
+
+```json
+{
+  "tool": "google_ads_list_keywords",
+  "parameters": {
+    "reason": "Find keywords with policy problems",
+    "customer_id": "1234567890",
+    "approval_status": ["DISAPPROVED", "UNDER_REVIEW", "PENDING_REVIEW"]
+  }
+}
+```
+
+Each row carries `disapproval_reasons` in Google's wording. Set `system_serving_status` to `["RARELY_SERVED"]` instead to find keywords Google rarely shows because of low search volume.
 
 ---
 
