@@ -153,7 +153,7 @@ Use `google_ads_get_search_terms_report` to see which actual queries triggered a
   "parameters": {
     "reason": "Finding search terms not yet added as keywords",
     "customer_id": "1234567890",
-    "search_term_status": "NONE",
+    "search_term_status": ["NONE"],
     "order_by": "conversions",
     "limit": 50
   }
@@ -163,6 +163,32 @@ Use `google_ads_get_search_terms_report` to see which actual queries triggered a
 ### Uses for Search Term Data
 - Find high-value queries to add as exact/phrase keywords
 - Find irrelevant or poor-performing queries for negative keywords
+
+### Performance Max Search Terms
+
+Performance Max campaigns never appear in the rows above. For the individual queries a PMax campaign showed on, set `include_pmax_search_terms: true`. Rows then come from `campaign_search_term_view`, one per campaign and query, with no ad group. Leave out `campaign_id` to cover every PMax campaign in the account.
+
+```json
+{
+  "tool": "google_ads_get_search_terms_report",
+  "parameters": {
+    "reason": "Find PMax queries not yet negated, ranked by cost",
+    "customer_id": "1234567890",
+    "date_preset": "LAST_30_DAYS",
+    "include_pmax_search_terms": true,
+    "search_term_status": ["NONE", "ADDED"],
+    "order_by": "cost"
+  }
+}
+```
+
+- `search_term_status: ["NONE", "ADDED"]` leaves out queries already negated (EXCLUDED, ADDED_EXCLUDED)
+- Add `"include_conversion_breakdown": true` (with `"order_by": "conversions"`) to see which conversion action each query counted as; the breakdown is keyed by query text
+- Each row carries `campaign_search_term_view_search_term`, `segments_search_term_targeting_status`, `segments_search_term_match_type`, `campaign_id`, `campaign_name`, impressions, clicks, cost and conversions
+- `ad_group_id`, `include_landing_pages`, `pmax_search_categories` and keyword segments (`keyword.*`, `match_type`) are refused with a 422, because PMax has no ad groups or keywords. Call again without them, and say that per-ad-group landing pages do not exist for PMax queries rather than inventing them
+- For grouped search categories (themes) instead of queries, make a separate call with `pmax_search_categories: true`
+
+**Reading `coverage`:** the response's `coverage` block holds `search_terms` (the totals of every matching query, all pages), `campaigns_search_network` (the PMax campaigns' own totals on Google Search and search partners) and `campaigns_all_networks`. Report the queries' cost as a share of each campaign figure. Google discloses only search queries and withholds low-volume ones, so the remainder is spend outside Search plus undisclosed queries: never present the visible queries as all of PMax spend. A missing campaign figure means its query failed, and `warnings` says so.
 
 ---
 
@@ -208,6 +234,10 @@ Use `google_ads_get_insights` with segments for audience-level data:
 - Queries with meaningful spend but zero conversions
 - Queries clearly irrelevant or outside the ICP
 - Recommend blocking at campaign or account level
+
+**Performance Max queries (when requested):**
+- The same two lists, per campaign rather than per ad group
+- State the share of PMax spend the visible queries cover, from `coverage`
 
 ### 7.3 Audience Insights
 
@@ -264,6 +294,13 @@ Plain-language summary of key findings.
 | Search Term | Spend | Conv | Reason to Block |
 |-------------|-------|------|-----------------|
 | [query] | $X | 0 | Irrelevant/outside ICP |
+
+**Performance Max queries (when requested):**
+| Campaign | Search Term | Impr | Clicks | Spend | Conv | Recommendation |
+|----------|-------------|------|--------|-------|------|----------------|
+| [name] | [query] | X | X | $X | X | Negate / keep |
+
+Follow the table with one line from `coverage`: "These queries account for $X of $Y PMax spend on the Search network (Z%) and of $W across all networks (V%). The rest is spend outside Search and queries Google does not disclose."
 
 ### 8.5 Audience Insights Section
 
