@@ -594,18 +594,32 @@ Get keyword performance data with quality scores and all key metrics. Also runs 
 ```
 
 #### google_ads_get_search_terms_report
-Get search terms report showing which actual search queries triggered ads. Also runs a parallel conversion breakdown query returning per-conversion-action stats grouped by ad group. Supports `ad_network_type` segment for network-level breakdown.
+Get search terms report showing which actual search queries triggered ads, with each query's keyword status. The default rows come from `search_term_view` and **never include Performance Max campaigns**. Supports `ad_network_type` segment for network-level breakdown. The per-conversion-action breakdown is opt-in (`include_conversion_breakdown: true`, or `conversion_action_name` in `segments`) and keyed by search term text; if a breakdown query fails, that breakdown comes back empty and `warnings` says why. Google does not disclose every term for privacy.
+
+**Performance Max search terms:** with `include_pmax_search_terms: true`, rows come from `campaign_search_term_view` instead: one row per campaign and query, with no ad group, carrying `campaign_search_term_view_search_term`, `segments_search_term_targeting_status`, `segments_search_term_match_type`, `campaign_id`, `campaign_name`, impressions, clicks, cost and conversions. It works account-wide or with `campaign_id`.
+- `search_term_status` filters on the targeting status: `["NONE", "ADDED"]` leaves out queries already negated (EXCLUDED, ADDED_EXCLUDED)
+- `include_conversion_breakdown: true` gives per-action conversions keyed by query text
+- The response adds a `coverage` block: `search_terms` (the totals of every matching query, all pages, not just this one), `campaigns_search_network` (the PMax campaigns' own totals on Google Search and search partners) and `campaigns_all_networks`, each with impressions, clicks, cost, conversions and conversions_value. A campaign figure is left out, with a `warnings` entry, when its query fails
+- These are search queries only, and Google withholds low-volume ones, so they never add up to the campaign totals. Report `coverage.search_terms.cost` as a share of the campaign figures, never claim the visible queries are all PMax spend, and do not treat the gap as missing data
+- `ad_group_id`, `include_landing_pages`, `pmax_search_categories` and keyword segments (`keyword.*`, `match_type`) are refused with a 422: Performance Max has no ad groups or keywords. Call again without them
+- For grouped search categories (themes) rather than queries, use `pmax_search_categories: true` instead
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `customer_id` (string, required) — Google Ads customer ID
 - `login_customer_id` (string, optional) — Manager account ID. Required when the target account is managed by an MCC — omitting it causes permission errors
+- `date_preset` / `date_range` — One of the two is required
 - `campaign_id` (string, optional) — Filter by campaign
-- `ad_group_id` (string, optional) — Filter by ad group
-- `search_term_status` (array of strings, optional) — Filter by status (e.g., `["ADDED"]`, `["EXCLUDED"]`, `["NONE"]`)
-- `order_by` (string, optional) — Sort field
-- `limit` (number, optional) — Max results per page (1–100)
-- `nextCursor` (string, optional) — Pagination cursor
+- `ad_group_id` (string, optional) — Filter by ad group (refused with `include_pmax_search_terms`)
+- `search_term_status` (array of strings, optional) — Filter by status: `ADDED`, `EXCLUDED`, `ADDED_EXCLUDED`, `NONE`
+- `order_by` (string, optional) — Sort by `impressions`, `clicks`, `cost`, `conversions` or `ctr` (descending)
+- `include_conversion_breakdown` (boolean, optional, default false) — Conversion breakdown by conversion action, keyed by search term text
+- `include_landing_pages` (boolean, optional, default false) — Final URLs per ad group (refused with `include_pmax_search_terms`)
+- `include_pmax_search_terms` (boolean, optional, default false) — Individual Performance Max queries plus the `coverage` block
+- `pmax_search_categories` (boolean, optional, default false) — Performance Max grouped search categories (themes), not individual queries
+- `segments` (array of strings, optional) — e.g. `ad_network_type`, `device`
+- `limit` (number, optional) — Rows per page (1–1000, default 40)
+- `cursor` (string, optional) — The `nextCursor` value from the previous response, with the same filters
 
 **Example:**
 ```json
@@ -615,8 +629,25 @@ Get search terms report showing which actual search queries triggered ads. Also 
     "reason": "Finding negative keyword candidates from search terms",
     "customer_id": "1234567890",
     "campaign_id": "123456789",
+    "date_preset": "LAST_30_DAYS",
     "order_by": "cost",
     "limit": 100
+  }
+}
+```
+
+**Example — Performance Max queries not yet negated:**
+```json
+{
+  "tool": "google_ads_get_search_terms_report",
+  "parameters": {
+    "reason": "Find PMax queries to negate",
+    "customer_id": "1234567890",
+    "campaign_id": "5555555555",
+    "date_preset": "LAST_30_DAYS",
+    "include_pmax_search_terms": true,
+    "search_term_status": ["NONE", "ADDED"],
+    "order_by": "cost"
   }
 }
 ```
@@ -950,7 +981,7 @@ Submit feedback or feature requests to the Hopkin development team. Use this too
 ### Pattern 2: Keyword Analysis
 **Workflow:**
 1. Use `google_ads_get_keyword_performance` for keyword metrics and quality scores
-2. Use `google_ads_get_search_terms_report` for search term data
+2. Use `google_ads_get_search_terms_report` for search term data (`include_pmax_search_terms: true` for Performance Max queries, which the default rows leave out)
 3. Use `google_ads_list_keywords` for policy status (disapproved, under review, rarely served)
 4. Identify top performers, underperformers, and negative keyword candidates
 5. Provide keyword optimization recommendations
