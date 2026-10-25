@@ -92,33 +92,15 @@ After installing or configuring the MCP server:
    }
    ```
 
-2. If not authenticated, call `meta_ads_get_login_url`:
-   ```json
-   {
-     "tool": "meta_ads_get_login_url",
-     "parameters": {
-       "reason": "Getting login URL for Meta Ads authentication"
-     }
-   }
-   ```
+2. If not authenticated, direct the user to https://app.hopkin.ai to connect their Meta Ads account, and wait until they confirm it is done
 
-3. Present the returned URL to the user — they need to authenticate via Meta's OAuth flow
-
-4. After the user completes authentication, verify with `meta_ads_get_user_info`:
-   ```json
-   {
-     "tool": "meta_ads_get_user_info",
-     "parameters": {
-       "reason": "Verifying authentication after user login"
-     }
-   }
-   ```
+3. Verify with `meta_ads_check_auth_status` again
 
 #### Solution 2: Session Expired
 
 If the user was previously authenticated but the session has expired:
 1. Re-run the authentication flow above
-2. The user will need to authenticate again via the login URL
+2. The user will need to reconnect their Meta Ads account at https://app.hopkin.ai
 
 **Prevention:**
 - Always check auth status at the beginning of a session
@@ -167,8 +149,8 @@ Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can
 **Solutions:**
 
 #### Solution 1: Re-authenticate with Correct Permissions
-1. Run `meta_ads_get_login_url` to get a new login URL
-2. Have the user authenticate again, ensuring they grant all requested permissions
+1. Have the user reconnect their Meta Ads account at https://app.hopkin.ai, granting all requested permissions
+2. Verify with `meta_ads_check_auth_status`
 
 #### Solution 2: Check Account Role
 1. Go to Business Settings → Ad Accounts
@@ -250,7 +232,7 @@ Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can
 **Cause:** Session expired or authentication issue
 
 **Solutions:**
-- Re-run authentication flow: `meta_ads_check_auth_status` → `meta_ads_get_login_url`
+- Re-run authentication flow: `meta_ads_check_auth_status` → reconnect at https://app.hopkin.ai
 
 #### Error 200: Permission Denied
 **Cause:** Insufficient permissions for operation
@@ -324,7 +306,7 @@ When encountering issues, work through this checklist:
 
 - [ ] **Authentication**
   - [ ] `meta_ads_check_auth_status` returns authenticated
-  - [ ] User has completed OAuth flow via `meta_ads_get_login_url` if needed
+  - [ ] User has connected their Meta Ads account at https://app.hopkin.ai if needed
 
 - [ ] **Permissions**
   - [ ] User has access to target ad account
@@ -350,7 +332,7 @@ When encountering issues, work through this checklist:
 → Check: Date range, campaign status, filters
 
 **"Not authenticated"**
-→ Run: `meta_ads_check_auth_status` → `meta_ads_get_login_url` → user authenticates → `meta_ads_get_user_info`
+→ Run: `meta_ads_check_auth_status` → user reconnects at https://app.hopkin.ai → `meta_ads_check_auth_status`
 
 **"Rate limit exceeded"**
 → Check: Request frequency, implement backoff, reduce query scope

@@ -70,6 +70,13 @@ Health check. Verify the MCP server is reachable and returns version/timestamp.
 - `reason` (string, required) — Reason for the call
 - `message` (string, optional) — Optional echo message
 
+#### google_ads_get_billing_status
+Call this after a tool call fails with a billing error (HTTP 402) before retrying. It explains why, gives the organization owner a link to pay (a member gets the owner's contact instead), and says when to retry.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `checkout_tier` (string, optional) — Organization owner only: also create a checkout link for this plan (`starter` or `pro`)
+
 ---
 
 ### Account Tools
@@ -819,6 +826,208 @@ Retrieve change history (audit log) for a Google Ads account. Shows what changed
   }
 }
 ```
+
+---
+
+### Audience Tools
+
+#### google_ads_list_audiences
+List audience lists (user lists): Customer Match, remarketing, rule-based, similar and lookalike segments, with name, type, size (Search and Display), membership status and match rate.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `type` (array, optional) — Filter by audience type, e.g. `CRM_BASED`, `REMARKETING`, `RULE_BASED`, `LOOKALIKE`
+- `membership_status` (string, optional) — `OPEN` or `CLOSED`
+- `search` (string, optional) — Case-insensitive name filter
+- `limit` (number, optional) — Lists per page (default 20, max 100)
+- `cursor` (string, optional) — The `nextCursor` value from the previous response, with every other parameter unchanged
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+#### google_ads_get_audience_report
+Performance by audience and demographic: answers "lookalike vs custom segment vs remarketing — which performs?" and "which age groups / genders convert?" in one call. Each row carries the campaign and ad group, criterion type and status, the resolved audience name and subtype, bid modifier, impressions, clicks, cost, CTR, average CPC, conversions, conversion value, cost per conversion and ROAS, with a per-conversion-action breakdown. Rows are ranked by cost; returns JSON.
+
+Audiences in one ad group overlap, so audience rows do not add up to the ad group total (demographic buckets do). Performance Max has no rows: its audiences are signals, not targeting, so use `google_ads_get_asset_report` with `include_audience_signals: true`.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `dimensions` (array, optional) — `AUDIENCE` (default), `AGE_RANGE`, `GENDER`, `PARENTAL_STATUS`, `INCOME_RANGE`; several at once tag each row with `dimension`
+- `level` (string, optional) — `AD_GROUP` (default) or `CAMPAIGN`
+- `date_preset` (string, optional) — Default `LAST_30_DAYS`; or `date_range` (`start_date`, `end_date`)
+- `segments` (array, optional) — `date` and/or `device`
+- `campaign_ids` / `ad_group_ids` (array, optional) — Restrict to these IDs (up to 100; `ad_group_ids` at `AD_GROUP` level only)
+- `criterion_types` (array, optional) — Restrict to these audience criterion types
+- `include_zero_activity` (boolean, optional) — Include attached audiences with no impressions, to check whether an audience serves at all
+- `include_all_conversions` (boolean, optional) — Add all conversions and view-through conversions
+- `include_video_metrics` (boolean, optional) — Add video views, view rate, CPV and quartiles (YouTube, Video, Demand Gen)
+- `limit` / `cursor` (optional) — Pagination; pass `nextCursor` back with every other parameter unchanged
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+---
+
+### Keyword Planning Tools
+
+#### google_ads_generate_keyword_ideas
+Keyword suggestions from seed keywords and/or a URL (yours or a competitor's), with average monthly searches, competition level and estimated bid ranges.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `keywords` (array, optional) — Seed keywords (max 20). Provide `keywords`, `url`, or both
+- `url` (string, optional) — Seed URL
+- `language` (string, optional) — ISO 639-1 code (default `"en"`)
+- `geo_targets` (array, optional) — ISO 3166-1 alpha-2 country codes (default `["US"]`)
+- `network` (string, optional) — `GOOGLE_SEARCH` (default) or `GOOGLE_SEARCH_AND_PARTNERS`
+- `include_adult_keywords` (boolean, optional) — Default false
+- `include_monthly_volumes` (boolean, optional) — Add per-month search volume history
+- `limit` (number, optional) — Ideas per page (1–1000, default 50)
+- `cursor` (string, optional) — The `nextCursor` value from the previous response
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+**Example:**
+```json
+{
+  "tool": "google_ads_generate_keyword_ideas",
+  "parameters": {
+    "reason": "Finding keyword ideas for a new running shoes campaign",
+    "customer_id": "1234567890",
+    "keywords": ["running shoes", "athletic footwear"],
+    "include_monthly_volumes": true
+  }
+}
+```
+
+#### google_ads_get_keyword_historical_metrics
+Historical search metrics (average monthly searches, competition, bid estimates) for keywords you already have. Unlike keyword ideas, it returns metrics for exactly the keywords given.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `keywords` (array, required) — 1–200 keywords
+- `language` (string, optional) — ISO 639-1 code (default `"en"`)
+- `geo_targets` (array, optional) — ISO 3166-1 alpha-2 country codes (default `["US"]`)
+- `network` (string, optional) — `GOOGLE_SEARCH` (default) or `GOOGLE_SEARCH_AND_PARTNERS`
+- `include_monthly_volumes` (boolean, optional) — Add month-by-month search volume
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+#### google_ads_generate_keyword_forecast_metrics
+Forecasts campaign performance for a keyword set under a budget and bidding strategy: projected impressions, clicks, cost, CTR, conversions and CPA. Amounts are in micros (10000000 = $10).
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `keywords` (array, required) — 1–200 keywords, each with `text`, optional `match_type` and optional `max_cpc_bid_micros`
+- `daily_budget_micros` (integer, required) — Daily budget in micros
+- `bidding_strategy` (string, optional) — `MANUAL_CPC` (default), `MAXIMIZE_CLICKS` or `MAXIMIZE_CONVERSIONS`
+- `default_max_cpc_bid_micros` (integer, optional) — Required for `MANUAL_CPC`; per-keyword bids override it
+- `max_cpc_bid_ceiling_micros` (integer, optional) — Bid ceiling for `MAXIMIZE_CLICKS`
+- `language` (string, optional) — ISO 639-1 code (default `"en"`)
+- `geo_targets` (array, optional) — ISO 3166-1 alpha-2 country codes (default `["US"]`)
+- `network` (string, optional) — `GOOGLE_SEARCH` (default) or `GOOGLE_SEARCH_AND_PARTNERS`
+- `forecast_start_date` / `forecast_end_date` (string, optional) — YYYY-MM-DD; defaults to tomorrow through 30 days later
+- `negative_keywords` (array, optional) — Keyword texts to exclude
+- `conversion_rate` (number, optional) — Expected conversion rate (0–1)
+- `currency_code` (string, optional) — ISO 4217; defaults to the account currency
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+#### google_ads_generate_ad_group_themes
+Suggests which existing ad group each keyword belongs in, with recommended match types, and flags ad groups it cannot use.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `keywords` (array, required) — 1–2000 keywords
+- `ad_groups` (array, required) — Ad group resource names, e.g. `"customers/1234567890/adGroups/111222333"`
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+---
+
+### URL Tracking Tools
+
+#### google_ads_get_url_tracking_config
+Complete URL and UTM tracking configuration across every hierarchy level (account, campaign, ad group, ad, keyword and asset) in one call. Preferred tool for any UTM or tracking audit; do not chain list tools for this. Returns each entity's own tracking template, final URL suffix, custom parameters and final URLs, plus the effective value resolved through Google's precedence chain (account → campaign → ad group → ad → keyword) and the level that set it. An unset field is `null`, never omitted, so "no tracking template here" is verifiable. The `coverage` block counts entities scanned at each level across the whole account, not just the returned page.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `levels` (array, optional) — Levels to scan (default all six; `ACCOUNT` is always included)
+- `scope` (string, optional) — `"all"` (default) returns every entity with its effective config; `"overrides"` returns only entities that set their own values
+- `campaign_ids` / `ad_group_ids` (array, optional) — Restrict the scan to these entities and their descendants
+- `status` (array, optional) — Entity status filter (default `["ENABLED"]`)
+- `limit` (number, optional) — Rows per page (default 200, max 1000)
+- `cursor` (string, optional) — The `nextCursor` value from the previous response
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+---
+
+### Creative Preview Tools
+
+#### google_ads_preview_ads
+**MCP App.** Renders ads with their creative (images, YouTube thumbnails) and a configurable metrics overlay in a visual UI. Offer it when the user asks what their ads look like or is comparing creative.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `customer_id` (string, required) — Google Ads customer ID
+- `login_customer_id` (string, optional) — Manager account ID for MCC-managed accounts
+- `ads` (array, required) — 1–20 ads to preview, each `{ ad_id, metrics? }` (metrics: key → display value, e.g. `{ "spend": "150.00" }`)
+- `metric_labels` (object, optional) — Display labels for metric keys
+- `connection_id` (string, optional) — Use a specific connection instead of the default. Call `google_ads_list_connections` to discover IDs.
+
+---
+
+### Connection Tools
+
+A user can have more than one Google connection: their own, or ones shared with them through their organization. Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection.
+
+#### google_ads_list_connections
+List the connections available to the user, owned and shared, with each one's ID, name and whether it is the default.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+
+#### google_ads_set_default_connection
+Set the connection used when `connection_id` is omitted. The default is scoped to the caller (the user account, or the API key in use). Call it only when the user asks.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `connection_id` (string, required) — UUID of the connection
+
+#### google_ads_share_connection
+Share an owned connection with every member of the user's organization. Owner only.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `connection_id` (string, required) — UUID of the connection
+
+#### google_ads_unshare_connection
+Stop sharing an owned connection; teammates lose access immediately. Owner only.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `connection_id` (string, required) — UUID of the connection
+
+#### google_ads_rename_connection
+Change an owned connection's display name. The grant and account are unaffected. Owner only.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `connection_id` (string, required) — UUID of the connection
+- `display_name` (string, required) — New name
+
+#### google_ads_revoke_connection
+Revoke (soft-delete) an owned connection. Defaults pointing to it are invalidated and shared members lose access. The grant at Google is not revoked; the user disconnects in the dashboard for that. Owner only; confirm with the user first.
+
+**Parameters:**
+- `reason` (string, required) — Reason for the call
+- `connection_id` (string, required) — UUID of the connection
 
 ---
 
