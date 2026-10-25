@@ -68,10 +68,6 @@ After confirming the MCP is available, authenticate the user's Mailchimp account
 1. **Check auth status:** Call `mailchimp_check_auth_status` to see if the user is already authenticated
 2. **If not authenticated:** Inform the user that they need to connect their Mailchimp account via https://app.hopkin.ai and follow the OAuth flow there
 
-### Quick Start with Preferences
-
-At the start of any session, call `mailchimp_get_preferences` with `entity_type: "ad_account"` and `entity_id: "global"` to check if the user has stored default settings (e.g., a default account ID or audience). If preferences are found, use them automatically without asking the user. After the user selects or confirms an account/audience, offer to store it as a preference for future sessions using `mailchimp_store_preference`.
-
 ### Required Information
 
 Before generating reports, confirm you have:
@@ -91,7 +87,7 @@ Some users connect multiple Mailchimp accounts to Hopkin. When this is the case:
 
 For complete tool documentation with all parameters, see **references/mcp-tools-reference.md**.
 
-All 21 tools use the `mailchimp_` prefix. Every tool call requires a `reason` (string) parameter for audit trail.
+All tools use the `mailchimp_` prefix. Every tool call requires a `reason` (string) parameter for audit trail.
 
 **Key tools by workflow:**
 - **Account setup:** `mailchimp_list_accounts`, `mailchimp_check_auth_status`
@@ -102,7 +98,7 @@ All 21 tools use the `mailchimp_` prefix. Every tool call requires a `reason` (s
 - **Templates:** `mailchimp_list_templates`
 - **Reports:** `mailchimp_get_campaign_report` (primary), `mailchimp_get_audience_insights`, `mailchimp_get_email_activity`
 - **Organization:** `mailchimp_list_segments`, `mailchimp_list_tags`
-- **Preferences:** `mailchimp_store_preference`, `mailchimp_get_preferences`, `mailchimp_delete_preference`
+- **Connections:** `mailchimp_list_connections`, `mailchimp_set_default_connection` (call it only when the user asks)
 - **Feedback:** `mailchimp_developer_feedback`
 
 ## Core Capabilities

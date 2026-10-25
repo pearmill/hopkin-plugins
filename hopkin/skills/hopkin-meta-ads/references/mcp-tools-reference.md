@@ -497,98 +497,6 @@ Optional: `tip` (tooltip fields from `meta`), `colorScheme`, `colorType`.
 
 ---
 
-### Preference Tools
-
-Preference tools let you store and retrieve persistent key-value observations about ad entities. Preferences survive across conversations and are automatically attached to entity-listing responses as `_stored_preferences`. Use them to remember user choices, default accounts, reporting preferences, and analytical observations.
-
-#### meta_ads_store_preference
-Store a persistent preference or observation about a Meta ad entity.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Type of entity: `"ad_account"`, `"campaign"`, `"ad_set"`, or `"ad"`
-- `entity_id` (string, required) — The Meta entity ID (e.g., `"act_123456"`, `"23842453456789"`)
-- `key` (string, required) — Preference key (e.g., `"default_account_id"`, `"preferred_conversion_metric"`)
-- `value` (any, required) — Preference value — string, number, boolean, or JSON object
-- `source` (string, optional) — Who set this: `"agent"` (default), `"user"`, or `"system"`
-- `note` (string, optional) — Context about why this preference was set
-
-**Example — Store default account ID:**
-```json
-{
-  "tool": "meta_ads_store_preference",
-  "parameters": {
-    "reason": "User confirmed act_123456789 as their primary account",
-    "entity_type": "ad_account",
-    "entity_id": "default",
-    "key": "default_account_id",
-    "value": "act_123456789",
-    "source": "user",
-    "note": "User selected from account list at session start"
-  }
-}
-```
-
-**Example — Store preferred metric for a campaign:**
-```json
-{
-  "tool": "meta_ads_store_preference",
-  "parameters": {
-    "reason": "User wants ROAS as primary metric for this campaign",
-    "entity_type": "campaign",
-    "entity_id": "23842453456789",
-    "key": "preferred_conversion_metric",
-    "value": "purchase_roas"
-  }
-}
-```
-
-#### meta_ads_get_preferences
-Get all stored preferences for a Meta ad entity.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Type of entity: `"ad_account"`, `"campaign"`, `"ad_set"`, or `"ad"`
-- `entity_id` (string, required) — The Meta entity ID
-
-> Note: Preferences are also automatically attached to entity-listing tool responses as `_stored_preferences`, so you often do not need to call this explicitly.
-
-**Example — Check for stored default account:**
-```json
-{
-  "tool": "meta_ads_get_preferences",
-  "parameters": {
-    "reason": "Checking for stored default account at session start",
-    "entity_type": "ad_account",
-    "entity_id": "default"
-  }
-}
-```
-
-#### meta_ads_delete_preference
-Delete a specific stored preference by key.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Type of entity: `"ad_account"`, `"campaign"`, `"ad_set"`, or `"ad"`
-- `entity_id` (string, required) — The Meta entity ID
-- `key` (string, required) — The preference key to delete
-
-**Example:**
-```json
-{
-  "tool": "meta_ads_delete_preference",
-  "parameters": {
-    "reason": "User wants to clear their saved default account",
-    "entity_type": "ad_account",
-    "entity_id": "default",
-    "key": "default_account_id"
-  }
-}
-```
-
----
-
 ### Feedback Tools
 
 #### meta_ads_developer_feedback
@@ -774,15 +682,6 @@ Pass one or more values as an array. When multiple windows are specified, Meta r
 5. Check automatic advanced matching: which user fields are being matched?
 6. Review diagnostics for any alerts or issues
 7. Provide recommendations for improving tracking quality
-
-### Pattern 7: Session Start with Preferences
-**When:** At the beginning of any new session before asking the user for account information.
-
-**Workflow:**
-1. Call `meta_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "default"` to check for a stored default account
-2. If a `default_account_id` preference exists, use it and tell the user: "Using your saved account [X]. Use a different one? Let me know."
-3. If no stored preference exists, call `meta_ads_list_ad_accounts` and present a numbered list if multiple accounts are found
-4. After the user selects an account (or if they want to save a different one), offer to store it with `meta_ads_store_preference`
 
 ---
 

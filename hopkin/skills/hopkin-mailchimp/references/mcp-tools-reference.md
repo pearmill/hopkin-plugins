@@ -223,39 +223,6 @@ List tags for a Mailchimp audience with pagination.
 
 ---
 
-### Preference Tools
-
-#### mailchimp_store_preference
-Store a persistent preference for a Mailchimp entity.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Entity type: `ad_account`, `campaign`, `ad_set`, `ad`
-- `entity_id` (string, required) — The entity ID
-- `key` (string, required) — Preference key (e.g., `default_audience`, `preferred_metric`)
-- `value` (any, required) — Preference value (string, number, boolean, or JSON object)
-- `source` (string, optional, default: `agent`) — Who set this: `agent`, `user`, `system`
-- `note` (string, optional) — Context about why this preference was set
-
-#### mailchimp_get_preferences
-Get all stored preferences for a Mailchimp entity.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Entity type: `ad_account`, `campaign`, `ad_set`, `ad`
-- `entity_id` (string, required) — The entity ID
-
-#### mailchimp_delete_preference
-Delete a stored preference by key.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Entity type: `ad_account`, `campaign`, `ad_set`, `ad`
-- `entity_id` (string, required) — The entity ID
-- `key` (string, required) — The preference key to delete
-
----
-
 ### Developer Feedback
 
 #### mailchimp_developer_feedback

@@ -68,10 +68,6 @@ After confirming the MCP is available, authenticate the user's Google Search Con
 1. **Check auth status:** Call `google_search_console_check_auth_status` to see if the user is already authenticated
 2. **If not authenticated:** Inform the user that they need to connect their Google Search Console account via https://app.hopkin.ai and follow the OAuth flow there
 
-### Quick Start with Preferences
-
-At the start of any session, call `google_search_console_get_preferences` with `entity_type: "site"` and `entity_id: "global"` to check if the user has a stored default site URL. If preferences are found, use them automatically without asking the user. After the user selects or confirms a site, offer to store it as a preference for future sessions using `google_search_console_store_preference`.
-
 ### Required Information
 
 Before generating reports, confirm you have:
@@ -83,7 +79,7 @@ Before generating reports, confirm you have:
 
 For complete tool documentation with all parameters, see **references/mcp-tools-reference.md**.
 
-All 12 tools use the `google_search_console_` prefix.
+All tools use the `google_search_console_` prefix.
 
 ### Authentication
 - `google_search_console_ping` — Health check; verify the MCP server is reachable
@@ -104,10 +100,9 @@ All 12 tools use the `google_search_console_` prefix.
 ### URL Inspection
 - `google_search_console_inspect_url` — Get detailed indexing, crawl, and canonical status for a specific URL. Quota: 2000 calls/day per property.
 
-### Preferences
-- `google_search_console_store_preference` — Store a persistent preference or observation for a Search Console entity
-- `google_search_console_get_preferences` — Retrieve all stored preferences for an entity
-- `google_search_console_delete_preference` — Delete a specific stored preference by key
+### Connections
+- `google_search_console_list_connections` — List the user's Search Console connections (own and shared) and which one is the default; pass `connection_id` to any tool to target one
+- `google_search_console_set_default_connection` — Change which connection is used when `connection_id` is omitted; call it only when the user asks
 
 ### Feedback
 - `google_search_console_developer_feedback` — Submit feature requests and workflow gap reports
