@@ -88,6 +88,7 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 ### Authentication
 - `google_ads_check_auth_status` — Check if user is authenticated; only call when another tool returns an auth error
 - `google_ads_ping` — Health check; verify the MCP server is reachable
+- `google_ads_get_billing_status` — Call after a tool fails with a billing error (HTTP 402): says why, gives the organization owner a link to pay, and says when to retry
 
 ### Accounts
 - `google_ads_list_accounts` — List accessible Google Ads accounts; child accounts include `managerCustomerId` indicating the MCC parent
@@ -95,6 +96,10 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 
 ### Campaigns
 - `google_ads_list_campaigns` — List campaigns for an account. Each row also carries the campaign's serving settings: `networkSettings` under Google's names (`targetSearchNetwork` is the search partners setting, `targetContentNetwork` is the Display Network, `targetPartnerSearchNetwork` is the Google Partner Network, not search partners), `aiMax` `{ enabled, bundlingRequired }` (Search campaigns only), `assetAutomation[]`, and `finalUrlExpansion` `{ status, effective, source }`, where `source` is `explicit` (the campaign's own setting), `google_default` (Google's default: off for Search, on for Performance Max) or `unset` (an AI Max Search campaign that sets nothing, so `effective` is `null`). It also carries URL tracking (`tracking_url_template`, `final_url_suffix`, `url_custom_parameters`). A `null` setting means Google returned nothing or the setting does not apply, never "off". Ad schedules are never capped, but they come back only with `include_criteria` `"summary"` (the default) or `"full"`: there, a campaign with no `adSchedules` runs at all hours, unless `warnings` names it as a campaign whose criteria could not be fetched. `include_criteria` `"none"` omits `adSchedules` from every campaign, so a missing schedule there means not fetched, never "runs at all hours". **Route "what are this campaign's network, AI Max, final URL expansion or ad schedule settings" and "did a campaign setting change" here:** it shows the current value. For when and by whom a setting changed, use `google_ads_get_activities` with `resource_type: "CAMPAIGN"`.
+
+### Audiences
+- `google_ads_list_audiences` — List audience lists (Customer Match, remarketing, rule-based, lookalike) with type, size, membership status and match rate. Filter by `type`, `membership_status` or name `search`; paginated with `nextCursor`
+- `google_ads_get_audience_report` — **Performance by audience and demographic in one call:** "lookalike vs custom segment vs remarketing — which performs?" and "which age groups / genders convert?". `dimensions` (default `["AUDIENCE"]`; also `AGE_RANGE`, `GENDER`, `PARENTAL_STATUS`, `INCOME_RANGE`), `level` `AD_GROUP` (default) or `CAMPAIGN`. Audience rows overlap, so they do not add up to the ad group total (demographic buckets do). Performance Max has no rows here: for its audience signals use `google_ads_get_asset_report` with `include_audience_signals: true`
 
 ### Ad Groups
 - `google_ads_list_ad_groups` — List ad groups for a campaign or account
@@ -128,17 +133,37 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_list_negative_keywords` — List negative keywords at campaign or ad-group level. Filter by match type or scope to a specific campaign/ad group. Essential for search term audit workflows — cross-reference with `google_ads_get_search_terms_report` to find wasteful queries that should be negated.
 - `google_ads_list_negative_keyword_lists` — List shared negative keyword lists and their associated campaigns. Use to audit shared exclusion lists across campaigns.
 
+### Keyword Planning
+- `google_ads_generate_keyword_ideas` — Keyword suggestions from seed `keywords` and/or a `url`, with average monthly searches, competition and bid ranges; `include_monthly_volumes: true` adds seasonal trends
+- `google_ads_get_keyword_historical_metrics` — Search volume, competition and bid estimates for keywords you already have (1–200)
+- `google_ads_generate_keyword_forecast_metrics` — Projected impressions, clicks, cost, CTR, conversions and CPA for a keyword set at a given `daily_budget_micros` and `bidding_strategy` (MANUAL_CPC, MAXIMIZE_CLICKS, MAXIMIZE_CONVERSIONS)
+- `google_ads_generate_ad_group_themes` — Suggests which existing ad group each keyword belongs in, with recommended match types
+
 ### Landing Pages
 - `google_ads_get_landing_page_report` — Clicks, impressions, cost, conversions (with a per-conversion-action breakdown) and `speed_score` for each landing page URL. `speed_score` is Google's mobile landing page speed score, 1–10 with 10 fastest, measured from mobile ad clicks; `null` means Google has no measurement for that row (common with little mobile traffic), not that the page is slow. It is the only landing page quality signal Google Ads still reports. Filter with `url_contains`, `campaign_id` or `ad_group_id`; segment by `date`, `device` or `ad_network_type`; paginated with `nextCursor`. **Preferred tool for any landing page question; do not use `google_ads_get_insights` or `google_ads_list_ads` for landing page data.**
 
+### URL Tracking
+- `google_ads_get_url_tracking_config` — **Preferred tool for any UTM or tracking audit.** Tracking template, final URL suffix, custom parameters and final URLs at every level (account, campaign, ad group, ad, keyword, asset) in one call, plus the effective value resolved through Google's precedence chain and the level that set it. `scope: "overrides"` returns only entities that set their own values. Do not chain list tools for this
+
 ### Assets
 - `google_ads_get_asset_report` — Asset-level performance report across AD_GROUP, CAMPAIGN, CUSTOMER, and ASSET_GROUP hierarchy levels. Returns per-asset metrics, performance labels, optional conversion breakdowns, and optional change history.
+
+### Creative
+- `google_ads_preview_ads` — **MCP App.** Renders ads with their creative (images, YouTube thumbnails) and a configurable metrics overlay. Offer it when the user asks what their ads look like or is comparing creative. Takes up to 20 ads with optional per-ad metric values
 
 ### Activity
 - `google_ads_get_activities` — Change history (audit log) for an account. Shows what changed, when, and by whom. Filter by resource type or specific `asset_ids` (automatically sets resource_type to ASSET).
 
 ### Visualization
 - `google_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
+
+### Connections
+A user can have more than one Google connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection.
+- `google_ads_list_connections` — Each connection's name, ID, whether it is the default, and whether it is owned or shared
+- `google_ads_set_default_connection` — Change which connection is used when `connection_id` is omitted; call it only when the user asks
+- `google_ads_share_connection` / `google_ads_unshare_connection` — Share an owned connection with the user's organization, or stop sharing it
+- `google_ads_rename_connection` — Change an owned connection's display name
+- `google_ads_revoke_connection` — Revoke an owned connection (shared members lose access; the grant at Google stays until the user disconnects in the dashboard). Confirm with the user first
 
 ### Feedback
 - `google_ads_developer_feedback` — Submit feature requests and workflow gap reports

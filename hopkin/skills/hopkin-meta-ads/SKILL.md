@@ -70,10 +70,6 @@ After confirming the MCP is available, authenticate the user's Meta Ads account:
 2. **If not authenticated:** Inform the user they need to connect their Meta Ads account via Hopkin at https://app.hopkin.ai and pause execution until they confirm it is done
 3. **Re-verify:** Call `meta_ads_check_auth_status` again to confirm successful authentication
 
-### Quick Start with Preferences
-
-At the start of any session, before asking for an account ID, call `meta_ads_get_preferences` with `entity_type: "ad_account"` and `entity_id: "default"` to check if the user has a stored default account. If a `default_account_id` preference exists, use it automatically and mention it: "Using your saved account [X]. Use a different one? Let me know." If no stored preference exists, proceed to ask for or look up the account ID.
-
 ### Required Information
 
 Before generating reports, confirm you have:
@@ -87,9 +83,14 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 
 1. Present them as a numbered list with account name and ID
 2. Ask the user to confirm which account to use: "I found [N] ad accounts. Which one should I use?"
-3. After the user selects, offer to save it: "Would you like me to save this as your default account so we can skip this step next time?"
-4. If yes, call `meta_ads_store_preference` with `entity_type: "ad_account"`, `entity_id: "default"`, `key: "default_account_id"`, and `value: "<selected_account_id>"`
-5. If the user already has a `default_account_id` stored preference, use it automatically but mention it: "Using your saved account [X]. Use a different one? Let me know."
+
+### Connections
+
+A user can have more than one Meta connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection.
+
+- `meta_ads_list_connections` shows each connection's name, ID, whether it is the default, and whether it is owned or shared
+- Provide `connection_id` to target a specific one
+- `meta_ads_set_default_connection` changes which one is used when `connection_id` is omitted — call it only when the user asks
 
 ## Available MCP Tools
 
@@ -125,11 +126,6 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 
 ### Visualization
 - `meta_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
-
-### Preferences
-- `meta_ads_store_preference` — Store a persistent preference or observation about an ad entity (account, campaign, ad set, or ad)
-- `meta_ads_get_preferences` — Get all stored preferences for an ad entity
-- `meta_ads_delete_preference` — Delete a specific stored preference by key
 
 ### Feedback
 - `meta_ads_developer_feedback` — Submit feature requests and workflow gap reports

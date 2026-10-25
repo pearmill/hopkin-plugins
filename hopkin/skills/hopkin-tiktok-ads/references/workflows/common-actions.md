@@ -42,7 +42,7 @@ After analyzing performance data, provide actionable recommendations based on th
 **Investigation steps:**
 1. Use `tiktok_ads_get_performance_report` with `level: "ad"` to identify underperforming creatives
 2. Use `tiktok_ads_get_creative_report` to check video engagement metrics
-3. Review ad group targeting with `tiktok_ads_list_adgroups` to assess audience fit
+3. Review ad group targeting with `tiktok_ads_list_ad_groups` to assess audience fit
 
 ```json
 {
@@ -131,7 +131,7 @@ After analyzing performance data, provide actionable recommendations based on th
 
 **Investigation steps:**
 1. Use `tiktok_ads_list_campaigns` to check campaign status and budget settings
-2. Use `tiktok_ads_list_adgroups` to verify ad groups are active
+2. Use `tiktok_ads_list_ad_groups` to verify ad groups are active
 3. Check targeting breadth and bid competitiveness
 
 ```json
