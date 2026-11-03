@@ -141,7 +141,7 @@ Presenting a micros budget as if it were dollars overstates it by a factor of a 
 
 `impressions`, `clicks`, `spend`, `ctr`, `cpc`, `cpm`. That is the complete list.
 
-**There is no conversions metric in insights.** Conversions come from a separate path — set `include_conversions: true` — and arrive as **whole-window totals** with no time bucketing. Cost per conversion is not returned and must be derived as `spend / conversions`, with an explicit guard for zero conversions (never report an infinite or NaN cost).
+**There is no conversions metric in insights.** Conversions come from a separate path — set `include_conversions: true` — and arrive in a separate `conversions` block: per day for a daily report (per month for monthly), with a count and value per conversion event (`attributed_events`). `conversions` counts the goal event; the number of orders is the `order_created` event's count. Cost per conversion is not returned and must be derived as `spend / conversions`, with an explicit guard for zero conversions (never report an infinite or NaN cost). Attribution can be changed with `attribution_time_basis` (`conversion_time` reliably covers only the goal event), `attribution_window_days` and `view_through_attribution_window_days`; the settings applied are echoed in `conversions.attribution`.
 
 ### Review Status Gates Delivery
 
@@ -184,7 +184,7 @@ Which ads are approved, in review, or rejected, and what is therefore eligible t
 → **references/workflows/creative-review.md**
 
 ### Conversion Analysis
-Conversion totals, configured events and attribution windows, derived cost per conversion.
+Daily and per-event conversions, order counts and revenue, attribution settings, derived cost per conversion, reconciling against store orders.
 → **references/workflows/conversion-analysis.md**
 
 ### Account & Targeting Review

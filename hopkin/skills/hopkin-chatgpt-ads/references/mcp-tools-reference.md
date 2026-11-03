@@ -121,9 +121,13 @@ Returns raw JSON rather than markdown, so the rows can be parsed and re-aggregat
 - `fields` (array of string, optional) — Explicit metric projection
 - `filters` (optional) — Row filters
 - `sort` (optional) — e.g. spend descending
-- `segment` (string, optional) — Segment breakdown; segment metrics come back **prefixed** (e.g. `product_spend`) while the row entity's own metrics are unprefixed (`spend`)
+- `segment` (string, optional) — `product`, `country` or `device` breakdown. The innermost grouping's metrics are **unprefixed**: on a segmented request `spend` is the per-segment value and `campaign_spend` the enclosing entity's total. Cannot be combined with conversions
 - `include_zero_impressions` (boolean, optional)
-- `include_conversions` (boolean, optional) — Merge conversion totals for the whole window (no time bucketing)
+- `include_conversions` (boolean, optional) — Add a separate `conversions` block (see below)
+- `attribution_time_basis` (string, optional) — `ad_event_time` (default: counted on the click/impression day) or `conversion_time` (counted on the day the conversion happened). Under `conversion_time` only the goal event is reliably reported; `order_created` and other non-goal events can be missing
+- `attribution_window_days` (integer, optional) — Click-through window: `7`, `14` or `30` (default 30)
+- `view_through_attribution_window_days` (integer, optional) — View-through window: `0` (exclude view-through) or `1` (default)
+- `event_names` (array of string, optional) — Narrow the per-event breakdown, e.g. `["order_created"]`. Any of these four implies `include_conversions`
 - `limit` (integer, optional)
 - `cursor` (string, optional)
 - `connection_id` (string, optional)
@@ -132,8 +136,15 @@ Returns raw JSON rather than markdown, so the rows can be parsed and re-aggregat
 - The default window is the **last 30 complete days ending yesterday**, in the account's timezone.
 - Money: `spend`, `cpc`, `cpm` are **decimals in the account currency** — unlike campaign budgets, which are micros.
 
+**The `conversions` block** (a sibling of `data`, not merged into delivery rows):
+- `conversions.data` — one row per entity per **day** (`date`) for a daily report, per **month** (`month`) for monthly, or for the whole window when `time_granularity` is `none` or `hourly` (hourly warns). Each row: `conversions` (the goal event — the conversion event setting the account optimizes for), `click_through_conversions`, `view_through_conversions`, `order_created_attributed_sales` (a **decimal string** in the account currency), and `attributed_events[]`.
+- `attributed_events[]` — per `event_name`: `attributed_event_count`, `attributed_event_value_amount`, `attributed_event_value_count`, click/view split, and `conversion_event_setting_breakdowns` on the goal event. The **order count is the `order_created` entry's `attributed_event_count`** — not `conversions`, which counts the goal event and can differ.
+- `conversions.attribution` — the settings actually applied (`attribution_time_basis`, `attribution_window_days`, `view_through_attribution_window_days`); `conversions.currency`; `conversions.time_granularity`.
+- Conversions come on the **first page only**; later pages carry a `conversions_on_first_page` warning. They cover every entity in scope, so they can include entities (and days) with no delivery row — join on entity + date rather than assuming one per delivery row.
+- A `conversion_events_missing` warning means a requested event came back in no row — absence, not a confirmed zero.
+
 #### chatgpt_ads_list_conversion_event_settings
-List the conversion events configured for the account — what each counts, its attribution window, and which campaigns use it. Use it to interpret the totals from `include_conversions`.
+List the conversion events configured for the account — what each counts, its attribution window, and which campaigns use it. Use it to interpret the goal-event `conversions` count from `include_conversions`.
 
 A 404 here usually means conversion tracking is **not enabled** for the account, not that the request was malformed.
 

@@ -77,7 +77,7 @@ If a report comes back with impressions but no clicks or spend, the request did 
 
 ### Metric Names Look Inconsistent
 
-The row entity's own metrics are **unprefixed** (`spend`, `clicks`). When a `segment` is applied, the segment's metrics are **prefixed** (`product_spend`). Both can appear in one response. Read the key names rather than assuming a naming scheme.
+The innermost grouping's metrics are **unprefixed**. Without a segment that is the row entity (`spend`). With a `segment`, `spend` is the per-segment value (e.g. per device) and the enclosing entity's total comes back prefixed (`campaign_spend`, repeated on every segment row). Both can appear in one response. Read the key names rather than assuming a naming scheme.
 
 ---
 
@@ -117,6 +117,14 @@ The conversions endpoints answer **404** for accounts that are not enabled for c
 
 Report the delivery data you do have and state that conversion reporting is not enabled for the account.
 
+### Orders Missing Under Conversion Time
+
+With `attribution_time_basis: "conversion_time"`, the API reliably reports only the goal event; `order_created` and other non-goal events often disappear, and the tool warns `conversion_events_missing`. That is a reporting gap, not zero orders. Re-run with `ad_event_time` (the default) for order counts and revenue, and say which basis each number uses.
+
+### Conversions Missing on Page 2
+
+Conversions cover the whole window and come on the **first page** only; later pages carry a `conversions_on_first_page` warning. Read them from page 1.
+
 ### 400 on Insights
 
 Two frequent causes:
@@ -139,7 +147,7 @@ Both come from `chatgpt_ads_get_ad_account`. Never assume.
 
 ### Claiming Conversions Are a Metric
 
-Insights exposes exactly six metrics and conversions is not among them. Conversions require `include_conversions: true` and arrive as whole-window totals with no time bucketing.
+Insights exposes exactly six metrics and conversions is not among them. Conversions require `include_conversions: true` (or an attribution option) and arrive in a separate `conversions` block, per day or month, with per-event counts and values.
 
 ### Dividing by Zero for Cost per Conversion
 
