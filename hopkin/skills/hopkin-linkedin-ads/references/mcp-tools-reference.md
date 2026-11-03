@@ -226,6 +226,8 @@ List LinkedIn Creatives — the ad content units containing headline, body text,
 
 Supports up to 3 pivots, e.g. ACCOUNT, CAMPAIGN_GROUP, CAMPAIGN or CREATIVE. **Does not support MEMBER_* demographic pivots** — use `linkedin_ads_get_insights` for those.
 
+**Conversation Ads / Message Ads** (`SPONSORED_INMAILS`) report sends and opens, not impressions and clicks, so the default report shows them at 0. Set `metric_set: "SPONSORED_MESSAGING"` for them.
+
 **Parameters:**
 - `reason` (string, required) — Reason for the call
 - `account_id` (string, required) — Ad account ID
@@ -236,11 +238,13 @@ Supports up to 3 pivots, e.g. ACCOUNT, CAMPAIGN_GROUP, CAMPAIGN or CREATIVE. **D
 - `time_granularity` (string, optional) — `ALL` for aggregate (default), `DAILY` or `MONTHLY` for time series
 - `campaign_ids` (array of strings, optional) — Filter to specific campaign IDs (max 50)
 - `campaign_group_ids` (array of strings, optional) — Filter to specific campaign group IDs (max 20)
+- `metric_set` (string, optional) — `FULL_FUNNEL` (default) or `SPONSORED_MESSAGING`. `SPONSORED_MESSAGING` swaps in the Conversation Ads / Message Ads metrics: spend, sends, opens, clicks, action / ad-unit / text-URL clicks, headline impressions and clicks, engagements, lead-gen mail contact-info shares and interested clicks, leads, conversions and reach. LinkedIn's 20-field limit means it replaces the full-funnel set rather than adding to it
 - `include_conversion_breakdown` (boolean, optional) — Include per-conversion-action breakdown (makes a second API call, default: true)
 
 **Returns:**
 - Full funnel metrics: impressions, clicks, spend, conversions, leads, video views, CTR, CPC, CPA, ROAS
 - `conversion_breakdown` — per-conversion-action metrics (on by default; pass `include_conversion_breakdown: false` to skip the extra call)
+- With `metric_set: "SPONSORED_MESSAGING"`: `sends`, `opens`, `action_clicks`, `ad_unit_clicks`, `text_url_clicks`, `headline_impressions`, `headline_clicks`, `lead_gen_mail_contact_info_shares`, `lead_gen_mail_interested_clicks`, plus `open_rate` (opens / sends), `engagement_rate` (engagements / sends), `cost_per_send` and `cost_per_open`. Rates and costs are null when sends is 0. `sends` is the delivered count; LinkedIn has no separate "delivered" metric
 
 **Example — Campaign group overview:**
 ```json
@@ -279,6 +283,22 @@ Supports up to 3 pivots, e.g. ACCOUNT, CAMPAIGN_GROUP, CAMPAIGN or CREATIVE. **D
     "pivots": ["CREATIVE"],
     "start_date": "2026-01-01",
     "end_date": "2026-01-31"
+  }
+}
+```
+
+**Example — Conversation Ads sends, opens and open rate by day:**
+```json
+{
+  "tool": "linkedin_ads_get_performance_report",
+  "parameters": {
+    "reason": "Daily sends, opens and open rate for a Conversation Ads campaign",
+    "account_id": "123456789",
+    "pivots": ["CAMPAIGN"],
+    "campaign_ids": ["987654321"],
+    "date_preset": "LAST_14_DAYS",
+    "time_granularity": "DAILY",
+    "metric_set": "SPONSORED_MESSAGING"
   }
 }
 ```
@@ -324,19 +344,19 @@ Get a high-level performance summary for a LinkedIn Ads account: spend, impressi
 ---
 
 #### linkedin_ads_get_insights
-Flexible analytics with a single pivot dimension. Supports LinkedIn's unique MEMBER_* demographic pivots for professional audience analysis. Use it only when `linkedin_ads_get_performance_report` cannot answer the question — a MEMBER_* pivot or a custom metric. MEMBER_* pivots have a 3-event minimum threshold and a 12–24 hour data delay, so their totals may not match account-level numbers.
+Flexible analytics with a single pivot dimension. Supports LinkedIn's unique MEMBER_* demographic pivots for professional audience analysis. Use it only when `linkedin_ads_get_performance_report` cannot answer the question — a MEMBER_* pivot or a custom metric. For Conversation Ads by campaign or creative, use `linkedin_ads_get_performance_report` with `metric_set: "SPONSORED_MESSAGING"` instead. MEMBER_* pivots have a 3-event minimum threshold and a 12–24 hour data delay, so their totals may not match account-level numbers.
 
 **Parameters:**
 - `reason` (string, required) — Say why this tool is needed instead of `linkedin_ads_get_performance_report` (e.g. the MEMBER_* pivot or custom metric)
 - `account_id` (string, required) — Ad account ID
-- `pivot` (string, required) — Dimension to pivot by. Standard pivots: `ACCOUNT`, `CAMPAIGN_GROUP`, `CAMPAIGN`, `CREATIVE`, `SHARE`, `COMPANY`, `CONVERSION`, `CONVERSATION_NODE`, `SERVING_LOCATION`, `PLACEMENT_NAME`, `IMPRESSION_DEVICE_TYPE`, `CARD_INDEX`. LinkedIn-unique demographic pivots: `MEMBER_COMPANY_SIZE`, `MEMBER_INDUSTRY`, `MEMBER_SENIORITY`, `MEMBER_JOB_TITLE`, `MEMBER_JOB_FUNCTION`, `MEMBER_COUNTRY_V2`, `MEMBER_REGION_V2`, `MEMBER_COUNTY`, `MEMBER_COMPANY`
+- `pivot` (string, required) — Dimension to pivot by. Standard pivots: `ACCOUNT`, `CAMPAIGN_GROUP`, `CAMPAIGN`, `CREATIVE`, `SHARE`, `COMPANY`, `CONVERSION`, `CONVERSATION_NODE`, `SERVING_LOCATION`, `PLACEMENT_NAME`, `IMPRESSION_DEVICE_TYPE`, `CARD_INDEX`. `CONVERSATION_NODE` (per Conversation Ads message step) defaults to the Sponsored Messaging metrics, but LinkedIn returns no rows for it on many accounts. LinkedIn-unique demographic pivots: `MEMBER_COMPANY_SIZE`, `MEMBER_INDUSTRY`, `MEMBER_SENIORITY`, `MEMBER_JOB_TITLE`, `MEMBER_JOB_FUNCTION`, `MEMBER_COUNTRY_V2`, `MEMBER_REGION_V2`, `MEMBER_COUNTY`, `MEMBER_COMPANY`
 - `date_preset` (string, optional) — Relative date range (default: `LAST_30_DAYS`). Options: `LAST_7_DAYS`, `LAST_14_DAYS`, `LAST_30_DAYS`, `THIS_MONTH`, `LAST_MONTH`, `LAST_90_DAYS`
 - `start_date` (string, optional) — Start date (YYYY-MM-DD); use with `end_date` to override `date_preset`
 - `end_date` (string, optional) — End date (YYYY-MM-DD)
 - `time_granularity` (string, optional) — `ALL` (aggregate, default), `DAILY` or `MONTHLY` (time series)
 - `campaign_ids` (array of strings, optional) — Filter to specific campaign IDs (max 50)
 - `campaign_group_ids` (array of strings, optional) — Filter to specific campaign group IDs (max 20)
-- `metrics` (array of strings, optional) — LinkedIn metric field names, **exact camelCase** (max 18). Default: `impressions`, `clicks`, `costInLocalCurrency`, `costInUsd`, `externalWebsiteConversions`, `oneClickLeads`, `videoViews`, `totalEngagements`. Others include `externalWebsitePostClickConversions`, `externalWebsitePostViewConversions`, `conversionValueInLocalCurrency`, `oneClickLeadFormOpens`, `qualifiedLeads`, `videoCompletions`, `shares`, `follows`, `reactions`, `comments`, `landingPageClicks`, `textUrlClicks`, `companyPageClicks`, `cardImpressions`, `cardClicks`, `viralCardImpressions`, `viralCardClicks`, and `approximateMemberReach` (ACCOUNT / CAMPAIGN_GROUP / CAMPAIGN pivot, ranges up to 92 days). Do **not** use aliases such as `spend`, `conversions`, `leads` or `reach`
+- `metrics` (array of strings, optional) — LinkedIn metric field names, **exact camelCase** (max 18). Default: `impressions`, `clicks`, `costInLocalCurrency`, `costInUsd`, `externalWebsiteConversions`, `oneClickLeads`, `videoViews`, `totalEngagements`. Others include `externalWebsitePostClickConversions`, `externalWebsitePostViewConversions`, `conversionValueInLocalCurrency`, `oneClickLeadFormOpens`, `qualifiedLeads`, `videoCompletions`, `shares`, `follows`, `reactions`, `comments`, `landingPageClicks`, `textUrlClicks`, `companyPageClicks`, `cardImpressions`, `cardClicks`, `viralCardImpressions`, `viralCardClicks`, and `approximateMemberReach` (ACCOUNT / CAMPAIGN_GROUP / CAMPAIGN pivot, ranges up to 92 days). Sponsored Messaging (Conversation Ads / Message Ads): `sends`, `opens`, `actionClicks`, `adUnitClicks`, `textUrlClicks`, `headlineImpressions`, `headlineClicks`, `leadGenerationMailContactInfoShares`, `leadGenerationMailInterestedClicks`; when `sends` is requested, rows also get `open_rate` and `engagement_rate`. Do **not** use aliases such as `spend`, `conversions`, `leads` or `reach`. Every requested metric comes back on each row in snake_case (`actionClicks` → `action_clicks`), a few under friendlier names: `costInLocalCurrency` → `spend`, `costInUsd` → `spend_usd`, `externalWebsiteConversions` → `conversions`, `oneClickLeads` → `leads`
 - `include_conversion_breakdown` (boolean, optional) — When true (and the pivot is not `CONVERSION`), runs a second query that breaks conversions down per named action (default: false)
 
 **Example — Job function demographic breakdown:**
