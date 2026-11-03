@@ -190,6 +190,29 @@ LinkedIn provider tokens expire after **60 days**. Unlike Meta and Google, Linke
 }
 ```
 
+### Conversation Ads Show 0 Impressions and 0 Clicks
+
+**Symptoms:**
+- A Conversation Ads or Message Ads campaign (`SPONSORED_INMAILS`) has spend but 0 impressions and 0 clicks
+- Sends, opens or open rate are missing from the report
+
+**Cause:** Sponsored Messaging is delivered to the inbox, so LinkedIn counts **sends and opens**, not impressions and clicks. The default full-funnel report doesn't request them.
+
+**Solution:** Run `linkedin_ads_get_performance_report` with `metric_set: "SPONSORED_MESSAGING"`:
+```json
+{
+  "tool": "linkedin_ads_get_performance_report",
+  "parameters": {
+    "reason": "Sends, opens and open rate for Conversation Ads",
+    "account_id": "123456789",
+    "pivots": ["CAMPAIGN"],
+    "date_preset": "LAST_30_DAYS",
+    "metric_set": "SPONSORED_MESSAGING"
+  }
+}
+```
+Rows then carry `sends`, `opens`, `open_rate`, `engagement_rate`, `cost_per_send` and `cost_per_open`. `sends` is the delivered count; LinkedIn has no separate "delivered" metric. `linkedin_ads_get_insights` with `pivot: "CONVERSATION_NODE"` often returns no rows, so don't rely on it.
+
 ### Incomplete Conversion Data
 
 **Symptoms:**

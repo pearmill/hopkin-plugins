@@ -104,7 +104,7 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `linkedin_ads_list_creatives` — List Creatives (headline, body, image, CTA) for an account or campaigns
 
 ### Analytics
-- `linkedin_ads_get_performance_report` — **Recommended.** Full-funnel report: impressions, clicks, spend, conversions, leads, CTR, CPC, CPA, ROAS, plus optional per-conversion breakdown
+- `linkedin_ads_get_performance_report` — **Recommended.** Full-funnel report: impressions, clicks, spend, conversions, leads, CTR, CPC, CPA, ROAS, plus optional per-conversion breakdown. For Conversation Ads / Message Ads, set `metric_set: "SPONSORED_MESSAGING"` (sends, opens, open rate, cost per send)
 - `linkedin_ads_get_account_summary` — Account-level summary; runs three parallel API calls (account details, metrics, conversion breakdown)
 - `linkedin_ads_get_insights` — Flexible analytics; **the only tool supporting LinkedIn's unique MEMBER_* demographic pivots**
 
@@ -220,6 +220,18 @@ Evaluate individual creative effectiveness — headlines, copy, CTR, and engagem
 **Primary tools:** `linkedin_ads_list_creatives` + `linkedin_ads_get_performance_report` with `pivots: ["CREATIVE"]`
 
 **See detailed workflow:** **references/workflows/creative-performance.md**
+
+---
+
+### Conversation Ads (Sponsored Messaging) Report
+
+Report on Conversation Ads and Message Ads (campaign type `SPONSORED_INMAILS`). They deliver to the inbox, so LinkedIn reports **sends and opens, not impressions and clicks**. A default report shows them with 0 impressions and 0 clicks, which is not a delivery problem.
+
+**Primary tool:** `linkedin_ads_get_performance_report` with `metric_set: "SPONSORED_MESSAGING"`, and `pivots: ["CAMPAIGN"]` or `["CREATIVE"]` plus `time_granularity: "DAILY"` as needed. Rows carry `sends`, `opens`, `action_clicks` (button clicks), `ad_unit_clicks`, `text_url_clicks`, `headline_impressions`, `headline_clicks`, `lead_gen_mail_contact_info_shares`, `lead_gen_mail_interested_clicks`, plus `open_rate`, `engagement_rate`, `cost_per_send` and `cost_per_open`.
+
+- `sends` is LinkedIn's delivered count. There is no separate "delivered" metric.
+- `metric_set` swaps the field set because of LinkedIn's 20-field limit. To show impressions and sends together, make two calls.
+- Prefer this over `linkedin_ads_get_insights` with `pivot: "CONVERSATION_NODE"`, which returns no rows on many accounts. Per-button (option index) breakdowns are not available.
 
 ---
 
