@@ -27,7 +27,7 @@ Inform the user and provide setup instructions:
 
 > The Hopkin LinkedIn Ads MCP is not configured. To use this skill:
 >
-> 1. Sign up at **https://app.hopkin.ai**
+> 1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads**
 > 2. Add the hosted MCP to your Claude configuration:
 >
 > ```json
@@ -51,9 +51,9 @@ Pause execution until the user confirms, then re-verify.
 ### Authentication Flow
 
 1. Call `linkedin_ads_check_auth_status` to verify authentication
-2. If not authenticated, direct the user to https://app.hopkin.ai to connect their account
+2. If not authenticated, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads to connect their account
 
-> **Note:** LinkedIn tokens have a **60-day TTL**. If a previously-authenticated user gets auth errors, direct them to https://app.hopkin.ai to reconnect.
+> **Note:** LinkedIn tokens have a **60-day TTL**. If a previously-authenticated user gets auth errors, direct them to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads to reconnect.
 
 > **Competitor research needs no LinkedIn connection.** The ad-library and competitor tools work with Hopkin sign-in alone — never ask the user to connect LinkedIn for them.
 
@@ -335,7 +335,7 @@ Most Hopkin tools accept numeric IDs. `linkedin_ads_list_creatives` accepts both
 
 ### Error Handling
 
-1. **Auth errors** — Run `linkedin_ads_check_auth_status`; if expired (60-day TTL), direct to https://app.hopkin.ai
+1. **Auth errors** — Run `linkedin_ads_check_auth_status`; if expired (60-day TTL), direct to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads
 2. **Account not found** — Ensure ID is numeric, no URN prefix
 3. **Invalid pivot** — MEMBER_* pivots require `linkedin_ads_get_insights`
 4. **No data** — Verify date range and campaign activity
@@ -349,8 +349,8 @@ Most Hopkin tools accept numeric IDs. `linkedin_ads_list_creatives` accepts both
 See **references/troubleshooting.md** for full guidance.
 
 - **"MCP server not found"** — Verify Hopkin MCP config and token
-- **"Not authenticated"** — Direct user to https://app.hopkin.ai
-- **"Token expired"** — LinkedIn tokens expire after 60 days; reconnect at https://app.hopkin.ai
+- **"Not authenticated"** — Direct user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads
+- **"Token expired"** — LinkedIn tokens expire after 60 days; reconnect at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads
 - **"Account not found"** — Account ID must be numeric (no URN prefix)
 - **"No data"** — Check date range and campaign activity
 - **"Invalid pivot"** — MEMBER_* pivots only work with `linkedin_ads_get_insights`
@@ -372,4 +372,4 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Requires:** Hopkin LinkedIn Ads MCP (https://app.hopkin.ai)
+**Requires:** Hopkin LinkedIn Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads)

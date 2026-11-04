@@ -19,7 +19,7 @@ This document provides detailed reference information for the Hopkin LinkedIn Ad
 ### Hopkin LinkedIn Ads MCP
 
 - **Service:** Hopkin — hosted MCP service
-- **Sign up:** https://app.hopkin.ai
+- **Sign up:** https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads
 - **Type:** Hosted MCP (URL + auth token, no local installation)
 
 ### Required Configuration
@@ -41,13 +41,13 @@ Configure the Hopkin LinkedIn Ads MCP as a hosted MCP service in your Claude set
 ```
 
 **Required Credentials:**
-- **Hopkin Token** — Obtain from https://app.hopkin.ai after signing up
+- **Hopkin Token** — Obtain from https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads after signing up
 
 ---
 
 ## Authentication & Connection
 
-Hopkin uses OAuth. If a tool call fails with an auth error, call `linkedin_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai to connect their LinkedIn Ads account. LinkedIn tokens expire after **60 days** — reconnect if auth errors appear.
+Hopkin uses OAuth. If a tool call fails with an auth error, call `linkedin_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads to connect their LinkedIn Ads account. LinkedIn tokens expire after **60 days** — reconnect if auth errors appear.
 
 ---
 
@@ -1024,7 +1024,7 @@ Hopkin list tools use cursor-based pagination:
 
 ### Common Error Types
 
-- **Authentication errors** — User not authenticated or LinkedIn token expired (60-day TTL). Call `linkedin_ads_check_auth_status` to confirm, then direct the user to https://app.hopkin.ai to reconnect.
+- **Authentication errors** — User not authenticated or LinkedIn token expired (60-day TTL). Call `linkedin_ads_check_auth_status` to confirm, then direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads to reconnect.
 - **Invalid account ID** — Ensure account ID is a numeric value (no URN prefix)
 - **Invalid pivot** — MEMBER_* demographic pivots are only supported by `linkedin_ads_get_insights`, not `linkedin_ads_get_performance_report`
 - **Rate limiting** — Wait and retry with exponential backoff
@@ -1036,7 +1036,7 @@ Hopkin list tools use cursor-based pagination:
 
 ### Error Handling Best Practices
 
-1. **Always check auth first** — If tools return auth errors, run `linkedin_ads_check_auth_status` and direct the user to https://app.hopkin.ai to re-authenticate (never for competitor tools — they need no LinkedIn connection)
+1. **Always check auth first** — If tools return auth errors, run `linkedin_ads_check_auth_status` and direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads to re-authenticate (never for competitor tools — they need no LinkedIn connection)
 2. **Validate account ID format** — Numeric, passed as a string (`"123456789"`, not `urn:li:sponsoredAccount:123456789`)
 3. **Use the right analytics tool** — `get_performance_report` for standard funnel metrics; `get_insights` for MEMBER_* demographic pivots
 4. **Handle pagination** — Don't assume all results are in the first page
@@ -1046,4 +1046,4 @@ Hopkin list tools use cursor-based pagination:
 
 **Document Version:** 1.1
 **Last Updated:** 2026-09-21
-**Service:** Hopkin LinkedIn Ads MCP (https://app.hopkin.ai)
+**Service:** Hopkin LinkedIn Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads)

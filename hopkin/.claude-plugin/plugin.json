@@ -26,5 +26,6 @@
     "analytics",
     "reporting",
     "hopkin"
-  ]
+  ],
+  "icon": "https://raw.githubusercontent.com/hopkin-ai/claude-plugin/main/.claude-plugin/icon.png"
 }

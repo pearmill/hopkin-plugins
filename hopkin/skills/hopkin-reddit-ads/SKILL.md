@@ -26,7 +26,7 @@ Inform the user and provide setup instructions:
 
 > The Hopkin Reddit Ads MCP is not configured. To use this skill:
 >
-> 1. Sign up at **https://app.hopkin.ai**
+> 1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads**
 > 2. Add the hosted MCP to your Claude configuration:
 >
 > ```json
@@ -50,9 +50,9 @@ Pause execution until the user confirms, then re-verify.
 ### Authentication Flow
 
 1. Call `reddit_ads_check_auth_status` to verify authentication
-2. If not authenticated, direct the user to https://app.hopkin.ai to connect their Reddit Ads account
+2. If not authenticated, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads to connect their Reddit Ads account
 
-> **Note:** Reddit tokens have a **1-hour TTL** but auto-refresh server-side. If a previously-authenticated user gets auth errors, direct them to https://app.hopkin.ai to reconnect.
+> **Note:** Reddit tokens have a **1-hour TTL** but auto-refresh server-side. If a previously-authenticated user gets auth errors, direct them to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads to reconnect.
 
 ### Required Information
 
@@ -262,7 +262,7 @@ Reddit account IDs are **plain strings** — no prefix conversion needed (unlike
 
 ### Error Handling
 
-1. **Auth errors** — Run `reddit_ads_check_auth_status`; if auth fails, direct to https://app.hopkin.ai to reconnect
+1. **Auth errors** — Run `reddit_ads_check_auth_status`; if auth fails, direct to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads to reconnect
 2. **Account not found** — Verify account ID with `reddit_ads_list_ad_accounts`
 3. **Invalid breakdown** — Max 3 breakdown dimensions; must be from: campaign, ad_group, ad, community, date, country, region, placement, device_os
 4. **No data** — Verify date range and campaign activity
@@ -284,8 +284,8 @@ Reddit account IDs are **plain strings** — no prefix conversion needed (unlike
 See **references/troubleshooting.md** for full guidance.
 
 - **"MCP server not found"** — Verify Hopkin MCP config and token
-- **"Not authenticated"** — Direct user to https://app.hopkin.ai
-- **"Token expired"** — Reddit tokens auto-refresh server-side (1-hour expiry); if persistent, reconnect at https://app.hopkin.ai
+- **"Not authenticated"** — Direct user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads
+- **"Token expired"** — Reddit tokens auto-refresh server-side (1-hour expiry); if persistent, reconnect at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads
 - **"Account not found"** — Verify account ID with `reddit_ads_list_ad_accounts`
 - **"No data"** — Check date range and campaign activity
 - **"Invalid breakdown"** — Max 3 dimensions; use valid values only
@@ -304,4 +304,4 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Requires:** Hopkin Reddit Ads MCP (https://app.hopkin.ai)
+**Requires:** Hopkin Reddit Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads)

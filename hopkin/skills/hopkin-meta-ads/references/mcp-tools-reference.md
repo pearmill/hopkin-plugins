@@ -20,7 +20,7 @@ This document provides detailed reference information for the Hopkin Meta Ads MC
 ### Hopkin Meta Ads MCP
 
 - **Service:** Hopkin — hosted MCP service
-- **Sign up:** https://app.hopkin.ai
+- **Sign up:** https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads
 - **Type:** Hosted MCP (URL + auth token, no local installation)
 
 ### Required Configuration
@@ -42,13 +42,13 @@ Configure the Hopkin Meta Ads MCP as a hosted MCP service in your Claude setting
 ```
 
 **Required Credentials:**
-- **Hopkin Token** — Obtain from https://app.hopkin.ai after signing up
+- **Hopkin Token** — Obtain from https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads after signing up
 
 ---
 
 ## Authentication & Connection
 
-Hopkin uses OAuth. If a tool call fails with an auth error, call `meta_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai to connect their Meta Ads account.
+Hopkin uses OAuth. If a tool call fails with an auth error, call `meta_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads to connect their Meta Ads account.
 
 ---
 
@@ -856,14 +856,14 @@ Hopkin list tools use cursor-based pagination:
 
 ### Common Error Types
 
-- **Authentication errors** — User not authenticated or session expired. Call `meta_ads_check_auth_status` to confirm, then direct the user to https://app.hopkin.ai to reconnect their Meta Ads account.
+- **Authentication errors** — User not authenticated or session expired. Call `meta_ads_check_auth_status` to confirm, then direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads to reconnect their Meta Ads account.
 - **Invalid parameters** — Check parameter names and formats (e.g., account_id must start with "act_")
 - **Rate limiting** — Wait and retry with exponential backoff
 - **Account not found** — Verify account ID and user access
 
 ### Error Handling Best Practices
 
-1. **Always check auth first** — If tools return auth errors, run `meta_ads_check_auth_status`; if not authenticated, direct the user to https://app.hopkin.ai to reconnect their account
+1. **Always check auth first** — If tools return auth errors, run `meta_ads_check_auth_status`; if not authenticated, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads to reconnect their account
 2. **Validate inputs** — Ensure account IDs start with "act_", dates are YYYY-MM-DD
 3. **Handle pagination** — Don't assume all results are in the first page
 4. **Provide clear messages** — Translate errors into user-friendly guidance
@@ -872,4 +872,4 @@ Hopkin list tools use cursor-based pagination:
 
 **Document Version:** 2.3
 **Last Updated:** 2026-03-22
-**Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
+**Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads)

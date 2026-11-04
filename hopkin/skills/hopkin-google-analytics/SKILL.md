@@ -33,12 +33,12 @@ To verify the Hopkin Google Analytics MCP is available:
 If no `ga4_` prefixed tools are available:
 
 1. **Inform the user** that the Hopkin Google Analytics MCP is required to use this skill
-2. **Direct them to sign up** at https://app.hopkin.ai
+2. **Direct them to sign up** at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics
 3. **Provide setup instructions:**
 
 > The Hopkin Google Analytics MCP is not configured. To use this skill:
 >
-> 1. Sign up at **https://app.hopkin.ai**
+> 1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics**
 > 2. Add the hosted MCP to your Claude configuration:
 >
 > ```json
@@ -62,8 +62,8 @@ If no `ga4_` prefixed tools are available:
 After confirming the MCP is available, authenticate the user's Google account:
 
 1. **Just call the tool you need** — do not call `ga4_check_auth_status` proactively
-2. **If a tool fails with an auth error:** call `ga4_check_auth_status` to diagnose, then direct the user to connect their Google account via https://app.hopkin.ai
-3. **Insufficient scope:** GA4 requires the `analytics.readonly` Google scope. Users who connected Google **before** GA4 support was added must reconnect at https://app.hopkin.ai/settings to re-consent. Tools return a targeted reconnect message on 403 insufficient-scope errors.
+2. **If a tool fails with an auth error:** call `ga4_check_auth_status` to diagnose, then direct the user to connect their Google account via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics
+3. **Insufficient scope:** GA4 requires the `analytics.readonly` Google scope. Users who connected Google **before** GA4 support was added must reconnect at https://app.hopkin.ai/settings?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics to re-consent. Tools return a targeted reconnect message on 403 insufficient-scope errors.
 
 ### Required Information
 
@@ -220,8 +220,8 @@ Users can provide feedback about this skill directly through the Hopkin Google A
 
 When errors occur:
 
-1. **Auth errors** — Run `ga4_check_auth_status`; if not authenticated, direct the user to connect their Google account at https://app.hopkin.ai
-2. **403 insufficient scope** — The Google connection predates GA4 support; user must reconnect at https://app.hopkin.ai/settings to grant `analytics.readonly`
+1. **Auth errors** — Run `ga4_check_auth_status`; if not authenticated, direct the user to connect their Google account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics
+2. **403 insufficient scope** — The Google connection predates GA4 support; user must reconnect at https://app.hopkin.ai/settings?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics to grant `analytics.readonly`
 3. **Invalid dimension/metric** — Verify API names with `ga4_get_metadata`
 4. **Property not found** — Verify the property ID with `ga4_list_account_summaries` (pass `refresh: true` if recently added)
 5. **Consult troubleshooting guide** — See references/troubleshooting.md
@@ -235,8 +235,8 @@ For detailed troubleshooting guidance, see **references/troubleshooting.md**.
 Common quick fixes:
 
 - **"MCP server not found"** — Verify Hopkin MCP configuration
-- **"Not authenticated"** — Run `ga4_check_auth_status`; direct user to connect their account at https://app.hopkin.ai
-- **"Insufficient scope" / 403** — Reconnect Google at https://app.hopkin.ai/settings to grant Analytics access
+- **"Not authenticated"** — Run `ga4_check_auth_status`; direct user to connect their account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics
+- **"Insufficient scope" / 403** — Reconnect Google at https://app.hopkin.ai/settings?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics to grant Analytics access
 - **"Property not found"** — Verify property ID with `ga4_list_account_summaries`
 - **"Invalid dimension or metric"** — Look up valid API names with `ga4_get_metadata`
 - **"No data for today"** — GA4 standard reports lag up to 24-48h; use the realtime report for current activity
@@ -252,4 +252,4 @@ For more detailed information:
 
 ---
 
-**Requires:** Hopkin Google Analytics MCP (https://app.hopkin.ai)
+**Requires:** Hopkin Google Analytics MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics)

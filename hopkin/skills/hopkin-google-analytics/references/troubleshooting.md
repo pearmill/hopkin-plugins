@@ -23,14 +23,14 @@
 ### "Not authenticated" errors
 
 1. Call `ga4_check_auth_status` to confirm the auth state
-2. Direct the user to https://app.hopkin.ai to sign in and connect their Google account
+2. Direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics to sign in and connect their Google account
 3. Retry the original tool call after the user confirms
 
 ### 403 "insufficient scope" errors
 
 GA4 access requires the `https://www.googleapis.com/auth/analytics.readonly` Google scope. Users who connected Google **before** GA4 support was added to Hopkin do not have this scope on their stored token.
 
-**Fix:** the user must reconnect Google at **https://app.hopkin.ai/settings** to re-consent with the Analytics scope. Tools return a targeted reconnect message when this happens — relay it to the user.
+**Fix:** the user must reconnect Google at **https://app.hopkin.ai/settings?utm_source=claude-plugin&utm_medium=skill&utm_content=google-analytics** to re-consent with the Analytics scope. Tools return a targeted reconnect message when this happens — relay it to the user.
 
 ### Wrong Google account / missing properties
 

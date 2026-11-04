@@ -22,7 +22,7 @@ This document provides detailed reference information for the Hopkin Reddit Ads 
 ### Hopkin Reddit Ads MCP
 
 - **Service:** Hopkin — hosted MCP service
-- **Sign up:** https://app.hopkin.ai
+- **Sign up:** https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads
 - **Type:** Hosted MCP (URL + auth token, no local installation)
 
 ### Required Configuration
@@ -44,13 +44,13 @@ Configure the Hopkin Reddit Ads MCP as a hosted MCP service in your Claude setti
 ```
 
 **Required Credentials:**
-- **Hopkin Token** — Obtain from https://app.hopkin.ai after signing up
+- **Hopkin Token** — Obtain from https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads after signing up
 
 ---
 
 ## Authentication & Connection
 
-Hopkin uses OAuth. If a tool call fails with an auth error, call `reddit_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai to connect their Reddit Ads account. Reddit tokens expire after **1 hour** — Hopkin auto-refreshes tokens server-side, so users should not need to re-authenticate. If auth errors persist, direct the user to https://app.hopkin.ai to reconnect.
+Hopkin uses OAuth. If a tool call fails with an auth error, call `reddit_ads_check_auth_status` to check. If not authenticated, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads to connect their Reddit Ads account. Reddit tokens expire after **1 hour** — Hopkin auto-refreshes tokens server-side, so users should not need to re-authenticate. If auth errors persist, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads to reconnect.
 
 ---
 
@@ -501,14 +501,14 @@ Hopkin list tools use cursor-based pagination:
 
 ### Common Error Types
 
-- **Authentication errors** — User not authenticated or Reddit token failed to refresh. Call `reddit_ads_check_auth_status` to confirm, then direct the user to https://app.hopkin.ai to reconnect.
+- **Authentication errors** — User not authenticated or Reddit token failed to refresh. Call `reddit_ads_check_auth_status` to confirm, then direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads to reconnect.
 - **Rate limiting** — Reddit API rate limit is approximately 1 request per second. Wait and retry with exponential backoff.
 - **Account not found** — Verify account ID and user access. Ensure the account ID format is correct.
 - **No data** — The requested date range or entity filters returned no results. Broaden the date range or remove filters.
 
 ### Error Handling Best Practices
 
-1. **Always check auth first** — If tools return auth errors, run `reddit_ads_check_auth_status` and direct the user to https://app.hopkin.ai to re-authenticate
+1. **Always check auth first** — If tools return auth errors, run `reddit_ads_check_auth_status` and direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads to re-authenticate
 2. **Respect rate limits** — Reddit's API enforces ~1 req/sec. Avoid rapid sequential calls; batch where possible using `*_ids` parameters
 3. **Handle pagination** — Don't assume all results are in the first page
 4. **Handle micro units** — Budget values are in micro units (divide by 1,000,000 for display currency)
@@ -686,4 +686,4 @@ Simple health check and connectivity test for the Reddit Ads MCP server.
 
 **Document Version:** 1.1
 **Last Updated:** 2026-03-16
-**Service:** Hopkin Reddit Ads MCP (https://app.hopkin.ai)
+**Service:** Hopkin Reddit Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads)
