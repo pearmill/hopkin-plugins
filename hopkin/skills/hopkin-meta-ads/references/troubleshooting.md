@@ -92,7 +92,7 @@ After installing or configuring the MCP server:
    }
    ```
 
-2. If not authenticated, direct the user to https://app.hopkin.ai to connect their Meta Ads account, and wait until they confirm it is done
+2. If not authenticated, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads to connect their Meta Ads account, and wait until they confirm it is done
 
 3. Verify with `meta_ads_check_auth_status` again
 
@@ -100,7 +100,7 @@ After installing or configuring the MCP server:
 
 If the user was previously authenticated but the session has expired:
 1. Re-run the authentication flow above
-2. The user will need to reconnect their Meta Ads account at https://app.hopkin.ai
+2. The user will need to reconnect their Meta Ads account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads
 
 **Prevention:**
 - Always check auth status at the beginning of a session
@@ -149,7 +149,7 @@ Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can
 **Solutions:**
 
 #### Solution 1: Re-authenticate with Correct Permissions
-1. Have the user reconnect their Meta Ads account at https://app.hopkin.ai, granting all requested permissions
+1. Have the user reconnect their Meta Ads account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads, granting all requested permissions
 2. Verify with `meta_ads_check_auth_status`
 
 #### Solution 2: Check Account Role
@@ -232,7 +232,7 @@ Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can
 **Cause:** Session expired or authentication issue
 
 **Solutions:**
-- Re-run authentication flow: `meta_ads_check_auth_status` → reconnect at https://app.hopkin.ai
+- Re-run authentication flow: `meta_ads_check_auth_status` → reconnect at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads
 
 #### Error 200: Permission Denied
 **Cause:** Insufficient permissions for operation
@@ -306,7 +306,7 @@ When encountering issues, work through this checklist:
 
 - [ ] **Authentication**
   - [ ] `meta_ads_check_auth_status` returns authenticated
-  - [ ] User has connected their Meta Ads account at https://app.hopkin.ai if needed
+  - [ ] User has connected their Meta Ads account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads if needed
 
 - [ ] **Permissions**
   - [ ] User has access to target ad account
@@ -332,7 +332,7 @@ When encountering issues, work through this checklist:
 → Check: Date range, campaign status, filters
 
 **"Not authenticated"**
-→ Run: `meta_ads_check_auth_status` → user reconnects at https://app.hopkin.ai → `meta_ads_check_auth_status`
+→ Run: `meta_ads_check_auth_status` → user reconnects at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads → `meta_ads_check_auth_status`
 
 **"Rate limit exceeded"**
 → Check: Request frequency, implement backoff, reduce query scope
