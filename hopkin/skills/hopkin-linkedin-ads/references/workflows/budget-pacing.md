@@ -252,6 +252,5 @@ Use a waterfall chart to show spend contribution by campaign group with CPA colo
 
 ## See Also
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tools reference
 - **references/workflows/campaign-performance.md** — Campaign-level ROAS and efficiency analysis
 - **references/troubleshooting.md** — Common issues with budget delivery

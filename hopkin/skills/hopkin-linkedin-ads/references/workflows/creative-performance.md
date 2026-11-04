@@ -230,7 +230,6 @@ For creative fatigue analysis, use a timeseries chart plotting CTR over time per
 
 ## See Also
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tools reference
 - **references/workflows/campaign-performance.md** — Campaign-level performance workflow
 - **references/workflows/demographic-insights.md** — Who's responding to your creatives by job function, seniority, etc.
 - **references/troubleshooting.md** — Common issues and solutions

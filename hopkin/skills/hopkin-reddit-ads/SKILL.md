@@ -290,7 +290,6 @@ See **references/troubleshooting.md** for full guidance.
 
 ## Additional Resources
 
-- **references/mcp-tools-reference.md** — Tool documentation, parameters, and usage examples
 - **references/troubleshooting.md** — Error solutions and debugging steps
 - **references/workflows/campaign-performance.md** — Campaign performance reporting
 - **references/workflows/community-insights.md** — Subreddit-level community insights

@@ -85,8 +85,6 @@ Some users connect multiple Mailchimp accounts to Hopkin. When this is the case:
 
 ## Available MCP Tools
 
-For complete tool documentation with all parameters, see **references/mcp-tools-reference.md**.
-
 All tools use the `mailchimp_` prefix. Every tool call requires a `reason` (string) parameter for audit trail.
 
 **Key tools by workflow:**
@@ -272,7 +270,6 @@ Common quick fixes:
 
 For more detailed information:
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tool documentation, parameters, and usage examples
 - **references/troubleshooting.md** — Comprehensive error solutions and debugging steps
 - **references/workflows/campaign-performance.md** — Detailed campaign performance report workflow
 - **references/workflows/audience-insights.md** — Detailed audience insights report workflow

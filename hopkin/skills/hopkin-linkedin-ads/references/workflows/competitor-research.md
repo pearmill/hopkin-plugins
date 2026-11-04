@@ -262,6 +262,5 @@ This removes only the user's tracking. Ads already collected stay available. Unt
 
 ## See Also
 
-- **references/mcp-tools-reference.md**: full parameters and response fields for every tool
 - **references/workflows/creative-performance.md**: the user's own creative performance, to compare against competitors
 - **references/troubleshooting.md**: common issues and solutions

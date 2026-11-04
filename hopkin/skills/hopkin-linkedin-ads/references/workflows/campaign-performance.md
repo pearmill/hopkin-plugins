@@ -243,6 +243,5 @@ Use a funnel chart for conversion pipeline (impressions → clicks → leads) an
 
 ## See Also
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tools reference
 - **references/workflows/demographic-insights.md** — LinkedIn's MEMBER_* audience pivots
 - **references/troubleshooting.md** — Common issues and solutions

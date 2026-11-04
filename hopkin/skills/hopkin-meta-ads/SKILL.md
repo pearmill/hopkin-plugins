@@ -325,8 +325,6 @@ Attribution windows define how long after an ad click or view a conversion is co
 }
 ```
 
-For full details see **references/mcp-tools-reference.md#attribution-windows**.
-
 ### Date Range Considerations
 
 - **Short-term (1-7 days):** Daily monitoring, recent changes, quick checks
@@ -386,7 +384,6 @@ Common quick fixes:
 For more detailed information:
 
 - **references/report-types.md** — Complete metric definitions, breakdown options, field descriptions
-- **references/mcp-tools-reference.md** — Specific Hopkin MCP tools, parameters, and usage examples
 - **references/troubleshooting.md** — Comprehensive error solutions and debugging steps
 - **references/workflows/campaign-performance.md** — Detailed campaign performance report workflow
 - **references/workflows/ad-creative-performance.md** — Detailed ad creative report workflow

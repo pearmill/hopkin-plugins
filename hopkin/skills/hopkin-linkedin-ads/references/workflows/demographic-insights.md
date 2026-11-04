@@ -247,6 +247,5 @@ Render a chart for each MEMBER_* pivot analyzed. Charts make demographic compari
 
 ## See Also
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tools reference
 - **references/workflows/campaign-performance.md** — Campaign-level performance workflow
 - **references/troubleshooting.md** — Troubleshooting demographic data issues

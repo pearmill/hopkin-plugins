@@ -172,7 +172,6 @@ After completing tasks, if a faster workflow would have been possible, submit fe
 
 ## See Also
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tools reference
 - **references/workflows/campaign-performance.md** — Campaign performance analysis
 - **references/workflows/demographic-insights.md** — Audience optimization via MEMBER_* pivots
 - **references/workflows/creative-performance.md** — Creative analysis and optimization

@@ -46,7 +46,6 @@ The key is validated against the platform before being stored, so an invalid key
 
 The key was revoked or rotated on the platform. **There is no refresh path** — keys cannot be renewed. The user must issue a new key and reconnect.
 
-
 ## Empty or Wrong Report Data
 
 ### A Report Returned 200 With Zero Rows

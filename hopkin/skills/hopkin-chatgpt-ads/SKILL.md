@@ -106,8 +106,6 @@ If the user has more than one connection:
 **Utility**
 - `chatgpt_ads_ping`, `chatgpt_ads_check_auth_status`, `chatgpt_ads_developer_feedback`
 
-See **references/mcp-tools-reference.md** for full parameters.
-
 ## Core Capabilities
 
 ### Always Establish Currency and Timezone First
@@ -272,7 +270,6 @@ Common issues and their resolutions are documented in **references/troubleshooti
 
 ## Additional Resources
 
-- **references/mcp-tools-reference.md** — full parameter reference for all 17 tools
 - **references/troubleshooting.md** — diagnostic guide
 - **references/workflows/** — step-by-step report procedures
 - Hopkin dashboard — https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads

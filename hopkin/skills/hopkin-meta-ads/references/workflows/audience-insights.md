@@ -194,5 +194,4 @@ If data is suppressed, aggregate to a higher level (e.g., region instead of city
 ## See Also
 
 - **references/report-types.md** — Complete breakdown dimension reference and privacy details
-- **references/mcp-tools-reference.md** — Hopkin MCP tools reference
 - **references/troubleshooting.md** — Common issues with demographic data
