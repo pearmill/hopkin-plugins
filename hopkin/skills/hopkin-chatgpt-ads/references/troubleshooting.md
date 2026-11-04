@@ -20,7 +20,7 @@ Diagnostics for the Hopkin ChatGPT Ads MCP. Several entries below describe behav
 **Symptom:** No `chatgpt_ads_` prefixed tools are available.
 
 **Resolution:**
-1. Confirm the user has signed up at https://app.hopkin.ai
+1. Confirm the user has signed up at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads
 2. Confirm the MCP is registered at `https://chatgpt.mcp.hopkin.ai/mcp` with a valid bearer token
 3. Restart Claude after any configuration change
 
@@ -35,7 +35,7 @@ Diagnostics for the Hopkin ChatGPT Ads MCP. Several entries below describe behav
 ChatGPT Ads has **no OAuth**. The user must paste an API key:
 
 1. Issue a key in **ChatGPT Ads Manager → Settings** (https://ads.openai.com)
-2. Paste it at https://app.hopkin.ai → Connections → ChatGPT Ads
+2. Paste it at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads → Connections → ChatGPT Ads
 3. Name the connection something recognizable
 
 The key is validated against the platform before being stored, so an invalid key is rejected at paste time rather than failing later.

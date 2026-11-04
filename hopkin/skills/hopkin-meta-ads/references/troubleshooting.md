@@ -30,7 +30,7 @@ This guide provides solutions to common issues encountered when using the Meta A
 
 #### Solution 1: Sign Up and Configure Hopkin
 
-1. Sign up at **https://app.hopkin.ai**
+1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads**
 2. Add the hosted MCP to your Claude configuration:
 
 ```json
@@ -359,4 +359,4 @@ When encountering issues, work through this checklist:
 
 **Document Version:** 2.0
 **Last Updated:** 2026-02-10
-**Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai)
+**Service:** Hopkin Meta Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=meta-ads)

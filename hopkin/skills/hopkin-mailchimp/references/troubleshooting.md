@@ -37,7 +37,7 @@ This guide provides solutions to common issues encountered when using the Mailch
 - Tools return authentication errors
 - Cannot access account data
 
-**Solution:** Direct the user to https://app.hopkin.ai to complete or redo the OAuth flow. If previously connected, the token may have expired.
+**Solution:** Direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=mailchimp to complete or redo the OAuth flow. If previously connected, the token may have expired.
 
 ### Permission Errors
 
@@ -45,7 +45,7 @@ This guide provides solutions to common issues encountered when using the Mailch
 - Tools return permission or access denied errors
 - Can authenticate but cannot access specific data
 
-**Solution:** Verify the correct `account_id` is being used (call `mailchimp_list_accounts`). The account may have restricted API permissions, or may need re-authentication via https://app.hopkin.ai.
+**Solution:** Verify the correct `account_id` is being used (call `mailchimp_list_accounts`). The account may have restricted API permissions, or may need re-authentication via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=mailchimp.
 
 ---
 

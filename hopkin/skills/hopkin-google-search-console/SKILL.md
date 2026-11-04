@@ -34,12 +34,12 @@ To verify the Hopkin Google Search Console MCP is available:
 If no `google_search_console_` prefixed tools are available:
 
 1. **Inform the user** that the Hopkin Google Search Console MCP is required to use this skill
-2. **Direct them to sign up** at https://app.hopkin.ai
+2. **Direct them to sign up** at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console
 3. **Provide setup instructions:**
 
 > The Hopkin Google Search Console MCP is not configured. To use this skill:
 >
-> 1. Sign up at **https://app.hopkin.ai**
+> 1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console**
 > 2. Add the hosted MCP to your Claude configuration:
 >
 > ```json
@@ -66,7 +66,7 @@ If no `google_search_console_` prefixed tools are available:
 After confirming the MCP is available, authenticate the user's Google Search Console account:
 
 1. **Check auth status:** Call `google_search_console_check_auth_status` to see if the user is already authenticated
-2. **If not authenticated:** Inform the user that they need to connect their Google Search Console account via https://app.hopkin.ai and follow the OAuth flow there
+2. **If not authenticated:** Inform the user that they need to connect their Google Search Console account via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console and follow the OAuth flow there
 
 ### Quick Start with Preferences
 
@@ -305,7 +305,7 @@ Use `google_search_console_list_sites` to get the exact property URL format.
 
 When errors occur:
 
-1. **Check authentication** — Run `google_search_console_check_auth_status`; if not authenticated, direct the user to connect their account at https://app.hopkin.ai
+1. **Check authentication** — Run `google_search_console_check_auth_status`; if not authenticated, direct the user to connect their account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console
 2. **Validate site URL** — Ensure the property URL matches exactly (including protocol and trailing slash)
 3. **Inspect error messages** — Hopkin errors include specific guidance
 4. **Check date range** — Ensure start_date <= end_date, and dates are not in the future
@@ -320,7 +320,7 @@ For detailed troubleshooting guidance, see **references/troubleshooting.md**.
 Common quick fixes:
 
 - **"MCP server not found"** — Verify Hopkin MCP configuration and token
-- **"Not authenticated"** — Run `google_search_console_check_auth_status`; direct user to connect their account at https://app.hopkin.ai
+- **"Not authenticated"** — Run `google_search_console_check_auth_status`; direct user to connect their account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console
 - **"Site not found"** — Verify property URL with `google_search_console_list_sites`; check exact format
 - **"No data available"** — Check date range; recent dates (last 3 days) may be incomplete
 - **"Invalid dimension combination"** — `searchAppearance` cannot be combined with query, page, device, or country
@@ -340,4 +340,4 @@ For more detailed information:
 
 ---
 
-**Requires:** Hopkin Google Search Console MCP (https://app.hopkin.ai)
+**Requires:** Hopkin Google Search Console MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console)

@@ -31,7 +31,7 @@ This guide provides solutions to common issues encountered when using the TikTok
 
 #### Solution 1: Sign Up and Configure Hopkin
 
-1. Sign up at **https://app.hopkin.ai**
+1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads**
 2. Add the hosted MCP to your Claude configuration:
 
 ```json
@@ -81,7 +81,7 @@ After installing or configuring the MCP server:
 
 1. Call `tiktok_ads_check_auth_status` to verify current status
 2. If not authenticated, use `tiktok_ads_get_login_url` to get the OAuth URL
-3. Alternatively, direct the user to connect their TikTok Ads account via https://app.hopkin.ai
+3. Alternatively, direct the user to connect their TikTok Ads account via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
 4. After the user completes the OAuth flow, re-verify with `tiktok_ads_check_auth_status`
 
 #### Solution 2: Token Refresh Issues
@@ -90,7 +90,7 @@ TikTok provider tokens may expire, but Hopkin automatically refreshes them. This
 
 **If auto-refresh fails:**
 - `tiktok_ads_check_auth_status` will show `authenticated: false`
-- Direct the user to https://app.hopkin.ai to reconnect their TikTok account
+- Direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads to reconnect their TikTok account
 - After reconnection, re-verify with `tiktok_ads_check_auth_status`
 
 ---
@@ -107,7 +107,7 @@ TikTok provider tokens may expire, but Hopkin automatically refreshes them. This
 
 #### Solution 1: Re-authenticate with Correct Scopes
 
-1. Direct the user to https://app.hopkin.ai
+1. Direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
 2. Ask them to disconnect and reconnect their TikTok account
 3. Ensure they grant all requested permissions during the OAuth flow
 
@@ -193,14 +193,14 @@ TikTok provider tokens may expire, but Hopkin automatically refreshes them. This
 
 **Solutions:**
 - Call `tiktok_ads_check_auth_status` to confirm token status
-- If not authenticated, use `tiktok_ads_get_login_url` or direct user to https://app.hopkin.ai to reconnect
+- If not authenticated, use `tiktok_ads_get_login_url` or direct user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads to reconnect
 
 #### Forbidden / 403
 **Cause:** Insufficient permissions or attempting a write operation.
 
 **Solutions:**
 - Verify the user has access to the target advertiser account
-- Re-authenticate via https://app.hopkin.ai
+- Re-authenticate via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
 - Confirm this is a read operation (MCP is read-only)
 
 #### Too Many Requests / 429
@@ -318,7 +318,7 @@ When encountering issues, work through this checklist:
 - [ ] **Authentication**
   - [ ] `tiktok_ads_check_auth_status` returns `authenticated: true`
   - [ ] TikTok token is valid (auto-refreshed by Hopkin)
-  - [ ] User has completed OAuth flow via https://app.hopkin.ai
+  - [ ] User has completed OAuth flow via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
 
 - [ ] **Permissions**
   - [ ] User has access to target advertiser account
@@ -351,7 +351,7 @@ When encountering issues, work through this checklist:
 -> Check: Hopkin MCP configuration and token, restart Claude
 
 **"Not authenticated"**
--> Run: `tiktok_ads_check_auth_status` -> Use `tiktok_ads_get_login_url` or direct user to https://app.hopkin.ai
+-> Run: `tiktok_ads_check_auth_status` -> Use `tiktok_ads_get_login_url` or direct user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
 
 **"Advertiser not found"**
 -> Check: `advertiser_id` is a numeric string, user has advertiser access
@@ -378,4 +378,4 @@ When encountering issues, work through this checklist:
 
 **Document Version:** 1.0
 **Last Updated:** 2026-03-22
-**Service:** Hopkin TikTok Ads MCP (https://app.hopkin.ai)
+**Service:** Hopkin TikTok Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads)

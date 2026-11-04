@@ -32,12 +32,12 @@ Before using this skill, verify that the Hopkin ChatGPT Ads MCP is configured an
 If no `chatgpt_ads_` prefixed tools are available:
 
 1. **Inform the user** that the Hopkin ChatGPT Ads MCP is required to use this skill
-2. **Direct them to sign up** at https://app.hopkin.ai
+2. **Direct them to sign up** at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads
 3. **Provide setup instructions:**
 
 > The Hopkin ChatGPT Ads MCP is not configured. To use this skill:
 >
-> 1. Sign up at **https://app.hopkin.ai**
+> 1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads**
 > 2. Add the hosted MCP to your Claude configuration:
 >
 > ```json
@@ -61,7 +61,7 @@ If no `chatgpt_ads_` prefixed tools are available:
 ChatGPT Ads differs from every other Hopkin ads integration: **the platform has no OAuth.** Users authenticate by pasting an API key.
 
 1. The user issues a key in **ChatGPT Ads Manager → Settings**
-2. They paste it at **https://app.hopkin.ai** → Connections → ChatGPT Ads
+2. They paste it at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads** → Connections → ChatGPT Ads
 3. They give the connection a name they will recognize (e.g. "Acme — House Account")
 
 The key is validated against the platform before it is stored, then encrypted at rest.
@@ -254,7 +254,7 @@ If it returns `undefined`, **reload once and re-probe** — the API is absent un
 
 ### Error Handling Patterns
 
-- **401 / auth error** → the stored key was rejected. The user must issue a new key in ChatGPT Ads Manager → Settings and reconnect at https://app.hopkin.ai. The key cannot be refreshed.
+- **401 / auth error** → the stored key was rejected. The user must issue a new key in ChatGPT Ads Manager → Settings and reconnect at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads. The key cannot be refreshed.
 - **404 on conversions endpoints** → often means "feature not enabled for this account", not "missing". Report delivery data and say conversion reporting is not enabled.
 - **429** → rate limited. Limits are counted per ad account *and* per IP. Back off; do not retry in a tight loop.
 - **400 on insights** → usually an invalid field or a window ending in the future. The platform's message lists valid fields; read it.
@@ -275,5 +275,5 @@ Common issues and their resolutions are documented in **references/troubleshooti
 - **references/mcp-tools-reference.md** — full parameter reference for all 17 tools
 - **references/troubleshooting.md** — diagnostic guide
 - **references/workflows/** — step-by-step report procedures
-- Hopkin dashboard — https://app.hopkin.ai
+- Hopkin dashboard — https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=chatgpt-ads
 - ChatGPT Ads Manager — https://ads.openai.com

@@ -38,7 +38,7 @@ This guide provides solutions to common issues encountered when using the Google
 - Tools return authentication errors
 - Cannot access site data
 
-**Solution:** Direct the user to https://app.hopkin.ai to complete or redo the OAuth flow. If previously connected, the token may have expired.
+**Solution:** Direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console to complete or redo the OAuth flow. If previously connected, the token may have expired.
 
 ### Missing Scopes
 
@@ -46,7 +46,7 @@ This guide provides solutions to common issues encountered when using the Google
 - `google_search_console_check_auth_status` returns `needs_reconnect`
 - Some tools work but others fail with permission errors
 
-**Solution:** The user needs to reconnect their Google account at https://app.hopkin.ai to grant the required scopes (`mcp:tools`, `gsc:read`).
+**Solution:** The user needs to reconnect their Google account at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=google-search-console to grant the required scopes (`mcp:tools`, `gsc:read`).
 
 ### Permission Errors on Specific Sites
 

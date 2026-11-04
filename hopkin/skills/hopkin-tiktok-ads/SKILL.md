@@ -26,7 +26,7 @@ Inform the user and provide setup instructions:
 
 > The Hopkin TikTok Ads MCP is not configured. To use this skill:
 >
-> 1. Sign up at **https://app.hopkin.ai**
+> 1. Sign up at **https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads**
 > 2. Add the hosted MCP to your Claude configuration:
 >
 > ```json
@@ -51,9 +51,9 @@ Pause execution until the user confirms, then re-verify.
 
 1. Call `tiktok_ads_check_auth_status` to verify authentication
 2. If not authenticated, call `tiktok_ads_get_login_url` to get the TikTok OAuth login URL and direct the user to complete login
-3. Alternatively, direct the user to https://app.hopkin.ai to connect their TikTok Ads account
+3. Alternatively, direct the user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads to connect their TikTok Ads account
 
-> **Note:** If a previously-authenticated user gets auth errors, direct them to https://app.hopkin.ai to reconnect their TikTok account.
+> **Note:** If a previously-authenticated user gets auth errors, direct them to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads to reconnect their TikTok account.
 
 ### Required Information
 
@@ -296,7 +296,7 @@ TikTok advertiser IDs are **numeric strings**. Use them exactly as returned by `
 
 ## Error Handling
 
-1. **Auth errors** — Run `tiktok_ads_check_auth_status`; if auth fails, use `tiktok_ads_get_login_url` or direct to https://app.hopkin.ai to reconnect
+1. **Auth errors** — Run `tiktok_ads_check_auth_status`; if auth fails, use `tiktok_ads_get_login_url` or direct to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads to reconnect
 2. **Advertiser not found** — Verify advertiser ID with `tiktok_ads_list_advertisers`
 3. **Invalid level** — `level` must be one of: `campaign`, `adgroup`, `ad`
 4. **Invalid status** — Use `ENABLE`, `DISABLE`, or `DELETE` (not ACTIVE/PAUSED)
@@ -322,9 +322,9 @@ TikTok advertiser IDs are **numeric strings**. Use them exactly as returned by `
 
 See **references/troubleshooting.md** for full guidance.
 
-- **"MCP server not found"** — Verify Hopkin MCP config and token at https://app.hopkin.ai
-- **"Not authenticated"** — Use `tiktok_ads_get_login_url` or direct user to https://app.hopkin.ai
-- **"Token expired"** — Direct user to reconnect at https://app.hopkin.ai
+- **"MCP server not found"** — Verify Hopkin MCP config and token at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
+- **"Not authenticated"** — Use `tiktok_ads_get_login_url` or direct user to https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
+- **"Token expired"** — Direct user to reconnect at https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
 - **"Advertiser not found"** — Verify advertiser ID with `tiktok_ads_list_advertisers`
 - **"No data"** — Check date range and campaign activity; TikTok may have reporting delays
 - **"Invalid parameter"** — Check that `adgroup_id` (not `ad_group_id`) and status values (ENABLE/DISABLE/DELETE) are correct
@@ -343,4 +343,4 @@ See **references/troubleshooting.md** for full guidance.
 
 ---
 
-**Requires:** Hopkin TikTok Ads MCP (https://app.hopkin.ai)
+**Requires:** Hopkin TikTok Ads MCP (https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads)
