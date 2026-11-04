@@ -74,8 +74,6 @@ Before generating reports, confirm you have:
 
 ## Available MCP Tools
 
-For complete tool documentation with all parameters, see **references/mcp-tools-reference.md**.
-
 All tools use the `ga4_` prefix.
 
 ### Health & Authentication
@@ -244,7 +242,6 @@ Common quick fixes:
 
 For more detailed information:
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tool documentation, parameters, and usage examples
 - **references/troubleshooting.md** — Comprehensive error solutions and debugging steps
 
 ---

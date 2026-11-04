@@ -354,7 +354,6 @@ See **references/troubleshooting.md** for full guidance.
 
 ## Additional Resources
 
-- **references/mcp-tools-reference.md** — Tool documentation, parameters, and usage examples
 - **references/troubleshooting.md** — Error solutions and debugging steps
 - **references/workflows/campaign-performance.md** — Campaign group & campaign performance
 - **references/workflows/demographic-insights.md** — MEMBER_* demographic insights

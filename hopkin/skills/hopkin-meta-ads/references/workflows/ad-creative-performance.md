@@ -382,5 +382,4 @@ For video ads, include additional video performance metrics:
 ## See Also
 
 - **references/report-types.md** - Complete creative metric definitions and video metrics
-- **references/mcp-tools-reference.md** — Hopkin MCP tools reference
 - **references/troubleshooting.md** — Common issues and solutions

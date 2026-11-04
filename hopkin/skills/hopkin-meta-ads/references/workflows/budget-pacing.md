@@ -165,5 +165,4 @@ Use a waterfall chart to show spend contribution by campaign with CPA color enco
 ## See Also
 
 - **references/report-types.md** — Budget field definitions and calculations
-- **references/mcp-tools-reference.md** — Hopkin MCP tools reference
 - **references/troubleshooting.md** — Common budget and delivery issues

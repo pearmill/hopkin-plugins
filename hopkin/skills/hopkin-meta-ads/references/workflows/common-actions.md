@@ -299,6 +299,5 @@ Use these recommendations when analyzing reports to identify and address perform
 
 ## See Also
 
-- **references/mcp-tools-reference.md** — Hopkin MCP tools reference
 - **references/troubleshooting.md** — Common issues when using the MCP
 - **references/report-types.md** — Metrics to monitor after making changes

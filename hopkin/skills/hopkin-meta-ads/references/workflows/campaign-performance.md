@@ -172,5 +172,4 @@ Separate active, paused, and completed campaigns.
 ## See Also
 
 - **references/report-types.md** — Complete metric definitions and field descriptions
-- **references/mcp-tools-reference.md** — Hopkin MCP tools reference
 - **references/troubleshooting.md** — Common issues and solutions
