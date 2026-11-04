@@ -140,33 +140,7 @@ List the dimensions and metrics available on a GA4 property (including custom de
 
 ## Connections
 
-Connection tools manage which Google account's Analytics access is used. Only Google connections with the `analytics.readonly` scope are returned/used.
-
-### ga4_list_connections
-
-List the Google Analytics connections available to you — both ones you own and ones shared with you via an organization. Use this to discover connection IDs for set_default / share / rename / revoke.
-
-### ga4_set_default_connection
-
-Set the Google Analytics connection used by default for subsequent GA4 tool calls. The default is scoped to the calling actor (your user account, or the API key being used).
-
-### ga4_share_connection
-
-Share an owned Google Analytics connection with all members of your organization, so teammates can use it without reconnecting Google themselves. You must be the owner.
-
-### ga4_unshare_connection
-
-Stop sharing an owned Google Analytics connection with your organization. Teammates lose access immediately. You must be the owner. **Destructive — confirm with the user first.**
-
-### ga4_rename_connection
-
-Rename a Google Analytics connection.
-
-### ga4_revoke_connection
-
-Revoke a Google Analytics connection. **Destructive — confirm with the user first.**
-
----
+Tools accept an optional `connection_id`. `ga4_list_connections` lists them; call `ga4_set_default_connection` only when the user asks.
 
 ## Feedback
 

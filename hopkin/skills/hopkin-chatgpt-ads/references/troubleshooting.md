@@ -46,13 +46,6 @@ The key is validated against the platform before being stored, so an invalid key
 
 The key was revoked or rotated on the platform. **There is no refresh path** — keys cannot be renewed. The user must issue a new key and reconnect.
 
-> The error message deliberately does not include the rejected key. The platform echoes the key (middle-masked) in its own 401 text; Hopkin replaces that message so no part of a real credential reaches logs or tool output. This is expected, not a loss of diagnostic detail — the `code` field carries the signal.
-
-### Permission Errors on a Shared Connection
-
-Shared connections are read-only for recipients and cannot be renamed, re-shared, or revoked by them. Those operations are owner-only. Ask the owner.
-
----
 
 ## Empty or Wrong Report Data
 
@@ -171,6 +164,3 @@ Do not infer meaning from ID prefixes either — they differ from the documentat
 
 `chatgpt_ads_check_auth_status` is for use **after** a failure. Calling it first wastes a request against a shared rate limit.
 
-### Expecting Revoke to Invalidate the Key
-
-`chatgpt_ads_revoke_connection` deletes Hopkin's stored copy only. The key stays valid on the platform until deleted in ChatGPT Ads Manager.

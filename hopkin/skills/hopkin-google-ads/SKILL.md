@@ -158,12 +158,8 @@ Some Google Ads users manage multiple client accounts through a Manager (MCC) ac
 - `google_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
 
 ### Connections
-A user can have more than one Google connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection. Connections are stored and used on Hopkin's servers; the plugin never reads, stores or passes a token or key.
-- `google_ads_list_connections` — Each connection's name, ID, whether it is the default, and whether it is owned or shared
-- `google_ads_set_default_connection` — Change which connection is used when `connection_id` is omitted; call it only when the user asks
-- `google_ads_share_connection` / `google_ads_unshare_connection` — Share an owned connection with the user's organization, or stop sharing it
-- `google_ads_rename_connection` — Change an owned connection's display name
-- `google_ads_revoke_connection` — Revoke an owned connection (shared members lose access; Google access stays until the user disconnects it in the Hopkin dashboard). Confirm with the user first
+
+Tools accept an optional `connection_id`. `google_ads_list_connections` lists them; call `google_ads_set_default_connection` only when the user asks.
 
 ### Feedback
 - `google_ads_developer_feedback` — Submit feature requests and workflow gap reports
@@ -434,7 +430,6 @@ Common quick fixes:
 
 For more detailed information:
 
-- **references/mcp-tools-reference.md** — Complete Hopkin MCP tool documentation, parameters, and usage examples
 - **references/troubleshooting.md** — Comprehensive error solutions and debugging steps
 - **references/workflows/campaign-performance.md** — Detailed campaign performance report workflow
 - **references/workflows/geo-performance.md** — Detailed geographic performance report workflow

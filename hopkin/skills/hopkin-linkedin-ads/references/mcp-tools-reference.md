@@ -578,55 +578,7 @@ Optional: `tip`, `colorScheme`, `colorType`.
 
 ### Connection Tools
 
-A connection is one LinkedIn sign-in that Hopkin uses to read ad accounts. A user can have several: their own, and ones teammates share with the organization. Account and reporting tools use the **default** connection unless you pass `connection_id`.
-
-Only call the write tools below when the user asks. Confirm the destructive ones (`unshare`, `revoke`) with the user first.
-
-#### linkedin_ads_list_connections
-List the LinkedIn connections available to you — ones you own and ones shared with you through your organization. Use it to find connection IDs for `connection_id` and for the tools below.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-
-**Returns:** `data[]` (per connection: `id`, `display_name`, `external_account_label`, `is_default`, `access_via` — `owned` or `shared`, `shared_with_org`, `revoked_at`) and `count`.
-
-#### linkedin_ads_set_default_connection
-Set the connection used by default for subsequent LinkedIn Ads tool calls. The default is scoped to the caller (the signed-in Hopkin user).
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `connection_id` (string, required) — UUID of the connection to make the default
-
-#### linkedin_ads_share_connection
-Share a connection you own with all members of your organization, so teammates can use it without connecting LinkedIn themselves. Owner only.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `connection_id` (string, required) — UUID of the connection to share
-
-#### linkedin_ads_unshare_connection
-Stop sharing a connection you own with your organization. Teammates lose access immediately. Owner only. **Destructive — confirm with the user first.**
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `connection_id` (string, required) — UUID of the connection to stop sharing
-
-#### linkedin_ads_rename_connection
-Rename a connection you own. Only the display label changes; the underlying LinkedIn access is unaffected. Owner only.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `connection_id` (string, required) — UUID of the connection to rename
-- `display_name` (string, required) — New name (1–120 characters)
-
-#### linkedin_ads_revoke_connection
-Revoke a connection you own. Defaults pointing to it stop working and teammates it was shared with lose access. It does **not** revoke Hopkin's access at LinkedIn itself — for that, the user disconnects in the Hopkin dashboard. Owner only. **Destructive — confirm with the user first.**
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `connection_id` (string, required) — UUID of the connection to revoke
-
----
+Tools accept an optional `connection_id`. `linkedin_ads_list_connections` lists them; call `linkedin_ads_set_default_connection` only when the user asks.
 
 ### Ad Library & Competitor Tools
 

@@ -68,11 +68,7 @@ When `linkedin_ads_list_ad_accounts` returns multiple accounts, present them as 
 
 ### Connections
 
-A user can have more than one LinkedIn connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection. Connections are stored and used on Hopkin's servers; the plugin never reads, stores or passes a token or key.
-
-- `linkedin_ads_list_connections` shows each connection's name, ID, whether it is the default, and whether it is owned or shared
-- Pass `connection_id` to target a specific one
-- `linkedin_ads_set_default_connection` changes which one is used when `connection_id` is omitted — call it only when the user asks
+Tools accept an optional `connection_id`. `linkedin_ads_list_connections` lists them; call `linkedin_ads_set_default_connection` only when the user asks.
 
 ## LinkedIn Ads Hierarchy
 
@@ -118,11 +114,8 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `linkedin_ads_get_budget_pricing` — Recommended bid ranges and daily budget limits for a campaign type and audience
 
 ### Connections
-- `linkedin_ads_list_connections` — List LinkedIn connections available to you (owned and org-shared), with their IDs
-- `linkedin_ads_set_default_connection` — Set the default connection for subsequent LinkedIn Ads tool calls
-- `linkedin_ads_share_connection` / `linkedin_ads_unshare_connection` — Share/unshare an owned connection with your organization (unshare is destructive — confirm with the user first)
-- `linkedin_ads_rename_connection` — Rename an owned connection's display name
-- `linkedin_ads_revoke_connection` — Revoke an owned connection (destructive — confirm with the user first)
+
+Tools accept an optional `connection_id`. `linkedin_ads_list_connections` lists them; call `linkedin_ads_set_default_connection` only when the user asks.
 
 ### Competitor Research & Ad Library (no LinkedIn connection needed)
 - `linkedin_ads_search_ad_library` — Search the LinkedIn Ad Library for any advertiser's ads with real creative, returned under `data`. **One company's ads → `organization_ids` (exact, works cold) or `advertiser_name`**; keyword search over ad copy → `search_terms`. `countries` is required

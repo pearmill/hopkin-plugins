@@ -101,10 +101,8 @@ All tools use the `google_search_console_` prefix.
 - `google_search_console_inspect_url` — Get detailed indexing, crawl, and canonical status for a specific URL. Quota: 2000 calls/day per property.
 
 ### Connections
-Connections are stored and used on Hopkin's servers; the plugin never reads, stores or passes a token or key.
 
-- `google_search_console_list_connections` — List the user's Search Console connections (own and shared) and which one is the default; pass `connection_id` to any tool to target one
-- `google_search_console_set_default_connection` — Change which connection is used when `connection_id` is omitted; call it only when the user asks
+Tools accept an optional `connection_id`. `google_search_console_list_connections` lists them; call `google_search_console_set_default_connection` only when the user asks.
 
 ### Feedback
 - `google_search_console_developer_feedback` — Submit feature requests and workflow gap reports

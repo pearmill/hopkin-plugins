@@ -34,7 +34,7 @@ GA4 access requires the `https://www.googleapis.com/auth/analytics.readonly` Goo
 
 ### Wrong Google account / missing properties
 
-- Call `ga4_list_connections` to see which Google connections are available (owned and org-shared)
+- Call `ga4_list_connections` to see which Google connections are available
 - Use `ga4_set_default_connection` to switch the default, or pass `connection_id` on individual calls to pin a specific connection
 
 ## Data Issues
