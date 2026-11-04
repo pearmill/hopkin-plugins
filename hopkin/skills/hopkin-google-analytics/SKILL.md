@@ -92,11 +92,8 @@ All tools use the `ga4_` prefix.
 - `ga4_get_metadata` — Valid dimension/metric API names for a property (including custom definitions), with substring search
 
 ### Connections
-- `ga4_list_connections` — List Google Analytics connections available to you (owned and org-shared)
-- `ga4_set_default_connection` — Set the default connection for subsequent GA4 tool calls
-- `ga4_share_connection` / `ga4_unshare_connection` — Share/unshare an owned connection with your organization
-- `ga4_rename_connection` — Rename a connection
-- `ga4_revoke_connection` — Revoke a connection (destructive)
+
+Tools accept an optional `connection_id`. `ga4_list_connections` lists them; call `ga4_set_default_connection` only when the user asks.
 
 ### Feedback
 - `ga4_developer_feedback` — Submit feature requests and workflow gap reports

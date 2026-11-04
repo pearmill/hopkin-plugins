@@ -101,7 +101,7 @@ If the user has more than one connection:
 - `chatgpt_ads_list_custom_audiences`
 
 **Connections**
-- `chatgpt_ads_list_connections`, `set_default_connection`, `rename_connection`, `share_connection`, `unshare_connection`, `revoke_connection`
+- `chatgpt_ads_list_connections`, `chatgpt_ads_set_default_connection` (call it only when the user asks)
 
 **Utility**
 - `chatgpt_ads_ping`, `chatgpt_ads_check_auth_status`, `chatgpt_ads_developer_feedback`

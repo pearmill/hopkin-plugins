@@ -86,11 +86,7 @@ When `meta_ads_list_ad_accounts` returns multiple accounts:
 
 ### Connections
 
-A user can have more than one Meta connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection. Connections are stored and used on Hopkin's servers; the plugin never reads, stores or passes a token or key.
-
-- `meta_ads_list_connections` shows each connection's name, ID, whether it is the default, and whether it is owned or shared
-- Provide `connection_id` to target a specific one
-- `meta_ads_set_default_connection` changes which one is used when `connection_id` is omitted — call it only when the user asks
+Tools accept an optional `connection_id`. `meta_ads_list_connections` lists them; call `meta_ads_set_default_connection` only when the user asks.
 
 ## Available MCP Tools
 

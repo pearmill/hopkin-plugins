@@ -170,54 +170,7 @@ Primary use is resolving identity: campaigns return `targeting.custom_audiences.
 
 ### Connection Management Tools
 
-These write to Hopkin's own records, never to the ChatGPT Ads platform.
-
-#### chatgpt_ads_list_connections
-List the connections available to you — both owned and shared with you by your organization. Shows display name, id, and which is your default.
-
-**Parameters:**
-- `reason` (string, required)
-
-#### chatgpt_ads_set_default_connection
-Set which connection other tools use when `connection_id` is omitted.
-
-**Parameters:**
-- `connection_id` (string, required) — From `chatgpt_ads_list_connections`; do not guess
-- `reason` (string, required)
-
-#### chatgpt_ads_rename_connection
-Change a connection's display name. Owner-only.
-
-**Parameters:**
-- `connection_id` (string, required)
-- `reason` (string, required)
-
-#### chatgpt_ads_share_connection
-Share an owned connection with your organization so teammates can report on that ad account. Owner-only.
-
-> The ChatGPT Ads API has **no reduced-scope keys**, so sharing grants full read access to the whole ad account. Confirm the user understands this before sharing.
-
-**Parameters:**
-- `connection_id` (string, required)
-- `reason` (string, required)
-
-#### chatgpt_ads_unshare_connection
-Stop sharing an owned connection with your organization. Owner-only.
-
-**Parameters:**
-- `connection_id` (string, required)
-- `reason` (string, required)
-
-#### chatgpt_ads_revoke_connection
-Remove a stored connection. Owner-only.
-
-> This deletes **Hopkin's stored copy of the API key only**. The key remains valid on the ChatGPT Ads platform — the API has no revocation endpoint — so to fully revoke it the user must also delete it in ChatGPT Ads Manager → Settings. Always say this when revoking.
-
-**Parameters:**
-- `connection_id` (string, required)
-- `reason` (string, required)
-
----
+Tools accept an optional `connection_id`. `chatgpt_ads_list_connections` lists them; call `chatgpt_ads_set_default_connection` only when the user asks.
 
 ### Feedback Tool
 
