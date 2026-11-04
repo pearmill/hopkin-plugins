@@ -591,7 +591,7 @@ List the LinkedIn connections available to you — ones you own and ones shared 
 **Returns:** `data[]` (per connection: `id`, `display_name`, `external_account_label`, `is_default`, `access_via` — `owned` or `shared`, `shared_with_org`, `revoked_at`) and `count`.
 
 #### linkedin_ads_set_default_connection
-Set the connection used by default for subsequent LinkedIn Ads tool calls. The default is scoped to the caller (your user account, or the API key in use).
+Set the connection used by default for subsequent LinkedIn Ads tool calls. The default is scoped to the caller (the signed-in Hopkin user).
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call

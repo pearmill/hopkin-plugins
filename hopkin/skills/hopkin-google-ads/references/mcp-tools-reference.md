@@ -985,7 +985,7 @@ Complete URL and UTM tracking configuration across every hierarchy level (accoun
 
 ### Connection Tools
 
-A user can have more than one Google connection: their own, or ones shared with them through their organization. Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection.
+A user can have more than one Google connection: their own, or ones shared with them through their organization. Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection. Connections are stored and used on Hopkin's servers; the plugin never reads, stores or passes a token or key.
 
 #### google_ads_list_connections
 List the connections available to the user, owned and shared, with each one's ID, name and whether it is the default.
@@ -994,7 +994,7 @@ List the connections available to the user, owned and shared, with each one's ID
 - `reason` (string, required) — Reason for the call
 
 #### google_ads_set_default_connection
-Set the connection used when `connection_id` is omitted. The default is scoped to the caller (the user account, or the API key in use). Call it only when the user asks.
+Set the connection used when `connection_id` is omitted. The default is scoped to the caller (the signed-in Hopkin user). Call it only when the user asks.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -1015,7 +1015,7 @@ Stop sharing an owned connection; teammates lose access immediately. Owner only.
 - `connection_id` (string, required) — UUID of the connection
 
 #### google_ads_rename_connection
-Change an owned connection's display name. The grant and account are unaffected. Owner only.
+Change an owned connection's display name. The linked account is unaffected. Owner only.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
@@ -1023,7 +1023,7 @@ Change an owned connection's display name. The grant and account are unaffected.
 - `display_name` (string, required) — New name
 
 #### google_ads_revoke_connection
-Revoke (soft-delete) an owned connection. Defaults pointing to it are invalidated and shared members lose access. The grant at Google is not revoked; the user disconnects in the dashboard for that. Owner only; confirm with the user first.
+Revoke (soft-delete) an owned connection. Defaults pointing to it are invalidated and shared members lose access. Google access is not removed; the user disconnects it in the Hopkin dashboard. Owner only; confirm with the user first.
 
 **Parameters:**
 - `reason` (string, required) — Reason for the call
