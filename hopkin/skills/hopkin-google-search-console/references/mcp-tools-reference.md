@@ -152,36 +152,6 @@ Get detailed indexing and crawl status for a specific URL. Quota: 2000 calls per
 
 ---
 
-### Preference Tools
-
-#### google_search_console_store_preference
-Store a persistent preference or observation about a Search Console property.
-
-**Parameters:**
-- `entity_type` (string, required) — Type of entity (e.g., `site`, `query`)
-- `entity_id` (string, required) — Entity identifier (e.g., `https://example.com/`)
-- `key` (string, required, max 100 chars) — Preference key
-- `value` (any, required) — Preference value (string, number, boolean, or JSON object)
-- `source` (string, optional, default: `agent`) — Who set this: `agent`, `user`, `system`
-- `note` (string, optional, max 500 chars) — Context about why preference was set
-
-#### google_search_console_get_preferences
-Retrieve stored preferences for a Search Console entity.
-
-**Parameters:**
-- `entity_type` (string, required) — Type of entity
-- `entity_id` (string, required) — Entity identifier
-
-#### google_search_console_delete_preference
-Delete a stored preference for a Search Console entity.
-
-**Parameters:**
-- `entity_type` (string, required) — Type of entity
-- `entity_id` (string, required) — Entity identifier
-- `key` (string, required) — Preference key to delete
-
----
-
 ### Developer Feedback
 
 #### google_search_console_developer_feedback

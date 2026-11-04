@@ -12,8 +12,7 @@ This document provides detailed reference information for the Hopkin Reddit Ads 
 6. [Pagination](#pagination)
 7. [Error Handling](#error-handling)
 8. [Visualization Tools](#visualization-tools)
-9. [Preference Tools](#preference-tools)
-10. [Feedback & Health Tools](#feedback--health-tools)
+9. [Feedback & Health Tools](#feedback--health-tools)
 
 ---
 
@@ -554,84 +553,6 @@ Render a data visualization chart as an interactive MCP App UI. **Always call th
 ```
 
 > The chart renderer renders entirely client-side as an MCP App resource. No data is sent externally — all rendering happens in the UI bundle.
-
----
-
-## Preference Tools
-
-Preferences allow persistent, per-entity storage of recurring settings — metric preferences, alert thresholds, and analysis defaults. Preferences auto-attach to list tool responses as `_stored_preferences`.
-
-### reddit_ads_store_preference
-Store a persistent preference for a Reddit ad entity. Use when you infer a recurring preference from the conversation (e.g., a user always wants ROAS, not CTR).
-
-**Parameters:**
-- `reason` (string, required) — Reason for storing the preference
-- `entity_type` (string, required) — Entity level: `ad_account`, `campaign`, `ad_set` (ad groups), or `ad`
-- `entity_id` (string, required) — The entity's platform ID (e.g., `t2_abc123`)
-- `key` (string, required) — Preference key (e.g., `preferred_conversion_metric`, `budget_alert_threshold`)
-- `value` (any, required) — Value: string, number, boolean, or JSON object
-- `source` (string, optional) — Who set it: `agent` (default), `user`, `system`
-- `note` (string, optional) — Optional context about why this was set
-
-**Example:**
-```json
-{
-  "tool": "reddit_ads_store_preference",
-  "parameters": {
-    "reason": "User always asks for ROAS as the primary metric",
-    "entity_type": "ad_account",
-    "entity_id": "t2_abc123",
-    "key": "preferred_conversion_metric",
-    "value": "ROAS"
-  }
-}
-```
-
----
-
-### reddit_ads_get_preferences
-Get all stored preferences for a Reddit ad entity.
-
-**Parameters:**
-- `reason` (string, required) — Reason for the call
-- `entity_type` (string, required) — Entity level: `ad_account`, `campaign`, `ad_set`, or `ad`
-- `entity_id` (string, required) — The entity's platform ID
-
-**Example:**
-```json
-{
-  "tool": "reddit_ads_get_preferences",
-  "parameters": {
-    "reason": "Checking stored preferences before generating report",
-    "entity_type": "ad_account",
-    "entity_id": "t2_abc123"
-  }
-}
-```
-
----
-
-### reddit_ads_delete_preference
-Delete a stored preference by key. No-op if it doesn't exist.
-
-**Parameters:**
-- `reason` (string, required) — Reason for deleting
-- `entity_type` (string, required) — Entity level: `ad_account`, `campaign`, `ad_set`, or `ad`
-- `entity_id` (string, required) — The entity's platform ID
-- `key` (string, required) — The preference key to delete
-
-**Example:**
-```json
-{
-  "tool": "reddit_ads_delete_preference",
-  "parameters": {
-    "reason": "User no longer wants budget alerts",
-    "entity_type": "campaign",
-    "entity_id": "campaign_456",
-    "key": "budget_alert_threshold"
-  }
-}
-```
 
 ---
 
