@@ -68,7 +68,7 @@ When `linkedin_ads_list_ad_accounts` returns multiple accounts, present them as 
 
 ### Connections
 
-A user can have more than one LinkedIn connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection.
+A user can have more than one LinkedIn connection (their own, or ones shared with them through their organization). Every account and reporting tool accepts an optional `connection_id`; omit it to use the default connection. Connections are stored and used on Hopkin's servers; the plugin never reads, stores or passes a token or key.
 
 - `linkedin_ads_list_connections` shows each connection's name, ID, whether it is the default, and whether it is owned or shared
 - Pass `connection_id` to target a specific one
