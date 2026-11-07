@@ -1,6 +1,6 @@
 ---
 name: hopkin-tiktok-ads
-description: Build reports and analyze TikTok Ads campaigns using the Hopkin TikTok Ads MCP. Includes prerequisite checks, authentication flow, campaign and ad group performance reporting, video/creative performance analysis, audience demographic insights, and advertiser management.
+description: Build reports and analyze TikTok Ads campaigns using the Hopkin TikTok Ads MCP. Includes prerequisite checks, authentication flow, campaign and ad group performance reporting, ad creative analysis (video and creative performance, compare creatives, ad previews), audience demographic insights, and advertiser management.
 ---
 
 # TikTok Ads Skill

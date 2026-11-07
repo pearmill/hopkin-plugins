@@ -1,6 +1,6 @@
 ---
 name: hopkin-linkedin-ads
-description: Generate LinkedIn Ads performance reports and analytics, and research competitors' LinkedIn ads, using the Hopkin LinkedIn Ads MCP. Includes prerequisite checks, authentication and connection management, report generation workflows, demographic insights using LinkedIn's unique MEMBER_* pivots, LinkedIn Ad Library search and name-based competitor tracking (real creative, video frames, employee posts a company pays for, EU transparency data — no LinkedIn connection needed), and developer feedback for unsupported write operations.
+description: Generate LinkedIn Ads performance reports and analytics, and research competitor ads in the LinkedIn Ad Library, using the Hopkin LinkedIn Ads MCP. Includes prerequisite checks, authentication and connection management, report generation workflows, demographic insights using LinkedIn's unique MEMBER_* pivots, LinkedIn Ad Library search and name-based competitor tracking (real creative, video frames, employee posts a company pays for, EU transparency data — no LinkedIn connection needed), and developer feedback for unsupported write operations.
 ---
 
 # LinkedIn Ads Skill
