@@ -8,6 +8,10 @@
       "type": "http",
       "url": "https://meta.mcp.hopkin.ai/mcp"
     },
+    "hopkin-microsoft-ads": {
+      "type": "http",
+      "url": "https://microsoft.mcp.hopkin.ai/mcp"
+    },
     "hopkin-linkedin-ads": {
       "type": "http",
       "url": "https://linkedin.mcp.hopkin.ai/mcp"

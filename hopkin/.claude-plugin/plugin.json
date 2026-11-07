@@ -1,7 +1,7 @@
 {
   "name": "hopkin",
   "version": "1.26.2",
-  "description": "Analyze ad performance and ad creatives across Google, Meta, LinkedIn, Reddit, TikTok and ChatGPT Ads, and track competitor ads on Meta and LinkedIn, directly in Claude. Also reads Mailchimp, Search Console and GA4.",
+  "description": "Analyze ad performance and ad creatives across Google, Meta, Microsoft, LinkedIn, Reddit, TikTok and ChatGPT Ads, and track competitor ads on Meta and LinkedIn, directly in Claude. Also reads Mailchimp, Search Console and GA4.",
   "author": {
     "name": "Hopkin"
   },
@@ -18,6 +18,8 @@
     "google-ads",
     "meta-ads",
     "facebook-ads",
+    "microsoft-ads",
+    "bing-ads",
     "linkedin-ads",
     "reddit-ads",
     "tiktok-ads",
