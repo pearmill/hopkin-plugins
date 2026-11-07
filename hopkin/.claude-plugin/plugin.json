@@ -1,6 +1,6 @@
 {
   "name": "hopkin",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "description": "Ad creative analysis and competitor ad tracking in Claude. Compare creatives, search the Meta and LinkedIn ad libraries, and report across Google, Meta, Microsoft, LinkedIn, Reddit, TikTok, ChatGPT Ads, Mailchimp, GA4 and Search Console. Read-only.",
   "author": {
     "name": "Hopkin"
