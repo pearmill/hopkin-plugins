@@ -9,7 +9,7 @@
       "name": "hopkin",
       "source": "./hopkin",
       "description": "Ad performance, creative analysis and competitor ad tracking in Claude. Report on campaigns and compare creatives across Google, Meta, Microsoft, LinkedIn, Reddit, TikTok and ChatGPT Ads, search the Meta and LinkedIn ad libraries, and read Mailchimp, GA4 and Search Console. Read-only.",
-      "version": "1.28.0"
+      "version": "1.29.0"
     }
   ]
 }
