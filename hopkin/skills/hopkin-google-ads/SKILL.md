@@ -1,6 +1,6 @@
 ---
 name: hopkin-google-ads
-description: Generate Google Ads account summaries, performance reports and analytics using the Hopkin Google Ads MCP. Includes prerequisite checks, authentication flow, report generation workflows, keyword analysis, and developer feedback for unsupported write operations.
+description: Generate Google Ads account summaries, performance reports and analytics using the Hopkin Google Ads MCP. Includes prerequisite checks, authentication flow, report generation workflows, keyword and search term analysis, ad creative analysis with asset reports and ad previews, and developer feedback for unsupported write operations.
 ---
 
 # Google Ads Reports Skill

@@ -1,6 +1,6 @@
 ---
 name: hopkin-meta-ads
-description: Guide for building reports and analyzing Meta Ads campaigns using the Hopkin Meta Ads MCP. Includes prerequisite checks, authentication flow, report generation workflows, and developer feedback for unsupported write operations.
+description: Analyze Meta (Facebook and Instagram) Ads performance and ad creatives, and research competitor ads in the Meta Ad Library, using the Hopkin Meta Ads MCP. Covers campaign, ad set and ad reports, ad creative analysis (compare creatives, rank creatives by CPA or ROAS, ad previews), audience and budget reports, pixel health, competitor ad tracking (hooks, angles, offers, video frames and transcripts; no Meta connection needed), and developer feedback for unsupported write operations.
 ---
 
 # Meta Ads Skill
@@ -14,6 +14,7 @@ This skill enables Claude to build comprehensive reports and analyze Meta Ads ca
 - Understand audience demographics and behavior
 - Track budget pacing and forecasting
 - Preview ad creatives with performance data
+- Research competitor ads in the Meta Ad Library and track competitors so their ads keep being collected (no Meta connection needed)
 - Optimize ad performance based on data insights
 - Audit Meta Pixel health, CAPI integration status, and event diagnostics
 
@@ -120,6 +121,14 @@ Tools accept an optional `connection_id`. `meta_ads_list_connections` lists them
 ### Creative
 - `meta_ads_preview_ads` — **MCP App.** Renders a visual UI with actual ad creative (images/videos) and a configurable metrics overlay — not tabular data. Proactively offer this whenever the user asks "what do my ads look like", wants to review creative quality, or is doing A/B creative comparison. Takes a list of ad IDs with optional per-ad metric values.
 
+### Competitor Research & Meta Ad Library (no Meta connection needed)
+- `meta_ads_search_ad_library` — Search the Meta Ad Library for any advertiser's ads with real creative (copy, CTA, landing URL, media), returned under `data`. `ad_reached_countries` is required; one advertiser's ads → `search_page_ids`, keyword search over ad copy → `search_terms`
+- `meta_ads_track_competitor` — Track an advertiser for daily collection. Provide exactly one of `page_id` (most precise), `page_url` or `name`. Call it directly with a name; several matches return candidates and track nothing
+- `meta_ads_untrack_competitor` — Stop tracking an advertiser
+- `meta_ads_list_tracked_competitors` — Tracked advertisers with ad counts and scrape health
+- `meta_ads_list_competitor_ads` — A tracked advertiser's ads; filter by `active_only`, `display_format`, `first_seen_since` (new ads) and `search`
+- `meta_ads_get_competitor_ad` — One ad in full: copy, media URLs, video frames, voiceover transcript and audio analysis
+
 ### Visualization
 - `meta_ads_render_chart` — **MCP App.** Renders interactive data visualization charts. Supports bar, scatter, timeseries, funnel, waterfall, and choropleth chart types. Use after fetching data with analytics tools to present visual reports. Always render charts when presenting performance trends, campaign comparisons, or geographic data — do not substitute a table or text summary when a chart is requested.
 
@@ -130,7 +139,7 @@ Tools accept an optional `connection_id`. `meta_ads_list_connections` lists them
 
 ## Core Capabilities
 
-This skill supports five primary report types and a developer feedback workflow for write operations.
+This skill supports six primary report types and a developer feedback workflow for write operations.
 
 ### Report Types
 
@@ -139,6 +148,7 @@ This skill supports five primary report types and a developer feedback workflow 
 3. **Audience Insights Reports** — Demographics, interests, and behavior breakdowns
 4. **Budget & Pacing Reports** — Budget tracking, spend pacing, and forecasting
 5. **Pixel Health & Tracking Audit** — Meta Pixel status, CAPI integration health, event volumes, automatic advanced matching, and diagnostic alerts
+6. **Competitor Research** — Any advertiser's ads from the Meta Ad Library: hooks, angles, offers, formats and creative patterns
 
 ### Data Visualization
 
@@ -201,6 +211,17 @@ Evaluate individual ad creative effectiveness, conduct A/B testing analysis, ide
 **Primary tools:** `meta_ads_get_ad_creative_report` + `meta_ads_preview_ads`
 
 **See detailed workflow:** **references/workflows/ad-creative-performance.md**
+
+---
+
+### Competitor Research (Meta Ad Library)
+
+See what other advertisers run on Facebook and Instagram (copy, CTAs, landing pages, formats, video frames and transcripts) and track competitors so their ads keep being collected. **No Meta connection is needed**, so never ask the user to connect Meta for this.
+
+**Primary tools:** `meta_ads_search_ad_library` (look without tracking), `meta_ads_track_competitor` → `meta_ads_list_competitor_ads` → `meta_ads_get_competitor_ad`
+
+- Summarize hooks, angles, offers and creative patterns from the ads' own copy and frames. Describe only what the ads show: the ad library has no spend or performance data for other advertisers.
+- Tracking changes Hopkin-side state only. Nothing in the user's Meta account changes.
 
 ---
 
