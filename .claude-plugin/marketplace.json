@@ -1,6 +1,6 @@
 {
   "name": "hopkin",
-  "description": "Analyze ad performance and ad creatives across Google, Meta, LinkedIn, Reddit, TikTok and ChatGPT Ads, and track competitor ads on Meta and LinkedIn, directly in Claude. Also reads Mailchimp, Search Console and GA4.",
+  "description": "Analyze ad performance and ad creatives across Google, Meta, Microsoft, LinkedIn, Reddit, TikTok and ChatGPT Ads, and track competitor ads on Meta and LinkedIn, directly in Claude. Also reads Mailchimp, Search Console and GA4.",
   "owner": {
     "name": "Pearmill Inc. d/b/a Hopkin"
   },
@@ -8,7 +8,7 @@
     {
       "name": "hopkin",
       "source": "./hopkin",
-      "description": "Analyze ad performance and ad creatives across Google, Meta, LinkedIn, Reddit, TikTok and ChatGPT Ads, and track competitor ads on Meta and LinkedIn, directly in Claude. Also reads Mailchimp, Search Console and GA4.",
+      "description": "Analyze ad performance and ad creatives across Google, Meta, Microsoft, LinkedIn, Reddit, TikTok and ChatGPT Ads, and track competitor ads on Meta and LinkedIn, directly in Claude. Also reads Mailchimp, Search Console and GA4.",
       "version": "1.26.2"
     }
   ]
