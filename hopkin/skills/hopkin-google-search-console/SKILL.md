@@ -47,7 +47,7 @@ If no `google_search_console_` prefixed tools are available:
 >   "mcpServers": {
 >     "hopkin-google-search-console": {
 >       "type": "url",
->       "url": "https://gcs.mcp.hopkin.ai/mcp",
+>       "url": "https://gsc.mcp.hopkin.ai/mcp",
 >       "headers": {
 >         "Authorization": "Bearer YOUR_HOPKIN_TOKEN"
 >       }
