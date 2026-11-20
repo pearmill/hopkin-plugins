@@ -30,7 +30,7 @@
     },
     "hopkin-google-search-console": {
       "type": "http",
-      "url": "https://gcs.mcp.hopkin.ai/mcp"
+      "url": "https://gsc.mcp.hopkin.ai/mcp"
     },
     "hopkin-google-analytics": {
       "type": "http",
