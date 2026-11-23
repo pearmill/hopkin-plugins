@@ -148,8 +148,8 @@ The performance report includes these key metrics:
 - `roas` — Return on ad spend
 
 **Video Metrics (when applicable):**
-- `video_views` — Total video views
-- `video_completions` — Completed video plays
+- `video_views` — 2-second feed views (0 on Connected TV and other non-feed placements)
+- `video_completions` — Completed video plays, counted against video starts, so they can exceed `video_views`. Completion rate = `video_completions` / `impressions`
 
 ### Step 6: Sort and Present
 

@@ -107,9 +107,9 @@ Creative ID | Headline | Spend | Impressions | CTR | Leads | CPA
 - `roas` — Return on ad spend (where conversion value is tracked)
 
 **Video Metrics (for video creatives):**
-- `video_views` — Number of video plays
-- `video_completions` — Full video watches (strong engagement signal)
-- Video completion rate = `video_completions` / `video_views`
+- `video_views` — 2-second feed views. Always 0 on Connected TV (CTV) and other non-feed placements
+- `video_completions` — Full video watches (strong engagement signal), counted against video **starts**, not views
+- Video completion rate = `video_completions` / `impressions`, or ÷ `videoStarts` from `linkedin_ads_get_insights`. Never divide by `video_views`: on CTV, completions far exceed views, which is correct (see the `video_completions_without_views` warning)
 
 ### Step 5: Sort and Rank
 
