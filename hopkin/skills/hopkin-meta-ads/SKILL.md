@@ -1,6 +1,6 @@
 ---
 name: hopkin-meta-ads
-description: Analyze Meta (Facebook and Instagram) Ads performance and ad creatives, and research competitor ads in the Meta Ad Library, using the Hopkin Meta Ads MCP. Covers campaign, ad set and ad reports, ad creative analysis (compare creatives, rank creatives by CPA or ROAS, ad previews), audience and budget reports, pixel health, competitor ad tracking (hooks, angles, offers, video frames and transcripts; no Meta connection needed), and developer feedback for unsupported write operations.
+description: Analyze Meta (Facebook and Instagram) Ads performance and ad creatives, and research competitor ads in the Meta Ad Library, using the Hopkin Meta Ads MCP. Covers campaign, ad set and ad reports, ad creative analysis (compare creatives, rank creatives by CPA or ROAS, ad previews), audience and budget reports, reach and frequency forecasts (spend headroom before saturation, what a budget buys, audience size), pixel health, competitor ad tracking (hooks, angles, offers, video frames and transcripts; no Meta connection needed), and developer feedback for unsupported write operations.
 ---
 
 # Meta Ads Skill
@@ -13,6 +13,7 @@ This skill enables Claude to build comprehensive reports and analyze Meta Ads ca
 - Analyze campaign metrics, ROI, and spending patterns
 - Understand audience demographics and behavior
 - Track budget pacing and forecasting
+- Forecast reach, frequency and saturation: how much more you can spend before an audience saturates, what a budget buys between two dates, and how big an audience is
 - Preview ad creatives with performance data
 - Research competitor ads in the Meta Ad Library and track competitors so their ads keep being collected (no Meta connection needed)
 - Optimize ad performance based on data insights
@@ -112,6 +113,13 @@ Tools accept an optional `connection_id`. `meta_ads_list_connections` lists them
 - `meta_ads_get_ad_creative_report` — **Recommended for ad creative analysis.** Ad-level performance report with full funnel metrics and creative asset info (asset_type, asset_url, thumbnail_url). Supports two grouping modes via `level`: `ad_name` (default, aggregates ads with the same name across ad sets — returns a representative ad_id usable with `meta_ads_preview_ads`) or `ad_id` (one row per ad). Use this instead of `meta_ads_get_performance_report` with `level: "ad"` for creative analysis.
 - `meta_ads_get_insights` — Flexible insights with custom breakdowns, metrics, and date presets. Supports `attributionWindows` to specify post-click and post-view attribution periods (e.g., `["1d_click", "7d_click", "1d_view"]`).
 
+### Forecasting & Audience Size
+- `meta_ads_get_reach_forecast` — **Reach, frequency and spend headroom.** Answers "how much more can we spend before we saturate?", "what reach and frequency does $X buy between these dates?", "what does reaching N people cost?" and "which audience saturates first?". Takes up to 4 `scenarios`, each with exactly one of `adset_id` (that ad set's live targeting and placements), `targeting` (a spec) or `countries` (broad). Optional `budget` or `reach`, `start_date` and `end_date` or `window_days` (window 1–90 days, starting after today), `ladder_multipliers`, `soft_ceiling_freshness_pct`, `comparison_cpm`. Each scenario returns `audience_size`, `meta_estimate`, a spend `ladder` with `freshness_pct` and a `read` of room / diminishing / saturating, a `soft_ceiling_spend`, and a curve. `prediction_id` reads an existing prediction (including one made in Ads Manager) without creating another.
+  - **Pricing:** Meta prices predictions at Reach-objective CPM, which is far cheaper than conversion-optimized delivery. For a conversion campaign, quote the `ladder` (re-priced at the account's real CPM), not `meta_estimate` or the curve, and say which CPM you used.
+  - **Side effect:** each scenario creates one reach & frequency prediction in the ad account. It stays visible in Ads Manager and cannot be deleted, but it commits no spend and reserves nothing. Tell the user before running it on an account for the first time, and reuse a `prediction_id` (for example one returned as `pending`) rather than creating a new prediction.
+  - Needs a connection granted `ads_management` and an account with Meta's reach & frequency capability. A scenario can come back `failed` (audience too small, budget too low, below a country's minimum reach) while the others still return.
+- `meta_ads_get_delivery_estimate` — **Audience size.** The range of monthly active people (`audience_size.lower_bound` / `upper_bound`) a targeting setup can reach. Size a hypothetical audience (`optimization_goal` + `targeting_spec`) or existing ad sets (`adset_ids`, up to 25). Read-only. This is audience size, not a results forecast: never present it as predicted conversions, clicks or daily reach. For reach, frequency and spend, use `meta_ads_get_reach_forecast`.
+
 ### Pixel & Tracking
 - `meta_ads_get_pixel_health` — **Pixel health audit.** Check Meta Pixel and Conversions API (CAPI) integration status, event volumes, automatic advanced matching coverage, and event diagnostics. Use when users ask about tracking health, event firing, CAPI status, or data quality. Params: `account_id` (required), `pixel_id?`, `event_names?` (filter to specific events), `days_back?` (lookback window, default 7), `limit?`, `cursor?`
 
@@ -164,7 +172,7 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The Hopkin Meta Ads MCP does not change your Meta Ads account. Its only write tools act on Hopkin's own records or send feedback: connection management (`meta_ads_rename_connection`, `meta_ads_set_default_connection`, `meta_ads_share_connection`, `meta_ads_unshare_connection`, `meta_ads_revoke_connection`), competitor tracking (`meta_ads_track_competitor`, `meta_ads_untrack_competitor`), turning creative intelligence on for an ad account (`meta_ads_enable_creative_intelligence`) `meta_ads_developer_feedback`, which sends your feedback to Hopkin, and `meta_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When a user requests write operations in the account (create campaign, update budget, pause ads, etc.):
+The Hopkin Meta Ads MCP does not change your campaigns, ad sets, ads or budgets. The one tool that writes to the Meta ad account is `meta_ads_get_reach_forecast`, which creates a reach & frequency prediction (an estimate that commits no spend and cannot be deleted). Its other write tools act on Hopkin's own records or send feedback: connection management (`meta_ads_rename_connection`, `meta_ads_set_default_connection`, `meta_ads_share_connection`, `meta_ads_unshare_connection`, `meta_ads_revoke_connection`), competitor tracking (`meta_ads_track_competitor`, `meta_ads_untrack_competitor`), turning creative intelligence on for an ad account (`meta_ads_enable_creative_intelligence`) `meta_ads_developer_feedback`, which sends your feedback to Hopkin, and `meta_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When a user requests write operations in the account (create campaign, update budget, pause ads, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
 2. **Offer to send a feature request** to Hopkin with `meta_ads_developer_feedback`, and call it only if the user says yes, with:
@@ -232,6 +240,21 @@ Monitor budget utilization and spending pace, forecast end-of-period spend, iden
 
 ---
 
+### Reach & Scaling Forecast
+
+Answer forward-looking budget questions: how much more an audience can absorb before it saturates, what a budget buys over a window, what reaching N people costs, and which of several audiences saturates first.
+
+**Primary tool:** `meta_ads_get_reach_forecast` (use `meta_ads_get_delivery_estimate` when the user only wants audience size)
+
+**Quick workflow:**
+1. Find the ad sets to compare with `meta_ads_list_adsets` and pass them as `adset_id` scenarios, or describe the audience with `countries` or `targeting`
+2. Leave `budget` empty to start from the account's recent spend, or pass the budget or reach the user asked about
+3. Lead with each scenario's `soft_ceiling_spend` and the `read` on each ladder step; quote ladder dollars, not Meta's Reach-objective prices
+4. For a `pending` scenario, call again with its `prediction_id` only
+5. Mention that the forecast left a prediction in Ads Manager (no spend, cannot be deleted)
+
+---
+
 ### Pixel Health & Tracking Audit
 
 Audit Meta Pixel implementation health, verify Conversions API (CAPI) integration, check event volumes and quality, and diagnose tracking issues.
@@ -282,7 +305,7 @@ If it returns `undefined`, **reload once and re-probe** — the API is absent un
 
 ## Unsupported Write Operations
 
-The Hopkin Meta Ads MCP does not support create, update, or delete operations. When users request these actions, follow the developer feedback workflow.
+The Hopkin Meta Ads MCP does not support creating, updating or deleting campaigns, ad sets, ads or budgets (`meta_ads_get_reach_forecast` creates only a reach & frequency prediction). When users request these actions, follow the developer feedback workflow.
 
 **See detailed workflow:** **references/workflows/common-actions.md**
 
