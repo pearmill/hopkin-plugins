@@ -2,7 +2,7 @@
 
 ## Write Operations (Unsupported)
 
-The Hopkin TikTok Ads MCP does not change your TikTok account; its only write tools act on Hopkin's own records or send feedback: connection management (`tiktok_ads_rename_connection`, `tiktok_ads_set_default_connection`, `tiktok_ads_share_connection`, `tiktok_ads_unshare_connection`, `tiktok_ads_revoke_connection`), turning creative intelligence on for an ad account (`tiktok_ads_enable_creative_intelligence`) and `tiktok_ads_developer_feedback`, which sends your feedback to Hopkin. When users request write operations in the account, follow the workflow below.
+The Hopkin TikTok Ads MCP does not change your TikTok account; its only write tools act on Hopkin's own records or send feedback: connection management (`tiktok_ads_rename_connection`, `tiktok_ads_set_default_connection`, `tiktok_ads_share_connection`, `tiktok_ads_unshare_connection`, `tiktok_ads_revoke_connection`), turning creative intelligence on for an ad account (`tiktok_ads_enable_creative_intelligence`) `tiktok_ads_developer_feedback`, which sends your feedback to Hopkin, and `tiktok_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When users request write operations in the account, follow the workflow below.
 
 ### Write Operation Workflow
 

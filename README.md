@@ -26,7 +26,7 @@ Add the Hopkin plugin marketplace to Claude Code, then install:
 /plugin install hopkin@hopkin-plugins
 ```
 
-One install gives you all supported platforms. After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=readme&utm_content=readme). Hopkin reads campaign data from the ad platforms and does not change your ad accounts. A few tools do write: they rename, share, set the default for or revoke your Hopkin connections, track or untrack competitors, turn on creative intelligence for an ad account, and send feedback to Hopkin.
+One install gives you all supported platforms. After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=readme&utm_content=readme). Hopkin reads campaign data from the ad platforms and does not change your ad accounts. A few tools do write: they rename, share, set the default for or revoke your Hopkin connections, track or untrack competitors, turn on creative intelligence for an ad account, send feedback to Hopkin, and create a Stripe checkout link when the organization owner asks to pay.
 
 ## Why Hopkin
 

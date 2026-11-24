@@ -196,7 +196,7 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The Hopkin Google Ads MCP does not change your Google Ads account. Its only write tools act on Hopkin's own records or send feedback: connection management (`google_ads_rename_connection`, `google_ads_set_default_connection`, `google_ads_share_connection`, `google_ads_unshare_connection`, `google_ads_revoke_connection`) and `google_ads_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (create campaign, update budget, pause ads, etc.):
+The Hopkin Google Ads MCP does not change your Google Ads account. Its only write tools act on Hopkin's own records or send feedback: connection management (`google_ads_rename_connection`, `google_ads_set_default_connection`, `google_ads_share_connection`, `google_ads_unshare_connection`, `google_ads_revoke_connection`) `google_ads_developer_feedback`, which sends your feedback to Hopkin, and `google_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When a user requests write operations in the account (create campaign, update budget, pause ads, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
 2. **Offer to send a feature request** to Hopkin with `google_ads_developer_feedback`, and call it only if the user says yes, with:

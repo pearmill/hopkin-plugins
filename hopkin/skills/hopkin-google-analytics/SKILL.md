@@ -15,7 +15,7 @@ This skill enables Claude to analyze Google Analytics 4 data via the Hopkin Goog
 - Verify tags and key events fire in realtime after tracking changes
 - Look up valid dimension/metric API names (including custom definitions) before building reports
 
-The MCP reads data through the GA4 Admin API and Data API for reporting and configuration inspection. It does not change your Google Analytics account; its only write tools act on Hopkin's own records or send feedback: connection management (`ga4_rename_connection`, `ga4_set_default_connection`, `ga4_share_connection`, `ga4_unshare_connection`, `ga4_revoke_connection`) and `ga4_developer_feedback`, which sends your feedback to Hopkin.
+The MCP reads data through the GA4 Admin API and Data API for reporting and configuration inspection. It does not change your Google Analytics account; its only write tools act on Hopkin's own records or send feedback: connection management (`ga4_rename_connection`, `ga4_set_default_connection`, `ga4_share_connection`, `ga4_unshare_connection`, `ga4_revoke_connection`) `ga4_developer_feedback`, which sends your feedback to Hopkin, and `ga4_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay.
 
 ## Prerequisites
 
@@ -156,7 +156,7 @@ If it returns `undefined`, **reload once and re-probe** — the API is absent un
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The Hopkin Google Analytics MCP does not change your Google Analytics account. Its only write tools act on Hopkin's own records or send feedback: connection management (`ga4_rename_connection`, `ga4_set_default_connection`, `ga4_share_connection`, `ga4_unshare_connection`, `ga4_revoke_connection`) and `ga4_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (create key events, edit data streams, change retention settings, link Google Ads, etc.):
+The Hopkin Google Analytics MCP does not change your Google Analytics account. Its only write tools act on Hopkin's own records or send feedback: connection management (`ga4_rename_connection`, `ga4_set_default_connection`, `ga4_share_connection`, `ga4_unshare_connection`, `ga4_revoke_connection`) `ga4_developer_feedback`, which sends your feedback to Hopkin, and `ga4_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When a user requests write operations in the account (create key events, edit data streams, change retention settings, link Google Ads, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
 2. **Offer to send a feature request** to Hopkin with `ga4_developer_feedback`, and call it only if the user says yes, with:

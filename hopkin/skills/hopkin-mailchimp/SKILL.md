@@ -114,7 +114,7 @@ This skill supports six primary report types and a developer feedback workflow f
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The Hopkin Mailchimp MCP does not change your Mailchimp account. Its only write tools act on Hopkin's own records or send feedback: connection management (`mailchimp_rename_connection`, `mailchimp_set_default_connection`, `mailchimp_share_connection`, `mailchimp_unshare_connection`, `mailchimp_revoke_connection`) and `mailchimp_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (create campaign, add subscriber, update tags, send campaign, etc.):
+The Hopkin Mailchimp MCP does not change your Mailchimp account. Its only write tools act on Hopkin's own records or send feedback: connection management (`mailchimp_rename_connection`, `mailchimp_set_default_connection`, `mailchimp_share_connection`, `mailchimp_unshare_connection`, `mailchimp_revoke_connection`) `mailchimp_developer_feedback`, which sends your feedback to Hopkin, and `mailchimp_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When a user requests write operations in the account (create campaign, add subscriber, update tags, send campaign, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
 2. **Offer to send a feature request** to Hopkin with `mailchimp_developer_feedback`, and call it only if the user says yes, with:

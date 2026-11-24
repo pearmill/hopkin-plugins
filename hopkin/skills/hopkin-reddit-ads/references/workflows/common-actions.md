@@ -2,7 +2,7 @@
 
 ## Write Operations (Unsupported)
 
-The Hopkin Reddit Ads MCP does not change your Reddit Ads account; its only write tools act on Hopkin's own records or send feedback: connection management (`reddit_ads_rename_connection`, `reddit_ads_set_default_connection`, `reddit_ads_share_connection`, `reddit_ads_unshare_connection`, `reddit_ads_revoke_connection`) and `reddit_ads_developer_feedback`, which sends your feedback to Hopkin. When users request write operations in the account, follow the workflow below.
+The Hopkin Reddit Ads MCP does not change your Reddit Ads account; its only write tools act on Hopkin's own records or send feedback: connection management (`reddit_ads_rename_connection`, `reddit_ads_set_default_connection`, `reddit_ads_share_connection`, `reddit_ads_unshare_connection`, `reddit_ads_revoke_connection`) `reddit_ads_developer_feedback`, which sends your feedback to Hopkin, and `reddit_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When users request write operations in the account, follow the workflow below.
 
 ### Write Operation Workflow
 

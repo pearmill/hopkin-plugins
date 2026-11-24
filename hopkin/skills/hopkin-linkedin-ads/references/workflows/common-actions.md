@@ -2,7 +2,7 @@
 
 ## Write Operations (Unsupported)
 
-The Hopkin LinkedIn Ads MCP is **does not change your LinkedIn account**: it cannot create, change, pause, or delete anything in Campaign Manager. The only things it can change are on the Hopkin side — which competitors you track (`linkedin_ads_track_competitor` / `linkedin_ads_untrack_competitor`) your LinkedIn connections (`linkedin_ads_set_default_connection` and the other connection tools), whether creative intelligence is enabled for an ad account (`linkedin_ads_enable_creative_intelligence`), and feedback sent to Hopkin (`linkedin_ads_developer_feedback`). When users request LinkedIn write operations, follow the workflow below.
+The Hopkin LinkedIn Ads MCP **does not change your LinkedIn account**: it cannot create, change, pause, or delete anything in Campaign Manager. The only things it can change are on the Hopkin side — which competitors you track (`linkedin_ads_track_competitor` / `linkedin_ads_untrack_competitor`) your LinkedIn connections (`linkedin_ads_set_default_connection` and the other connection tools), whether creative intelligence is enabled for an ad account (`linkedin_ads_enable_creative_intelligence`), feedback sent to Hopkin (`linkedin_ads_developer_feedback`), and a Stripe checkout link created when the organization owner asks to pay (`linkedin_ads_get_billing_status`). When users request LinkedIn write operations, follow the workflow below.
 
 ### Write Operation Feedback Workflow
 

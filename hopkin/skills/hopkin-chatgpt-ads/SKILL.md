@@ -16,7 +16,7 @@ This skill enables Claude to analyze and report on ChatGPT Ads (OpenAI Ads) camp
 - Resolve custom audience targeting from bare IDs to names
 - Manage which connected ad account is used
 
-**This MCP does not change your ChatGPT Ads account.** It can report on the account but cannot create, edit, pause or archive anything there. Its only write tools act on Hopkin's own records or send feedback: connection management (`chatgpt_ads_rename_connection`, `chatgpt_ads_set_default_connection`, `chatgpt_ads_share_connection`, `chatgpt_ads_unshare_connection`, `chatgpt_ads_revoke_connection`) and `chatgpt_ads_developer_feedback`, which sends your feedback to Hopkin. See [Write Operations](#write-operations-unsupported--developer-feedback).
+**This MCP does not change your ChatGPT Ads account.** It can report on the account but cannot create, edit, pause or archive anything there. Its only write tools act on Hopkin's own records or send feedback: connection management (`chatgpt_ads_rename_connection`, `chatgpt_ads_set_default_connection`, `chatgpt_ads_share_connection`, `chatgpt_ads_unshare_connection`, `chatgpt_ads_revoke_connection`) `chatgpt_ads_developer_feedback`, which sends your feedback to Hopkin, and `chatgpt_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. See [Write Operations](#write-operations-unsupported--developer-feedback).
 
 ## Prerequisites
 
