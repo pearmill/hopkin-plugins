@@ -15,7 +15,7 @@ When a user requests a create, update, pause, or delete operation:
 
 Direct them to perform the action manually via Reddit Ads Manager at https://ads.reddit.com
 
-**Note:** There is no `reddit_ads_developer_feedback` tool available. If a write operation would be valuable, note it for future consideration but do not attempt to call a feedback tool.
+**Feedback:** if the user wants Hopkin to support this write operation, `reddit_ads_developer_feedback` can send a short description of the missing capability to Hopkin. Call it only when the user asks you to, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap itself: do not include the conversation, its history or a summary of it.
 
 ### Common Write Operations
 
