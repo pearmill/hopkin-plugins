@@ -20,8 +20,7 @@ Confirm the account (`microsoft_ads_list_accounts`), the date range and whether 
   "parameters": {
     "account_id": "123456789",
     "date_preset": "LastFourWeeks",
-    "aggregation": "Summary",
-    "reason": "Keyword performance and Quality Score review"
+    "aggregation": "Summary"
   }
 }
 ```
@@ -49,8 +48,7 @@ Read Quality Score components as the fix list:
   "tool": "microsoft_ads_get_search_terms",
   "parameters": {
     "account_id": "123456789",
-    "date_range": { "start": "2026-10-01", "end": "2026-10-31" },
-    "reason": "Search terms for negative keyword and expansion review"
+    "date_range": { "start": "2026-10-01", "end": "2026-10-31" }
   }
 }
 ```

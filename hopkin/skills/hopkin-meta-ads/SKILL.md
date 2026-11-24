@@ -135,8 +135,6 @@ Tools accept an optional `connection_id`. `meta_ads_list_connections` lists them
 ### Feedback
 - `meta_ads_developer_feedback` — Submit feature requests and workflow gap reports
 
-> **Note:** Every tool call requires a `reason` (string) parameter for audit trail.
-
 ## Core Capabilities
 
 This skill supports six primary report types and a developer feedback workflow for write operations.
@@ -169,7 +167,7 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 The Hopkin Meta Ads MCP does not change your Meta Ads account. Its only write tools act on Hopkin's own records or send feedback: connection management (`meta_ads_rename_connection`, `meta_ads_set_default_connection`, `meta_ads_share_connection`, `meta_ads_unshare_connection`, `meta_ads_revoke_connection`), competitor tracking (`meta_ads_track_competitor`, `meta_ads_untrack_competitor`), turning creative intelligence on for an ad account (`meta_ads_enable_creative_intelligence`) and `meta_ads_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (create campaign, update budget, pause ads, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
-2. **Submit a feature request** by calling `meta_ads_developer_feedback` with:
+2. **Offer to send a feature request** to Hopkin with `meta_ads_developer_feedback`, and call it only if the user says yes, with:
    - `feedback_type: "workflow_gap"`
    - `title`: Description of the write operation requested
    - `description`: What the user was trying to do
@@ -177,20 +175,9 @@ The Hopkin Meta Ads MCP does not change your Meta Ads account. Its only write to
    - `priority`: Based on user's urgency
 3. **Provide guidance** on performing the action manually via Meta Ads Manager
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-Whenever you complete a task and believe there should have been a faster or more efficient way to get the answer — for example, if you had to make multiple tool calls that could have been a single call, or if a dedicated tool for the workflow would have saved time — call `meta_ads_developer_feedback` with:
-- `feedback_type: "new_tool"` or `"improvement"`
-- `title`: Brief description of the missing capability
-- `description`: Explain what you were trying to accomplish, the steps you had to take, and how a new or improved tool could have made it faster
-- `current_workaround`: The steps you took to work around the limitation
-- `priority`: `"medium"`
-
-This helps the Hopkin team prioritize building tools that make common workflows more efficient.
-
-### User Feedback to Skill Developers
-
-Users can provide feedback about this skill directly through the Hopkin Meta Ads MCP. If a user wants to suggest improvements, report issues, or request new capabilities, call `meta_ads_developer_feedback` on their behalf with the appropriate `feedback_type` (`new_tool`, `improvement`, `bug`, or `workflow_gap`) and include their feedback in the `description`.
+`meta_ads_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Report Workflows
 
@@ -337,7 +324,6 @@ Attribution windows define how long after an ad click or view a conversion is co
 {
   "tool": "meta_ads_get_performance_report",
   "parameters": {
-    "reason": "Comparing 1-day vs 7-day click attribution to understand conversion lag",
     "account_id": "act_123456789",
     "level": "campaign",
     "time_range": {"since": "2026-01-01", "until": "2026-01-31"},

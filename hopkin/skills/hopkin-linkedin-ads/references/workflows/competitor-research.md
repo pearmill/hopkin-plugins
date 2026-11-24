@@ -70,7 +70,6 @@ If you have the organization ID (from a `linkedin.com/company/<id>` or Ad Librar
 {
   "tool": "linkedin_ads_search_ad_library",
   "parameters": {
-    "reason": "User wants to see one company's current LinkedIn ads without tracking it",
     "organization_ids": ["17955831"],
     "countries": ["ALL"]
   }
@@ -83,7 +82,6 @@ With only a name, pass `advertiser_name`:
 {
   "tool": "linkedin_ads_search_ad_library",
   "parameters": {
-    "reason": "User wants to see one company's current LinkedIn ads without tracking it",
     "advertiser_name": "Acme Analytics",
     "countries": ["ALL"]
   }
@@ -122,7 +120,6 @@ With the organization ID (or a pasted `linkedin.com/company/<id>` or Ad Library 
 {
   "tool": "linkedin_ads_track_competitor",
   "parameters": {
-    "reason": "User asked to start tracking a competitor whose LinkedIn organization ID we have",
     "organization_id": "1234567",
     "countries": ["US", "GB", "DE"]
   }
@@ -135,7 +132,6 @@ With only a name:
 {
   "tool": "linkedin_ads_track_competitor",
   "parameters": {
-    "reason": "User asked to start tracking a competitor",
     "name": "Acme Analytics",
     "countries": ["US", "GB", "DE"]
   }
@@ -164,7 +160,7 @@ If the call errors because the live lookup failed or timed out, **nothing was tr
 ```json
 {
   "tool": "linkedin_ads_list_tracked_competitors",
-  "parameters": { "reason": "Finding the tracked competitor's advertiser ID" }
+  "parameters": {}
 }
 ```
 
@@ -176,7 +172,6 @@ Each row has `advertiser_id`, an `advertiser` object (`name`, `platform_advertis
 {
   "tool": "linkedin_ads_list_competitor_ads",
   "parameters": {
-    "reason": "Reviewing a tracked competitor's active video creative",
     "advertiser_id": "<advertiser_id from step 1>",
     "active_only": true,
     "display_format": "sponsored_video"
@@ -192,7 +187,6 @@ Filters: `active_only`, `display_format`, `since` (seen on/after a date), `searc
 {
   "tool": "linkedin_ads_get_competitor_ad",
   "parameters": {
-    "reason": "Reading the full copy and media of the competitor's latest ad",
     "ad_id": "<ad id from step 2>"
   }
 }
@@ -229,7 +223,6 @@ Quote these values as given. If an ad has no such block (it wasn't delivered in 
 {
   "tool": "linkedin_ads_untrack_competitor",
   "parameters": {
-    "reason": "User no longer wants to track this competitor",
     "advertiser_id": "<advertiser_id>"
   }
 }

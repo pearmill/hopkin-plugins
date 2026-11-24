@@ -30,7 +30,6 @@ Start with `tiktok_ads_get_performance_report` at the campaign level for a high-
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Getting campaign-level performance report for February 2026",
     "advertiser_id": "7012345678901234567",
     "level": "campaign",
     "start_date": "2026-02-01",
@@ -49,7 +48,6 @@ Drill down into a specific campaign to see ad group performance:
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Breaking down performance by ad group within the conversion campaign",
     "advertiser_id": "7012345678901234567",
     "level": "adgroup",
     "start_date": "2026-02-01",
@@ -67,7 +65,6 @@ For creative-level performance within a specific ad group:
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Ad-level performance breakdown to identify top-performing creatives",
     "advertiser_id": "7012345678901234567",
     "level": "ad",
     "start_date": "2026-02-01",
@@ -152,7 +149,6 @@ For trend analysis, use `tiktok_ads_get_insights` with a time dimension:
 {
   "tool": "tiktok_ads_get_insights",
   "parameters": {
-    "reason": "Daily spend and performance trend for the account over February",
     "advertiser_id": "7012345678901234567",
     "report_type": "BASIC",
     "dimensions": ["stat_time_day"],

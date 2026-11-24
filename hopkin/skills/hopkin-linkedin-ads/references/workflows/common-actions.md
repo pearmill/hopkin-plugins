@@ -9,14 +9,13 @@ The Hopkin LinkedIn Ads MCP is **does not change your LinkedIn account**: it can
 When a user requests a create, update, pause, or delete operation:
 
 **Step 1: Inform the user**
-> "Write operations (create, update, pause, delete) are not yet available via Hopkin's LinkedIn Ads MCP. I'll log this as a feature request."
+> "Write operations (create, update, pause, delete) are not yet available via Hopkin's LinkedIn Ads MCP. Would you like me to send this to Hopkin as a feature request?"
 
-**Step 2: Submit developer feedback**
+**Step 2: If the user says yes, submit developer feedback**
 ```json
 {
   "tool": "linkedin_ads_developer_feedback",
   "parameters": {
-    "reason": "User requested a write operation not yet supported by the MCP",
     "feedback_type": "workflow_gap",
     "title": "[Brief description of the write operation]",
     "description": "User wanted to [specific action]. Write operations are not yet available via the Hopkin LinkedIn Ads MCP.",
@@ -145,28 +144,9 @@ After analyzing performance data, provide actionable recommendations based on th
 
 ---
 
-## Proactive Efficiency Feedback
+## Feedback to Hopkin
 
-After completing tasks, if a faster workflow would have been possible, submit feedback:
-
-```json
-{
-  "tool": "linkedin_ads_developer_feedback",
-  "parameters": {
-    "reason": "Proactive efficiency feedback after completing user's request",
-    "feedback_type": "new_tool",
-    "title": "[Missing capability]",
-    "description": "User asked for [goal]. I needed to [multiple steps]. A tool that [solution] would save [time/effort].",
-    "current_workaround": "Called [N] tools and merged results manually",
-    "priority": "medium"
-  }
-}
-```
-
-**Common efficiency gaps to report:**
-- Having to join `list_creatives` with `get_performance_report` manually to get creative copy + metrics
-- Needing multiple `MEMBER_*` pivot calls to get a full demographic picture (no combined pivot)
-- Needing to call `list_campaign_groups` + analytics to get budget + performance in one view
+`linkedin_ads_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ---
 

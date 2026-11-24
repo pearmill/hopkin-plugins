@@ -20,7 +20,6 @@ Start with `tiktok_ads_get_creative_report` for video-specific metrics across al
 {
   "tool": "tiktok_ads_get_creative_report",
   "parameters": {
-    "reason": "Getting creative-level performance with video metrics for February 2026",
     "advertiser_id": "7012345678901234567",
     "start_date": "2026-02-01",
     "end_date": "2026-02-28"
@@ -38,7 +37,6 @@ Use `tiktok_ads_get_performance_report` at the ad level for cost and delivery me
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Getting ad-level cost and delivery metrics to combine with creative data",
     "advertiser_id": "7012345678901234567",
     "level": "ad",
     "start_date": "2026-02-01",
@@ -55,7 +53,6 @@ Use `tiktok_ads_list_ads` to get creative configuration details (video URLs, thu
 {
   "tool": "tiktok_ads_list_ads",
   "parameters": {
-    "reason": "Listing ad creative details to understand what content each ad uses",
     "advertiser_id": "7012345678901234567",
     "campaign_ids": ["1801234567890123"]
   }
@@ -70,7 +67,6 @@ Use `tiktok_ads_preview_ads` to generate preview links for the top-performing cr
 {
   "tool": "tiktok_ads_preview_ads",
   "parameters": {
-    "reason": "Generating preview links for top 3 performing ads to share with the team",
     "advertiser_id": "7012345678901234567",
     "ad_ids": ["1901234567890123", "1901234567890124", "1901234567890125"]
   }
@@ -125,7 +121,6 @@ When comparing creative variants, use this approach:
 {
   "tool": "tiktok_ads_list_ads",
   "parameters": {
-    "reason": "Listing all ads in the A/B test ad group to identify variants",
     "advertiser_id": "7012345678901234567",
     "adgroup_ids": ["1851234567890123"]
   }
@@ -138,7 +133,6 @@ When comparing creative variants, use this approach:
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Comparing ad-level performance for creative A/B test variants",
     "advertiser_id": "7012345678901234567",
     "level": "ad",
     "start_date": "2026-02-01",
@@ -154,7 +148,6 @@ When comparing creative variants, use this approach:
 {
   "tool": "tiktok_ads_get_creative_report",
   "parameters": {
-    "reason": "Comparing video engagement metrics across A/B test creatives",
     "advertiser_id": "7012345678901234567",
     "start_date": "2026-02-01",
     "end_date": "2026-02-28"

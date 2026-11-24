@@ -159,7 +159,7 @@ If it returns `undefined`, **reload once and re-probe** — the API is absent un
 The Hopkin Google Analytics MCP does not change your Google Analytics account. Its only write tools act on Hopkin's own records or send feedback: connection management (`ga4_rename_connection`, `ga4_set_default_connection`, `ga4_share_connection`, `ga4_unshare_connection`, `ga4_revoke_connection`) and `ga4_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (create key events, edit data streams, change retention settings, link Google Ads, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
-2. **Submit a feature request** by calling `ga4_developer_feedback` with:
+2. **Offer to send a feature request** to Hopkin with `ga4_developer_feedback`, and call it only if the user says yes, with:
    - `feedback_type: "workflow_gap"`
    - `title`: Description of the write operation requested
    - `description`: What the user was trying to do
@@ -167,18 +167,9 @@ The Hopkin Google Analytics MCP does not change your Google Analytics account. I
    - `priority`: Based on user's urgency
 3. **Provide guidance** on performing the action manually in the GA4 admin UI
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-Whenever you complete a task and believe there should have been a faster or more efficient way to get the answer — for example, if you had to make multiple tool calls that could have been a single call, or if a dedicated tool for the workflow would have saved time — call `ga4_developer_feedback` with:
-- `feedback_type: "new_tool"` or `"improvement"`
-- `title`: Brief description of the missing capability
-- `description`: Explain what you were trying to accomplish, the steps you had to take, and how a new or improved tool could have made it faster
-- `current_workaround`: The steps you took to work around the limitation
-- `priority`: `"medium"`
-
-### User Feedback to Skill Developers
-
-Users can provide feedback about this skill directly through the Hopkin Google Analytics MCP. If a user wants to suggest improvements, report issues, or request new capabilities, call `ga4_developer_feedback` on their behalf with the appropriate `feedback_type` (`new_tool`, `improvement`, `bug`, or `workflow_gap`) and include their feedback in the `description`.
+`ga4_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Best Practices
 

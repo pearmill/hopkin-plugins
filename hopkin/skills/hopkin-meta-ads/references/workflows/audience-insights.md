@@ -23,7 +23,6 @@ Use `meta_ads_get_insights` with one or more breakdown dimensions applied.
 {
   "tool": "meta_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing audience demographics for targeting optimization",
     "account_id": "act_123456789",
     "level": "campaign",
     "date_preset": "last_30d",
@@ -37,7 +36,6 @@ Use `meta_ads_get_insights` with one or more breakdown dimensions applied.
 {
   "tool": "meta_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing geographic performance to identify top markets",
     "account_id": "act_123456789",
     "level": "campaign",
     "date_preset": "last_30d",
@@ -51,7 +49,6 @@ Use `meta_ads_get_insights` with one or more breakdown dimensions applied.
 {
   "tool": "meta_ads_get_insights",
   "parameters": {
-    "reason": "Comparing performance across platforms and devices",
     "account_id": "act_123456789",
     "level": "campaign",
     "date_preset": "last_30d",
@@ -92,7 +89,6 @@ Render a bar chart showing performance by demographic segment:
 {
   "tool": "meta_ads_render_chart",
   "parameters": {
-    "reason": "Visualizing CPA by age-gender segment to identify high-value audiences",
     "chart": {
       "type": "bar",
       "data": [

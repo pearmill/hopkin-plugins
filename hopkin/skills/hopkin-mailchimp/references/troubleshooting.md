@@ -122,7 +122,7 @@ This guide provides solutions to common issues encountered when using the Mailch
 **Solutions:**
 - Retry the request
 - Check MCP server health with `mailchimp_ping`
-- If persistent, report via `mailchimp_developer_feedback`
+- If persistent, offer to report it via `mailchimp_developer_feedback` (send only if the user says yes)
 
 ---
 

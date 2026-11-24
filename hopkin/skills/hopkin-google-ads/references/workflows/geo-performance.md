@@ -39,7 +39,6 @@ Additional levels: `geo_target_province`, `geo_target_county`, `geo_target_distr
 {
   "tool": "google_ads_get_geo_performance",
   "parameters": {
-    "reason": "Analyzing geographic performance by country for last 7 days",
     "customer_id": "1234567890",
     "date_preset": "LAST_7_DAYS"
   }
@@ -51,7 +50,6 @@ Additional levels: `geo_target_province`, `geo_target_county`, `geo_target_distr
 {
   "tool": "google_ads_get_geo_performance",
   "parameters": {
-    "reason": "City-level breakdown for Brand Search campaign",
     "customer_id": "1234567890",
     "campaign_id": "123456789",
     "geo_level": "geo_target_city",
@@ -66,7 +64,6 @@ Additional levels: `geo_target_province`, `geo_target_county`, `geo_target_distr
 {
   "tool": "google_ads_get_geo_performance",
   "parameters": {
-    "reason": "Daily geographic trends by country",
     "customer_id": "1234567890",
     "date_preset": "LAST_7_DAYS",
     "segments": ["date"]
@@ -79,7 +76,6 @@ Additional levels: `geo_target_province`, `geo_target_county`, `geo_target_distr
 {
   "tool": "google_ads_get_geo_performance",
   "parameters": {
-    "reason": "Metro area performance across all campaigns",
     "customer_id": "1234567890",
     "level": "ACCOUNT",
     "geo_level": "geo_target_metro",
@@ -93,7 +89,6 @@ Additional levels: `geo_target_province`, `geo_target_county`, `geo_target_distr
 {
   "tool": "google_ads_get_geo_performance",
   "parameters": {
-    "reason": "Geographic performance for MCC-managed client",
     "customer_id": "1234567890",
     "login_customer_id": "9999999999",
     "date_preset": "LAST_30_DAYS"
@@ -127,7 +122,6 @@ Render a choropleth map for US state-level performance:
 {
   "tool": "google_ads_render_chart",
   "parameters": {
-    "reason": "Visualizing spend distribution across US states",
     "chart": {
       "type": "choropleth",
       "data": [

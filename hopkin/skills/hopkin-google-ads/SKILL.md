@@ -164,8 +164,6 @@ Tools accept an optional `connection_id`. `google_ads_list_connections` lists th
 ### Feedback
 - `google_ads_developer_feedback` — Submit feature requests and workflow gap reports
 
-> **Note:** Every tool call requires a `reason` (string) parameter for audit trail.
-
 ## Core Capabilities
 
 This skill supports nine primary report types and a developer feedback workflow for write operations.
@@ -201,7 +199,7 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 The Hopkin Google Ads MCP does not change your Google Ads account. Its only write tools act on Hopkin's own records or send feedback: connection management (`google_ads_rename_connection`, `google_ads_set_default_connection`, `google_ads_share_connection`, `google_ads_unshare_connection`, `google_ads_revoke_connection`) and `google_ads_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (create campaign, update budget, pause ads, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
-2. **Submit a feature request** by calling `google_ads_developer_feedback` with:
+2. **Offer to send a feature request** to Hopkin with `google_ads_developer_feedback`, and call it only if the user says yes, with:
    - `feedback_type: "workflow_gap"`
    - `title`: Description of the write operation requested
    - `description`: What the user was trying to do
@@ -209,20 +207,9 @@ The Hopkin Google Ads MCP does not change your Google Ads account. Its only writ
    - `priority`: Based on user's urgency
 3. **Provide guidance** on performing the action manually via Google Ads
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-Whenever you complete a task and believe there should have been a faster or more efficient way to get the answer — for example, if you had to make multiple tool calls that could have been a single call, or if a dedicated tool for the workflow would have saved time — call `google_ads_developer_feedback` with:
-- `feedback_type: "new_tool"` or `"improvement"`
-- `title`: Brief description of the missing capability
-- `description`: Explain what you were trying to accomplish, the steps you had to take, and how a new or improved tool could have made it faster
-- `current_workaround`: The steps you took to work around the limitation
-- `priority`: `"medium"`
-
-This helps the Hopkin team prioritize building tools that make common workflows more efficient.
-
-### User Feedback to Skill Developers
-
-Users can provide feedback about this skill directly through the Hopkin Google Ads MCP. If a user wants to suggest improvements, report issues, or request new capabilities, call `google_ads_developer_feedback` on their behalf with the appropriate `feedback_type` (`new_tool`, `improvement`, `bug`, or `workflow_gap`) and include their feedback in the `description`.
+`google_ads_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Report Workflows
 

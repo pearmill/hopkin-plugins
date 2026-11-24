@@ -182,7 +182,6 @@ LinkedIn provider tokens expire after **60 days**. Unlike Meta and Google, Linke
 {
   "tool": "linkedin_ads_get_insights",
   "parameters": {
-    "reason": "Demographic analysis by job function",
     "account_id": "123456789",
     "pivot": "MEMBER_JOB_FUNCTION",
     "date_preset": "LAST_30_DAYS"
@@ -203,7 +202,6 @@ LinkedIn provider tokens expire after **60 days**. Unlike Meta and Google, Linke
 {
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
-    "reason": "Sends, opens and open rate for Conversation Ads",
     "account_id": "123456789",
     "pivots": ["CAMPAIGN"],
     "date_preset": "LAST_30_DAYS",
@@ -407,7 +405,7 @@ When encountering issues, work through this checklist:
   - [ ] User role in LinkedIn Campaign Manager allows read access
 
 - [ ] **Request Parameters**
-  - [ ] All required parameters are provided (including `reason`)
+  - [ ] All required parameters are provided
   - [ ] `account_id` is a numeric ID passed as a string (no URN prefix)
   - [ ] Date ranges are valid YYYY-MM-DD format
   - [ ] Using `linkedin_ads_get_insights` (not `get_performance_report`) for MEMBER_* pivots

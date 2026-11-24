@@ -78,42 +78,40 @@ No manager/MCC hierarchy — advertisers are accessed directly; no `login_custom
 ## Available MCP Tools
 
 ### Authentication
-- `tiktok_ads_ping` — Health check and connectivity test. Params: `message?`, `reason`
-- `tiktok_ads_check_auth_status` — Verify auth and troubleshoot connection issues; only call when another tool returns an auth error, not proactively. Params: `reason`
-- `tiktok_ads_get_login_url` — Get TikTok OAuth login URL for user authentication. Params: `reason`
-- `tiktok_ads_get_user_info` — Get authenticated user info. Params: `reason`
+- `tiktok_ads_ping` — Health check and connectivity test. Params: `message?`
+- `tiktok_ads_check_auth_status` — Verify auth and troubleshoot connection issues; only call when another tool returns an auth error, not proactively.
+- `tiktok_ads_get_login_url` — Get TikTok OAuth login URL for user authentication.
+- `tiktok_ads_get_user_info` — Get authenticated user info.
 
 ### Accounts
-- `tiktok_ads_list_advertisers` — List accessible TikTok advertisers (ad accounts). Params: `advertiser_id?`, `limit?`, `cursor?`, `reason`
-- `tiktok_ads_get_advertiser` — Get a single advertiser's details. Params: `advertiser_id` (required), `reason`
+- `tiktok_ads_list_advertisers` — List accessible TikTok advertisers (ad accounts). Params: `advertiser_id?`, `limit?`, `cursor?`
+- `tiktok_ads_get_advertiser` — Get a single advertiser's details. Params: `advertiser_id` (required)
 
 ### Campaigns
-- `tiktok_ads_list_campaigns` — List campaigns for an advertiser. Params: `advertiser_id` (required), `campaign_id?`, `campaign_ids?`, `status?` (ENABLE/DISABLE/DELETE), `search?`, `limit?`, `cursor?`, `reason`
-- `tiktok_ads_get_campaign` — Get a single campaign. Params: `advertiser_id` (required), `campaign_id` (required), `reason`
+- `tiktok_ads_list_campaigns` — List campaigns for an advertiser. Params: `advertiser_id` (required), `campaign_id?`, `campaign_ids?`, `status?` (ENABLE/DISABLE/DELETE), `search?`, `limit?`, `cursor?`
+- `tiktok_ads_get_campaign` — Get a single campaign. Params: `advertiser_id` (required), `campaign_id` (required)
 
 ### Ad Groups
-- `tiktok_ads_list_ad_groups` — List ad groups with targeting and bid details. Params: `advertiser_id` (required), `adgroup_id?`, `adgroup_ids?`, `campaign_ids?`, `status?` (ENABLE/DISABLE/DELETE), `search?`, `limit?`, `cursor?`, `reason`
-- `tiktok_ads_get_ad_group` — Get a single ad group. Params: `advertiser_id` (required), `adgroup_id` (required), `reason`
+- `tiktok_ads_list_ad_groups` — List ad groups with targeting and bid details. Params: `advertiser_id` (required), `adgroup_id?`, `adgroup_ids?`, `campaign_ids?`, `status?` (ENABLE/DISABLE/DELETE), `search?`, `limit?`, `cursor?`
+- `tiktok_ads_get_ad_group` — Get a single ad group. Params: `advertiser_id` (required), `adgroup_id` (required)
 
 ### Ads
-- `tiktok_ads_list_ads` — List ads. Params: `advertiser_id` (required), `ad_id?`, `ad_ids?`, `campaign_ids?`, `adgroup_ids?`, `status?` (ENABLE/DISABLE/DELETE), `search?`, `limit?`, `cursor?`, `reason`
-- `tiktok_ads_get_ad` — Get a single ad. Params: `advertiser_id` (required), `ad_id` (required), `reason`
+- `tiktok_ads_list_ads` — List ads. Params: `advertiser_id` (required), `ad_id?`, `ad_ids?`, `campaign_ids?`, `adgroup_ids?`, `status?` (ENABLE/DISABLE/DELETE), `search?`, `limit?`, `cursor?`
+- `tiktok_ads_get_ad` — Get a single ad. Params: `advertiser_id` (required), `ad_id` (required)
 
 ### Analytics
-- `tiktok_ads_get_performance_report` — **Primary analytics tool.** Performance report at campaign, ad group, or ad level. Params: `advertiser_id` (required), `level` (required: `campaign`, `adgroup`, or `ad`), `date_preset?`, `start_date?`, `end_date?`, `campaign_id?`, `adgroup_id?`, `page?`, `page_size?`, `reason`
-- `tiktok_ads_get_insights` — **Custom reporting** with configurable dimensions and metrics. Supports AUDIENCE report type for demographic breakdowns. Params: `advertiser_id` (required), `report_type?` (BASIC/AUDIENCE), `data_level` (required), `dimensions` (required), `metrics?`, `start_date?`, `end_date?`, `lifetime?`, `page?`, `page_size?`, `reason`
-- `tiktok_ads_get_creative_report` — **Video/creative performance** metrics including video completion rates and social engagement. Params: `advertiser_id` (required), `campaign_id?`, `adgroup_id?`, `start_date?`, `end_date?`, `page?`, `page_size?`, `reason`
+- `tiktok_ads_get_performance_report` — **Primary analytics tool.** Performance report at campaign, ad group, or ad level. Params: `advertiser_id` (required), `level` (required: `campaign`, `adgroup`, or `ad`), `date_preset?`, `start_date?`, `end_date?`, `campaign_id?`, `adgroup_id?`, `page?`, `page_size?`
+- `tiktok_ads_get_insights` — **Custom reporting** with configurable dimensions and metrics. Supports AUDIENCE report type for demographic breakdowns. Params: `advertiser_id` (required), `report_type?` (BASIC/AUDIENCE), `data_level` (required), `dimensions` (required), `metrics?`, `start_date?`, `end_date?`, `lifetime?`, `page?`, `page_size?`
+- `tiktok_ads_get_creative_report` — **Video/creative performance** metrics including video completion rates and social engagement. Params: `advertiser_id` (required), `campaign_id?`, `adgroup_id?`, `start_date?`, `end_date?`, `page?`, `page_size?`
 
 ### Creative
-- `tiktok_ads_preview_ads` — MCP App: visual ad previews with optional metric overlays. Params: `advertiser_id` (required), `ads` (required: array of `{ad_id, metrics?}`), `metric_labels?`, `reason`
+- `tiktok_ads_preview_ads` — MCP App: visual ad previews with optional metric overlays. Params: `advertiser_id` (required), `ads` (required: array of `{ad_id, metrics?}`), `metric_labels?`
 
 ### Audiences
-- `tiktok_ads_list_audiences` — List audiences for targeting. Params: `advertiser_id` (required), `limit?`, `cursor?`, `reason`
+- `tiktok_ads_list_audiences` — List audiences for targeting. Params: `advertiser_id` (required), `limit?`, `cursor?`
 
 ### Feedback
-- `tiktok_ads_developer_feedback` — Submit feedback about missing tools, improvements, bugs, or workflow gaps in the MCP toolset. Not for user-facing auth/API errors. Params: `feedback_type` (new_tool|improvement|bug|workflow_gap), `title`, `description`, `priority?`, `current_workaround?`, `reason`
-
-> **Note:** Every tool call requires a `reason` (string) parameter for audit trail.
+- `tiktok_ads_developer_feedback` — Submit feedback about missing tools, improvements, bugs, or workflow gaps in the MCP toolset. Not for user-facing auth/API errors. Params: `feedback_type` (new_tool|improvement|bug|workflow_gap), `title`, `description`, `priority?`, `current_workaround?`
 
 ## Core Capabilities
 

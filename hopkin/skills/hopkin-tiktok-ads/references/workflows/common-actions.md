@@ -48,7 +48,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Identifying ads with low CTR for creative optimization",
     "advertiser_id": "7012345678901234567",
     "level": "ad",
     "start_date": "2026-02-01",
@@ -79,7 +78,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Comparing CPC across ad groups to find expensive segments",
     "advertiser_id": "7012345678901234567",
     "level": "adgroup",
     "start_date": "2026-02-01",
@@ -106,7 +104,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_get_creative_report",
   "parameters": {
-    "reason": "Analyzing video engagement funnel to identify drop-off points",
     "advertiser_id": "7012345678901234567",
     "start_date": "2026-02-01",
     "end_date": "2026-02-28"
@@ -138,7 +135,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_list_campaigns",
   "parameters": {
-    "reason": "Checking campaign status and budget settings for underspending campaigns",
     "advertiser_id": "7012345678901234567"
   }
 }

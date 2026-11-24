@@ -15,8 +15,7 @@ Check the things that quietly break a Microsoft Advertising account: disapproved
     "account_id": "123456789",
     "status": ["Active"],
     "include_policy_issues": true,
-    "include_url_tracking": true,
-    "reason": "Account health audit: disapprovals and URL tracking"
+    "include_url_tracking": true
   }
 }
 ```
@@ -37,8 +36,7 @@ For a single ad group, use `microsoft_ads_list_ads` or `microsoft_ads_list_keywo
   "tool": "microsoft_ads_list_ad_extensions",
   "parameters": {
     "account_id": "123456789",
-    "editorial_status": ["Disapproved", "ActiveLimited", "Inactive"],
-    "reason": "Finding disapproved or limited ad extensions"
+    "editorial_status": ["Disapproved", "ActiveLimited", "Inactive"]
   }
 }
 ```
@@ -55,8 +53,7 @@ For a single ad group, use `microsoft_ads_list_ads` or `microsoft_ads_list_keywo
 {
   "tool": "microsoft_ads_get_uet_tag_health",
   "parameters": {
-    "account_id": "123456789",
-    "reason": "Checking UET tags and conversion goals are recording"
+    "account_id": "123456789"
   }
 }
 ```

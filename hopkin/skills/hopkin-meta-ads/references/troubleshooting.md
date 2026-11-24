@@ -87,7 +87,6 @@ After installing or configuring the MCP server:
    {
      "tool": "meta_ads_check_auth_status",
      "parameters": {
-       "reason": "Checking if user is authenticated"
      }
    }
    ```
@@ -125,7 +124,6 @@ Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can
 {
   "tool": "meta_ads_list_ad_accounts",
   "parameters": {
-    "reason": "Listing available accounts to find the correct one"
   }
 }
 ```
@@ -189,7 +187,6 @@ Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can
    {
      "tool": "meta_ads_list_campaigns",
      "parameters": {
-       "reason": "Checking campaign status to troubleshoot missing data",
        "account_id": "act_123456789"
      }
    }
@@ -313,7 +310,7 @@ When encountering issues, work through this checklist:
   - [ ] Ad account ID is correctly formatted (act_XXXXX)
 
 - [ ] **Request Parameters**
-  - [ ] All required parameters are provided (including `reason`)
+  - [ ] All required parameters are provided
   - [ ] Date ranges are valid
   - [ ] Account ID starts with "act_"
 

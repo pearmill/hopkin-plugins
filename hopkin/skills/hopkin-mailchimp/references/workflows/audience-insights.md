@@ -26,7 +26,6 @@ If the user hasn't specified an audience:
 {
   "tool": "mailchimp_list_audiences",
   "parameters": {
-    "reason": "Finding audiences to analyze"
   }
 }
 ```
@@ -41,7 +40,6 @@ For baseline stats and settings:
 {
   "tool": "mailchimp_get_audience",
   "parameters": {
-    "reason": "Getting audience baseline stats",
     "audience_id": "abc123"
   }
 }
@@ -53,7 +51,6 @@ For baseline stats and settings:
 {
   "tool": "mailchimp_get_audience_insights",
   "parameters": {
-    "reason": "Analyzing audience health and growth",
     "audience_id": "abc123",
     "include_growth_history": true,
     "include_activity": true,
@@ -71,7 +68,6 @@ To understand audience structure:
 {
   "tool": "mailchimp_list_segments",
   "parameters": {
-    "reason": "Reviewing audience segments",
     "audience_id": "abc123"
   }
 }
@@ -85,7 +81,6 @@ To see how subscribers are organized:
 {
   "tool": "mailchimp_list_tags",
   "parameters": {
-    "reason": "Reviewing audience tags",
     "audience_id": "abc123"
   }
 }

@@ -20,7 +20,6 @@ Use `linkedin_ads_list_campaign_groups` to get budget and schedule information:
 {
   "tool": "linkedin_ads_list_campaign_groups",
   "parameters": {
-    "reason": "Getting budget configuration for all active campaign groups",
     "account_id": "123456789",
     "status": ["ACTIVE"]
   }
@@ -37,7 +36,6 @@ Use `linkedin_ads_get_insights` with `time_granularity: "DAILY"` for day-by-day 
 {
   "tool": "linkedin_ads_get_insights",
   "parameters": {
-    "reason": "Getting daily spend trend for budget pacing analysis",
     "account_id": "123456789",
     "pivot": "ACCOUNT",
     "date_preset": "THIS_MONTH",
@@ -51,7 +49,6 @@ Use `linkedin_ads_get_insights` with `time_granularity: "DAILY"` for day-by-day 
 {
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
-    "reason": "Daily spend per campaign group for pacing analysis",
     "account_id": "123456789",
     "pivots": ["CAMPAIGN_GROUP"],
     "date_preset": "THIS_MONTH",
@@ -68,7 +65,6 @@ Use `linkedin_ads_get_account_summary` for a snapshot of current period performa
 {
   "tool": "linkedin_ads_get_account_summary",
   "parameters": {
-    "reason": "Getting account-level spend summary for the current month",
     "account_id": "123456789",
     "date_preset": "THIS_MONTH"
   }
@@ -111,7 +107,6 @@ For new campaigns or budget planning, use `linkedin_ads_get_budget_pricing` to u
 {
   "tool": "linkedin_ads_get_budget_pricing",
   "parameters": {
-    "reason": "Getting recommended CPC bid range for new Sponsored Content campaign targeting US professionals",
     "account_id": "123456789",
     "campaign_type": "SPONSORED_UPDATES",
     "bid_type": "CPC",
@@ -130,7 +125,6 @@ This returns recommended minimum and maximum bid amounts for the specified audie
 {
   "tool": "linkedin_ads_get_budget_pricing",
   "parameters": {
-    "reason": "Bid ranges for Director+ level targeting in the US tech industry",
     "account_id": "123456789",
     "campaign_type": "SPONSORED_UPDATES",
     "bid_type": "CPC",
@@ -179,7 +173,6 @@ Present an account summary (spend to date, projected month-end spend, monthly bu
 {
   "tool": "linkedin_ads_list_campaigns",
   "parameters": {
-    "reason": "Checking campaign status for underspending campaign groups",
     "account_id": "123456789",
     "status": ["ACTIVE", "PAUSED", "DRAFT"]
   }
@@ -232,7 +225,6 @@ Render a timeseries chart with daily spend data:
 {
   "tool": "linkedin_ads_render_chart",
   "parameters": {
-    "reason": "Showing daily spend trend for budget pacing analysis",
     "chart": {
       "type": "timeseries",
       "data": {

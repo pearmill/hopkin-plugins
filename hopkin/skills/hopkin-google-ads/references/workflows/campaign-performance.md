@@ -23,7 +23,6 @@ Use `google_ads_get_insights` only when you need custom metric selection, specia
 {
   "tool": "google_ads_get_performance_report",
   "parameters": {
-    "reason": "Generating campaign performance report for last 30 days",
     "customer_id": "1234567890",
     "level": "CAMPAIGN",
     "date_preset": "LAST_30_DAYS"
@@ -36,7 +35,6 @@ Use `google_ads_get_insights` only when you need custom metric selection, specia
 {
   "tool": "google_ads_get_performance_report",
   "parameters": {
-    "reason": "Analyzing campaign performance for January 2026",
     "customer_id": "1234567890",
     "level": "CAMPAIGN",
     "date_range": {"start_date": "2026-01-01", "end_date": "2026-01-31"}
@@ -49,7 +47,6 @@ Use `google_ads_get_insights` only when you need custom metric selection, specia
 {
   "tool": "google_ads_get_performance_report",
   "parameters": {
-    "reason": "Getting daily campaign performance trends",
     "customer_id": "1234567890",
     "level": "CAMPAIGN",
     "date_preset": "LAST_30_DAYS",
@@ -63,7 +60,6 @@ Use `google_ads_get_insights` only when you need custom metric selection, specia
 {
   "tool": "google_ads_get_performance_report",
   "parameters": {
-    "reason": "Campaign performance for client managed under MCC",
     "customer_id": "1234567890",
     "login_customer_id": "9999999999",
     "level": "CAMPAIGN",
@@ -114,7 +110,6 @@ Render a bar chart comparing campaigns by spend or ROAS:
 {
   "tool": "google_ads_render_chart",
   "parameters": {
-    "reason": "Comparing campaign performance by spend and ROAS",
     "chart": {
       "type": "bar",
       "data": [

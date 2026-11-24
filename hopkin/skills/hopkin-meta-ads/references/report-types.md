@@ -53,7 +53,6 @@ Use `meta_ads_get_insights` instead when you need:
 
 ### Parameters
 
-- `reason` (string, required) — Audit trail reason
 - `account_id` (string, required) — Ad account ID (act_XXXXXXXXXXXXX)
 - `level` (string, required) — `"campaign"`, `"adset"`, or `"ad"`
 - `date_preset` (string, optional) — e.g., `"last_7d"`, `"last_30d"`

@@ -19,7 +19,7 @@ The API has **no account-wide or campaign-wide ad listing**. There is no shortcu
 ### Step 1: List Campaigns
 
 ```
-chatgpt_ads_list_campaigns(reason: "Find campaigns to audit creative review status")
+chatgpt_ads_list_campaigns()
 ```
 
 Note each campaign's `id` and `status`. A paused campaign stops everything beneath it, which is often the real answer.
@@ -27,7 +27,7 @@ Note each campaign's `id` and `status`. A paused campaign stops everything benea
 ### Step 2: List Ad Groups Per Campaign
 
 ```
-chatgpt_ads_list_ad_groups(campaign_id: "<real id from step 1>", reason: "...")
+chatgpt_ads_list_ad_groups(campaign_id: "<real id from step 1>")
 ```
 
 Scope this. Auditing every campaign in a large account multiplies requests against a rate limit counted per IP. If the user named a campaign, use only that one.
@@ -35,7 +35,7 @@ Scope this. Auditing every campaign in a large account multiplies requests again
 ### Step 3: List Ads Per Ad Group
 
 ```
-chatgpt_ads_list_ads(ad_group_id: "<real id from step 2>", reason: "...")
+chatgpt_ads_list_ads(ad_group_id: "<real id from step 2>")
 ```
 
 Use `review_status` to filter directly when looking for problems.

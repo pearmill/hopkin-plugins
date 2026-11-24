@@ -13,7 +13,6 @@ This guide explains how to generate a comprehensive keyword, search term, and au
    {
      "tool": "google_ads_list_accounts",
      "parameters": {
-       "reason": "Finding the correct Google Ads account for keyword analysis"
      }
    }
    ```
@@ -71,7 +70,6 @@ Use `google_ads_get_keyword_performance` to get keyword-level data with quality 
 {
   "tool": "google_ads_get_keyword_performance",
   "parameters": {
-    "reason": "Gathering keyword performance data for analysis",
     "customer_id": "1234567890",
     "campaign_id": "123456789",
     "order_by": "cost",
@@ -85,7 +83,6 @@ Use `google_ads_get_keyword_performance` to get keyword-level data with quality 
 {
   "tool": "google_ads_get_keyword_performance",
   "parameters": {
-    "reason": "Analyzing exact match keyword performance",
     "customer_id": "1234567890",
     "keyword_match_type": "EXACT",
     "order_by": "conversions",
@@ -118,7 +115,6 @@ Use `google_ads_list_keywords` to find keywords Google has disapproved or is sti
 {
   "tool": "google_ads_list_keywords",
   "parameters": {
-    "reason": "Find keywords with policy problems",
     "customer_id": "1234567890",
     "approval_status": ["DISAPPROVED", "UNDER_REVIEW", "PENDING_REVIEW"]
   }
@@ -137,7 +133,6 @@ Use `google_ads_get_search_terms_report` to see which actual queries triggered a
 {
   "tool": "google_ads_get_search_terms_report",
   "parameters": {
-    "reason": "Analyzing search terms for keyword opportunities and negative candidates",
     "customer_id": "1234567890",
     "campaign_id": "123456789",
     "order_by": "cost",
@@ -151,7 +146,6 @@ Use `google_ads_get_search_terms_report` to see which actual queries triggered a
 {
   "tool": "google_ads_get_search_terms_report",
   "parameters": {
-    "reason": "Finding search terms not yet added as keywords",
     "customer_id": "1234567890",
     "search_term_status": ["NONE"],
     "order_by": "conversions",
@@ -172,7 +166,6 @@ Performance Max campaigns never appear in the rows above. For the individual que
 {
   "tool": "google_ads_get_search_terms_report",
   "parameters": {
-    "reason": "Find PMax queries not yet negated, ranked by cost",
     "customer_id": "1234567890",
     "date_preset": "LAST_30_DAYS",
     "include_pmax_search_terms": true,
@@ -200,7 +193,6 @@ Use `google_ads_get_insights` with segments for audience-level data:
 {
   "tool": "google_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing audience performance for targeting optimization",
     "customer_id": "1234567890",
     "level": "CAMPAIGN",
     "date_preset": "LAST_30_DAYS",
@@ -326,7 +318,6 @@ Render a scatter chart plotting keywords by spend vs. conversions:
 {
   "tool": "google_ads_render_chart",
   "parameters": {
-    "reason": "Plotting keywords by spend vs conversions to identify scaling opportunities",
     "chart": {
       "type": "scatter",
       "data": [

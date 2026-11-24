@@ -16,8 +16,7 @@ Call `microsoft_ads_list_accounts` (with `search` when the user names a client).
 {
   "tool": "microsoft_ads_list_accounts",
   "parameters": {
-    "search": "acme",
-    "reason": "Finding the Microsoft Ads account for the campaign performance report"
+    "search": "acme"
   }
 }
 ```
@@ -46,8 +45,7 @@ When the goals the user cares about are excluded from bidding, pass `include_all
     "account_id": "123456789",
     "level": "Campaign",
     "date_preset": "LastThreeMonths",
-    "aggregation": "Summary",
-    "reason": "Campaign comparison for the last three months"
+    "aggregation": "Summary"
   }
 }
 ```

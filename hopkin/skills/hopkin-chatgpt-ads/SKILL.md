@@ -157,17 +157,13 @@ This MCP does not change the ad account, by design. If the user asks to create, 
 
 1. **Tell them plainly** that the ChatGPT Ads MCP does not change the account and the change must be made in ChatGPT Ads Manager
 2. **Offer the analysis** that would inform the change
-3. **Call `chatgpt_ads_developer_feedback`** with `feedback_type: "new_tool"` describing the operation they wanted
+3. **Offer to report it with `chatgpt_ads_developer_feedback`** (call it only if the user says yes), using `feedback_type: "new_tool"` describing the operation they wanted
 
 Do not attempt a workaround. There is no write path.
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-If you find yourself making many calls to answer a routine question — for example traversing every campaign and ad group just to list all ads — submit `chatgpt_ads_developer_feedback` with `feedback_type: "improvement"`. Note that an account-wide ad listing is deliberately absent because it would be O(campaigns × ad groups) against a shared rate limit, so propose a narrower aggregate rather than a blanket listing.
-
-### User Feedback to Skill Developers
-
-If the user reports a gap in this skill itself, call `chatgpt_ads_developer_feedback` with `interface: "skill"`.
+`chatgpt_ads_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Report Workflows
 

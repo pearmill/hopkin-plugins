@@ -27,17 +27,16 @@ When a user asks to create, update, pause, delete, or otherwise modify Meta Ads 
 
 Let the user know that write operations are not yet available via the Hopkin Meta Ads MCP:
 
-> Write operations (create, update, pause, delete) are not yet available through the Hopkin Meta Ads MCP. I've submitted a feature request on your behalf so the team knows this capability is needed.
+> Write operations (create, update, pause, delete) are not yet available through the Hopkin Meta Ads MCP. If you like, I can send a feature request to Hopkin so the team knows this capability is needed.
 
-#### Step 2: Submit Developer Feedback
+#### Step 2: Offer to Send Developer Feedback
 
-Call `meta_ads_developer_feedback` to log the request as a workflow gap:
+Ask the user whether they want the request sent to Hopkin. Only if they say yes, call `meta_ads_developer_feedback` to log it as a workflow gap:
 
 ```json
 {
   "tool": "meta_ads_developer_feedback",
   "parameters": {
-    "reason": "User requested a write operation that is not yet supported",
     "feedback_type": "workflow_gap",
     "title": "[Description of the write operation]",
     "description": "[What the user was trying to do, including specific details like campaign names, budget amounts, status changes, etc.]",
@@ -51,7 +50,6 @@ Call `meta_ads_developer_feedback` to log the request as a workflow gap:
 **Creating a campaign:**
 ```json
 {
-  "reason": "User wants to create a new campaign",
   "feedback_type": "workflow_gap",
   "title": "Create new campaign",
   "description": "User wanted to create a new Sales campaign named 'Spring Sale 2026' with a $100/day budget in account act_123456789.",
@@ -62,7 +60,6 @@ Call `meta_ads_developer_feedback` to log the request as a workflow gap:
 **Updating a budget:**
 ```json
 {
-  "reason": "User wants to update campaign budget",
   "feedback_type": "workflow_gap",
   "title": "Update campaign budget",
   "description": "User wanted to increase daily budget from $100 to $150 for campaign 'Summer Sale 2026' (ID: 123456789).",
@@ -73,7 +70,6 @@ Call `meta_ads_developer_feedback` to log the request as a workflow gap:
 **Pausing a campaign:**
 ```json
 {
-  "reason": "User wants to pause a campaign",
   "feedback_type": "workflow_gap",
   "title": "Pause campaign",
   "description": "User wanted to pause campaign 'Old Summer Sale' (ID: 123456789) because the promotion has ended.",

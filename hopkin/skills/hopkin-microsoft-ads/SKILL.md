@@ -132,8 +132,6 @@ Tools accept an optional `connection_id`. `microsoft_ads_list_connections` lists
 ### Feedback
 - `microsoft_ads_developer_feedback`: report a missing tool, a needed improvement, a bug or a workflow gap
 
-> **Note:** Every tool call requires a `reason` (string) parameter for the audit trail.
-
 ## Core Capabilities
 
 ### Pick the Right Report
@@ -208,17 +206,13 @@ The Hopkin Microsoft Ads MCP **does not change your ad account, by design**; its
 
 1. **Tell them plainly** that the change must be made in Microsoft Advertising (https://ads.microsoft.com) or Microsoft Advertising Editor
 2. **Offer the analysis** that informs the change
-3. **Call `microsoft_ads_developer_feedback`** with `feedback_type: "missing_tool"` and a `message` describing the operation they wanted and why
+3. **Offer to report it with `microsoft_ads_developer_feedback`** (call it only if the user says yes), using `feedback_type: "missing_tool"` and a `message` describing the operation they wanted and why
 
 Keyword planning and forecasts, ad previews and any write path are deliberately not offered. Report them the same way rather than improvising.
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-If a routine question took many calls (for example, walking every ad group to collect something a single report should return), call `microsoft_ads_developer_feedback` with `feedback_type: "workflow_gap"` or `"improvement"`, describing what you needed and the steps it took. When a tool returned wrong or incomplete data, use `feedback_type: "bug"` and set `tool_name`.
-
-### User Feedback to Skill Developers
-
-If the user wants to suggest an improvement or report a problem, call `microsoft_ads_developer_feedback` on their behalf with the matching `feedback_type` and their words in `message`.
+`microsoft_ads_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Report Workflows
 

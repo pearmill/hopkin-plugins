@@ -30,7 +30,6 @@ Start with `reddit_ads_get_account_summary` for a high-level overview:
 {
   "tool": "reddit_ads_get_account_summary",
   "parameters": {
-    "reason": "Getting account-level performance summary to orient analysis",
     "account_id": "t2_abc123",
     "date_start": "2026-02-01",
     "date_end": "2026-02-28"
@@ -48,7 +47,6 @@ Use `reddit_ads_get_performance_report` with `breakdown: ["campaign"]` for campa
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Generating campaign performance report for February 2026",
     "account_id": "t2_abc123",
     "breakdown": ["campaign"],
     "date_start": "2026-02-01",
@@ -65,7 +63,6 @@ To see targeting-level breakdown within a specific campaign:
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Breaking down performance by ad group within the awareness campaign",
     "account_id": "t2_abc123",
     "breakdown": ["ad_group"],
     "date_start": "2026-02-01",
@@ -83,7 +80,6 @@ For creative-level performance:
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Ad-level performance breakdown to identify top creatives",
     "account_id": "t2_abc123",
     "breakdown": ["ad"],
     "date_start": "2026-02-01",
@@ -167,7 +163,6 @@ For trend analysis, add `"date"` to the breakdown:
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Daily spend and performance trend for the account over February",
     "account_id": "t2_abc123",
     "breakdown": ["campaign", "date"],
     "date_start": "2026-02-01",

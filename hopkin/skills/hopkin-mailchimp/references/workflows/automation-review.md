@@ -16,7 +16,6 @@ Review automation sequences — status, email performance, and delivery metrics 
 {
   "tool": "mailchimp_list_automations",
   "parameters": {
-    "reason": "Listing active automations",
     "status": ["sending"]
   }
 }
@@ -27,7 +26,6 @@ Review automation sequences — status, email performance, and delivery metrics 
 {
   "tool": "mailchimp_list_automations",
   "parameters": {
-    "reason": "Listing all automations for review"
   }
 }
 ```
@@ -38,7 +36,6 @@ Review automation sequences — status, email performance, and delivery metrics 
 {
   "tool": "mailchimp_get_automation",
   "parameters": {
-    "reason": "Reviewing automation performance",
     "automation_id": "abc123def4"
   }
 }

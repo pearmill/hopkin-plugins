@@ -54,6 +54,10 @@ Most ad teams repeat the same workflows every week: morning performance checks, 
 | Google Search Console | hopkin-google-search-console |
 | Google Analytics (GA4) | hopkin-google-analytics |
 
+## Feedback to Hopkin
+
+Every Hopkin server has a `*_developer_feedback` tool (for example `meta_ads_developer_feedback`). It sends a short description of a missing capability or fault to Hopkin. Claude sends it only when you ask it to, or after asking you and getting a yes. It does not send your conversation, its history or a summary of it.
+
 ## Get an Account
 
 The plugin requires a Hopkin account. Sign up at [hopkin.ai](https://hopkin.ai).

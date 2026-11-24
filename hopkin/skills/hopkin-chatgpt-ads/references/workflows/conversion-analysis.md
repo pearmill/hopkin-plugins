@@ -20,7 +20,7 @@ Three things make this different from other platforms' conversion reporting:
 ### Step 1: Establish Account Context
 
 ```
-chatgpt_ads_get_ad_account(reason: "Get currency and timezone for conversion analysis")
+chatgpt_ads_get_ad_account()
 ```
 
 Cost per conversion and order revenue are money values and need the account currency. Days are in the account timezone, which matters when matching against store orders.
@@ -30,7 +30,7 @@ If the user has several ChatGPT Ads accounts, `chatgpt_ads_list_ad_accounts` fir
 ### Step 2: Check What Is Being Counted
 
 ```
-chatgpt_ads_list_conversion_event_settings(reason: "Identify the goal conversion event and its attribution window")
+chatgpt_ads_list_conversion_event_settings()
 ```
 
 This tells you what the goal-event `conversions` count means. Without it, that count is uninterpretable.
@@ -48,7 +48,6 @@ chatgpt_ads_get_insights(
   event_names: ["order_created"],     # optional: narrow the per-event list
   date_since: "YYYY-MM-DD",
   date_until: "YYYY-MM-DD",
-  reason: "..."
 )
 ```
 
