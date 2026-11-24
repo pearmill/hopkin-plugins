@@ -33,7 +33,6 @@ Use `reddit_ads_list_custom_audiences` to see all available audiences:
 {
   "tool": "reddit_ads_list_custom_audiences",
   "parameters": {
-    "reason": "Reviewing all custom audiences available in the account",
     "account_id": "t2_abc123"
   }
 }
@@ -57,7 +56,6 @@ Use `reddit_ads_list_ad_groups` to see targeting settings per ad group:
 {
   "tool": "reddit_ads_list_ad_groups",
   "parameters": {
-    "reason": "Reviewing targeting configuration for all ad groups in the campaign",
     "account_id": "t2_abc123",
     "campaign_id": "campaign_123"
   }
@@ -82,7 +80,6 @@ Filter performance reports by ad group to compare how different targeting strate
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Comparing performance across ad groups with different targeting strategies",
     "account_id": "t2_abc123",
     "breakdown": ["ad_group"],
     "date_start": "2026-02-01",
@@ -98,7 +95,6 @@ To compare specific ad groups:
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Comparing performance of interest-targeted vs subreddit-targeted ad groups",
     "account_id": "t2_abc123",
     "breakdown": ["ad_group"],
     "date_start": "2026-02-01",
@@ -116,7 +112,6 @@ Use the community breakdown to see which targeted subreddits deliver results:
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Analyzing which targeted subreddits drive the best performance",
     "account_id": "t2_abc123",
     "breakdown": ["community"],
     "date_start": "2026-02-01",

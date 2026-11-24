@@ -23,7 +23,6 @@ Use `meta_ads_list_ad_accounts` to identify the correct account (if needed), the
 {
   "tool": "meta_ads_get_performance_report",
   "parameters": {
-    "reason": "Generating campaign performance report for client review",
     "account_id": "act_123456789",
     "level": "campaign",
     "date_preset": "last_30d"
@@ -36,7 +35,6 @@ Use `meta_ads_list_ad_accounts` to identify the correct account (if needed), the
 {
   "tool": "meta_ads_get_performance_report",
   "parameters": {
-    "reason": "Analyzing campaign performance for January 2026",
     "account_id": "act_123456789",
     "level": "campaign",
     "time_range": {"since": "2026-01-01", "until": "2026-01-31"}
@@ -89,7 +87,6 @@ Render a bar chart comparing campaigns by spend or ROAS:
 {
   "tool": "meta_ads_render_chart",
   "parameters": {
-    "reason": "Comparing campaign performance by spend and ROAS",
     "chart": {
       "type": "bar",
       "data": [
@@ -145,7 +142,6 @@ Request daily or weekly performance using `meta_ads_get_insights` with `time_inc
 {
   "tool": "meta_ads_get_insights",
   "parameters": {
-    "reason": "Getting daily campaign performance trends",
     "account_id": "act_123456789",
     "level": "campaign",
     "date_preset": "last_30d",

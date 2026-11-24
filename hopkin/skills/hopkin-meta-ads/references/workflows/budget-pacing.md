@@ -20,7 +20,6 @@ Use `meta_ads_list_campaigns` to get campaign budget configuration and status:
 {
   "tool": "meta_ads_list_campaigns",
   "parameters": {
-    "reason": "Getting campaign budgets and status for pacing analysis",
     "account_id": "act_123456789",
     "status": "ACTIVE"
   }
@@ -35,7 +34,6 @@ Use `meta_ads_get_insights` with `time_increment: "1"` for daily spend data:
 {
   "tool": "meta_ads_get_insights",
   "parameters": {
-    "reason": "Getting daily spend data for budget pacing calculations",
     "account_id": "act_123456789",
     "level": "campaign",
     "time_range": {"since": "2026-01-01", "until": "2026-01-31"},
@@ -102,7 +100,6 @@ Render a timeseries chart with daily spend data to show pacing visually:
 {
   "tool": "meta_ads_render_chart",
   "parameters": {
-    "reason": "Showing daily spend trend for budget pacing analysis",
     "chart": {
       "type": "timeseries",
       "data": {

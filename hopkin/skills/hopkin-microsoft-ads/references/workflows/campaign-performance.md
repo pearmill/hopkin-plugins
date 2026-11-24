@@ -16,8 +16,7 @@ Call `microsoft_ads_list_accounts` (with `search` when the user names a client).
 {
   "tool": "microsoft_ads_list_accounts",
   "parameters": {
-    "search": "acme",
-    "reason": "Finding the Microsoft Ads account for the campaign performance report"
+    "search": "acme"
   }
 }
 ```
@@ -46,8 +45,7 @@ When the goals the user cares about are excluded from bidding, pass `include_all
     "account_id": "123456789",
     "level": "Campaign",
     "date_preset": "LastThreeMonths",
-    "aggregation": "Summary",
-    "reason": "Campaign comparison for the last three months"
+    "aggregation": "Summary"
   }
 }
 ```
@@ -91,4 +89,4 @@ Flag:
 3. A chart with `microsoft_ads_render_chart` (bar for comparison, timeseries for trends)
 4. The date range, currency and which conversion definition you used
 
-Any change the user wants to make (budgets, pausing, bids) happens in Microsoft Advertising; this MCP is read-only.
+Any change the user wants to make (budgets, pausing, bids) happens in Microsoft Advertising; this MCP does not change the ad account.

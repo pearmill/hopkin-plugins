@@ -87,7 +87,6 @@ After installing or configuring the MCP server:
    {
      "tool": "google_ads_check_auth_status",
      "parameters": {
-       "reason": "Checking if user is authenticated"
      }
    }
    ```
@@ -127,7 +126,6 @@ Use `google_ads_list_accounts` to see which accounts the authenticated user can 
 {
   "tool": "google_ads_list_accounts",
   "parameters": {
-    "reason": "Listing available accounts to find the correct one"
   }
 }
 ```
@@ -189,7 +187,6 @@ Use `google_ads_list_campaigns` to verify campaigns exist and are active:
 {
   "tool": "google_ads_list_campaigns",
   "parameters": {
-    "reason": "Checking campaign status to troubleshoot missing data",
     "customer_id": "1234567890"
   }
 }
@@ -302,7 +299,7 @@ When encountering issues, work through this checklist:
   - [ ] Customer ID is correctly formatted (10 digits, no hyphens)
 
 - [ ] **Request Parameters**
-  - [ ] All required parameters are provided (including `reason`)
+  - [ ] All required parameters are provided
   - [ ] Date ranges are valid
   - [ ] Customer ID is 10 digits with no hyphens
 

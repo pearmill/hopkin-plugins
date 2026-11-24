@@ -16,7 +16,7 @@ Summarizes how an account is set up: its settings, its campaign structure, and w
 ### Step 1: Identify the Account
 
 ```
-chatgpt_ads_list_ad_accounts(reason: "Show which ChatGPT Ads accounts are reachable")
+chatgpt_ads_list_ad_accounts()
 ```
 
 Each API key is scoped to exactly one ad account, so **a single result is correct and normal** — not a failure. A user with three ad accounts has three connections.
@@ -26,7 +26,7 @@ This lists connections, so the name shown is the one the user chose. It may diff
 ### Step 2: Get Account Settings
 
 ```
-chatgpt_ads_get_ad_account(reason: "Report account currency, timezone and review status")
+chatgpt_ads_get_ad_account()
 ```
 
 Returns name, status, currency, timezone, website, and account review status.
@@ -36,7 +36,7 @@ Returns name, status, currency, timezone, website, and account review status.
 ### Step 3: Review Campaign Structure
 
 ```
-chatgpt_ads_list_campaigns(reason: "Review campaign structure and targeting")
+chatgpt_ads_list_campaigns()
 ```
 
 Record status, flight dates, budget (**integer micros**), and the `targeting` block.
@@ -48,7 +48,6 @@ Campaign targeting returns `targeting.custom_audiences.ids` as **bare opaque IDs
 ```
 chatgpt_ads_list_custom_audiences(
   custom_audience_ids: ["<id>", "<id>"],
-  reason: "Resolve audience IDs referenced in campaign targeting"
 )
 ```
 

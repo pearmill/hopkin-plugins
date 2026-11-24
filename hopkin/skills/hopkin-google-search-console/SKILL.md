@@ -127,10 +127,10 @@ Search Console data lends itself well to tables and trend analysis. Present data
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The Hopkin Google Search Console MCP is **read-only**. When a user requests write operations (submit URL for indexing, add sitemap, request removal, etc.):
+The Hopkin Google Search Console MCP does not change your Search Console account. Its only write tools act on Hopkin's own records or send feedback: connection management (`google_search_console_rename_connection`, `google_search_console_set_default_connection`, `google_search_console_share_connection`, `google_search_console_unshare_connection`, `google_search_console_revoke_connection`) `google_search_console_developer_feedback`, which sends your feedback to Hopkin, and `google_search_console_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When a user requests write operations in the account (submit URL for indexing, add sitemap, request removal, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
-2. **Submit a feature request** by calling `google_search_console_developer_feedback` with:
+2. **Offer to send a feature request** to Hopkin with `google_search_console_developer_feedback`, and call it only if the user says yes, with:
    - `feedback_type: "workflow_gap"`
    - `title`: Description of the write operation requested
    - `description`: What the user was trying to do
@@ -138,18 +138,9 @@ The Hopkin Google Search Console MCP is **read-only**. When a user requests writ
    - `priority`: Based on user's urgency
 3. **Provide guidance** on performing the action manually via Google Search Console
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-Whenever you complete a task and believe there should have been a faster or more efficient way to get the answer — for example, if you had to make multiple tool calls that could have been a single call, or if a dedicated tool for the workflow would have saved time — call `google_search_console_developer_feedback` with:
-- `feedback_type: "new_tool"` or `"improvement"`
-- `title`: Brief description of the missing capability
-- `description`: Explain what you were trying to accomplish, the steps you had to take, and how a new or improved tool could have made it faster
-- `current_workaround`: The steps you took to work around the limitation
-- `priority`: `"medium"`
-
-### User Feedback to Skill Developers
-
-Users can provide feedback about this skill directly through the Hopkin Google Search Console MCP. If a user wants to suggest improvements, report issues, or request new capabilities, call `google_search_console_developer_feedback` on their behalf with the appropriate `feedback_type` (`new_tool`, `improvement`, `bug`, or `workflow_gap`) and include their feedback in the `description`.
+`google_search_console_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Report Workflows
 

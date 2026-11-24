@@ -15,7 +15,6 @@ Examine individual subscribers — their status, merge fields, activity history,
 {
   "tool": "mailchimp_list_audiences",
   "parameters": {
-    "reason": "Finding audience for subscriber lookup"
   }
 }
 ```
@@ -27,7 +26,6 @@ Examine individual subscribers — their status, merge fields, activity history,
 {
   "tool": "mailchimp_list_subscribers",
   "parameters": {
-    "reason": "Searching for specific subscriber",
     "audience_id": "abc123",
     "search": "user@example.com"
   }
@@ -39,7 +37,6 @@ Examine individual subscribers — their status, merge fields, activity history,
 {
   "tool": "mailchimp_list_subscribers",
   "parameters": {
-    "reason": "Listing unsubscribed members",
     "audience_id": "abc123",
     "status": ["unsubscribed"],
     "limit": 50
@@ -53,7 +50,6 @@ Examine individual subscribers — their status, merge fields, activity history,
 {
   "tool": "mailchimp_get_subscriber",
   "parameters": {
-    "reason": "Getting full subscriber profile",
     "audience_id": "abc123",
     "email_or_hash": "user@example.com",
     "include_activity": true

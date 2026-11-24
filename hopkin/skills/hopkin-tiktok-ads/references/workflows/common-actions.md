@@ -2,7 +2,7 @@
 
 ## Write Operations (Unsupported)
 
-The Hopkin TikTok Ads MCP is **read-only**. When users request write operations, follow the workflow below.
+The Hopkin TikTok Ads MCP does not change your TikTok account; its only write tools act on Hopkin's own records or send feedback: connection management (`tiktok_ads_rename_connection`, `tiktok_ads_set_default_connection`, `tiktok_ads_share_connection`, `tiktok_ads_unshare_connection`, `tiktok_ads_revoke_connection`), turning creative intelligence on for an ad account (`tiktok_ads_enable_creative_intelligence`) `tiktok_ads_developer_feedback`, which sends your feedback to Hopkin, and `tiktok_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When users request write operations in the account, follow the workflow below.
 
 ### Write Operation Workflow
 
@@ -48,7 +48,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Identifying ads with low CTR for creative optimization",
     "advertiser_id": "7012345678901234567",
     "level": "ad",
     "start_date": "2026-02-01",
@@ -79,7 +78,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_get_performance_report",
   "parameters": {
-    "reason": "Comparing CPC across ad groups to find expensive segments",
     "advertiser_id": "7012345678901234567",
     "level": "adgroup",
     "start_date": "2026-02-01",
@@ -106,7 +104,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_get_creative_report",
   "parameters": {
-    "reason": "Analyzing video engagement funnel to identify drop-off points",
     "advertiser_id": "7012345678901234567",
     "start_date": "2026-02-01",
     "end_date": "2026-02-28"
@@ -138,7 +135,6 @@ After analyzing performance data, provide actionable recommendations based on th
 {
   "tool": "tiktok_ads_list_campaigns",
   "parameters": {
-    "reason": "Checking campaign status and budget settings for underspending campaigns",
     "advertiser_id": "7012345678901234567"
   }
 }

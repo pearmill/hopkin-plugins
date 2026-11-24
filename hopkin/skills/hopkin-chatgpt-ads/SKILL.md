@@ -16,7 +16,7 @@ This skill enables Claude to analyze and report on ChatGPT Ads (OpenAI Ads) camp
 - Resolve custom audience targeting from bare IDs to names
 - Manage which connected ad account is used
 
-**This MCP is read-only.** It can report on the account but cannot create, edit, pause, or archive anything. See [Write Operations](#write-operations-unsupported--developer-feedback).
+**This MCP does not change your ChatGPT Ads account.** It can report on the account but cannot create, edit, pause or archive anything there. Its only write tools act on Hopkin's own records or send feedback: connection management (`chatgpt_ads_rename_connection`, `chatgpt_ads_set_default_connection`, `chatgpt_ads_share_connection`, `chatgpt_ads_unshare_connection`, `chatgpt_ads_revoke_connection`) `chatgpt_ads_developer_feedback`, which sends your feedback to Hopkin, and `chatgpt_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. See [Write Operations](#write-operations-unsupported--developer-feedback).
 
 ## Prerequisites
 
@@ -153,21 +153,17 @@ Audience sizes come back as **bucketed range strings** (e.g. `"5000-10000"`). Ne
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-This MCP is read-only by design. If the user asks to create, edit, pause, activate, archive, or adjust budgets:
+This MCP does not change the ad account, by design. If the user asks to create, edit, pause, activate, archive, or adjust budgets:
 
-1. **Tell them plainly** that the ChatGPT Ads MCP is read-only and the change must be made in ChatGPT Ads Manager
+1. **Tell them plainly** that the ChatGPT Ads MCP does not change the account and the change must be made in ChatGPT Ads Manager
 2. **Offer the analysis** that would inform the change
-3. **Call `chatgpt_ads_developer_feedback`** with `feedback_type: "new_tool"` describing the operation they wanted
+3. **Offer to report it with `chatgpt_ads_developer_feedback`** (call it only if the user says yes), using `feedback_type: "new_tool"` describing the operation they wanted
 
 Do not attempt a workaround. There is no write path.
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-If you find yourself making many calls to answer a routine question — for example traversing every campaign and ad group just to list all ads — submit `chatgpt_ads_developer_feedback` with `feedback_type: "improvement"`. Note that an account-wide ad listing is deliberately absent because it would be O(campaigns × ad groups) against a shared rate limit, so propose a narrower aggregate rather than a blanket listing.
-
-### User Feedback to Skill Developers
-
-If the user reports a gap in this skill itself, call `chatgpt_ads_developer_feedback` with `interface: "skill"`.
+`chatgpt_ads_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Report Workflows
 
@@ -191,7 +187,7 @@ Account settings, campaign structure, and resolved audience targeting.
 
 ### Client-Side Tracking Audit (Browser)
 
-When the numbers point at a tracking problem rather than a media problem, audit the site itself. The **Hopkin Tag Inspector** Chrome extension reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. On ChatGPT Ads a conversion the platform never received is indistinguishable, from the API side, from genuinely zero conversions — and this server is read-only, so there is no way to test it from here.
+When the numbers point at a tracking problem rather than a media problem, audit the site itself. The **Hopkin Tag Inspector** Chrome extension reports every analytics and ad tag that fired, per-vendor event counts, findings, and the conversions that were expected but never fired. On ChatGPT Ads a conversion the platform never received is indistinguishable, from the API side, from genuinely zero conversions — and this server does not change the ad account, so there is no way to test it from here.
 
 This runs in the browser, not on the MCP server: it needs browser control, and Hopkin's servers cannot observe client-side tag behavior on their own.
 

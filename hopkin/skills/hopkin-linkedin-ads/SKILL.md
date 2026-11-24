@@ -130,8 +130,6 @@ Tools accept an optional `connection_id`. `linkedin_ads_list_connections` lists 
 ### Feedback
 - `linkedin_ads_developer_feedback` — Submit feature requests and workflow gap reports
 
-> **Note:** Every tool call requires a `reason` (string) parameter for audit trail.
-
 ## Core Capabilities
 
 ### Report Types
@@ -172,19 +170,15 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The MCP is **read-only toward LinkedIn** — it cannot create, change, pause, or delete campaigns, budgets, bids, creatives, or targeting. (It can change Hopkin-side state only: which competitors are tracked, and your LinkedIn connections.) When a user requests a LinkedIn write operation:
+The MCP **does not change your LinkedIn account** — it cannot create, change, pause, or delete campaigns, budgets, bids, creatives, or targeting. (It changes Hopkin-side state only: which competitors are tracked, whether creative intelligence is enabled for an ad account, your LinkedIn connections, feedback sent to Hopkin, and a Stripe checkout link created when the organization owner asks to pay.) When a user requests a LinkedIn write operation:
 
 1. Inform them write operations are not yet available via Hopkin
 2. Call `linkedin_ads_developer_feedback` with `feedback_type: "workflow_gap"`, a descriptive `title`, `description` of what was requested, and appropriate `priority`
 3. Guide them to perform the action manually in LinkedIn Campaign Manager
 
-### Proactive Efficiency Feedback
+### Feedback to Hopkin
 
-After completing a task, if a faster path should have existed (e.g., multiple calls that could have been one), call `linkedin_ads_developer_feedback` with `feedback_type: "new_tool"` or `"improvement"`. Submit feedback after delivering results — don't block the user's request.
-
-### User Feedback
-
-If a user wants to suggest improvements or report issues, call `linkedin_ads_developer_feedback` on their behalf with the appropriate `feedback_type` and their feedback in `description`.
+`linkedin_ads_developer_feedback` sends a short description of a missing capability or fault to Hopkin. Call it only when the user asks you to report something, or after you have asked the user whether to send it and they said yes. Never call it automatically or on your own initiative, and keep the description to the gap or fault itself: do not include the conversation, its history or a summary of it.
 
 ## Report Workflows
 

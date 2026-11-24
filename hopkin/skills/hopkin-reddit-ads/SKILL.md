@@ -81,32 +81,30 @@ No MCC equivalent — all accounts are accessible directly; no `login_customer_i
 - `reddit_ads_check_auth_status` — Verify auth and troubleshoot connection issues; only call when another tool returns an auth error, not proactively
 
 ### Accounts
-- `reddit_ads_list_ad_accounts` — List accessible Reddit Ads accounts. Params: `account_id?`, `account_ids?`, `limit`, `cursor`, `refresh`, `reason`
+- `reddit_ads_list_ad_accounts` — List accessible Reddit Ads accounts. Params: `account_id?`, `account_ids?`, `limit`, `cursor`, `refresh`
 
 ### Campaigns
-- `reddit_ads_list_campaigns` — List campaigns for an account. Params: `account_id` (required), `campaign_id?`, `campaign_ids?`, `status?` (ACTIVE/PAUSED/ARCHIVED), `search?`, `limit`, `cursor`, `refresh`, `reason`
+- `reddit_ads_list_campaigns` — List campaigns for an account. Params: `account_id` (required), `campaign_id?`, `campaign_ids?`, `status?` (ACTIVE/PAUSED/ARCHIVED), `search?`, `limit`, `cursor`, `refresh`
 
 ### Ad Groups
-- `reddit_ads_list_ad_groups` — List ad groups with targeting and bid strategy details. Params: `account_id` (required), `ad_group_id?`, `ad_group_ids?`, `campaign_id?`, `status?`, `limit`, `cursor`, `refresh`, `reason`
+- `reddit_ads_list_ad_groups` — List ad groups with targeting and bid strategy details. Params: `account_id` (required), `ad_group_id?`, `ad_group_ids?`, `campaign_id?`, `status?`, `limit`, `cursor`, `refresh`
 
 ### Ads
-- `reddit_ads_list_ads` — List ads. Params: `account_id` (required), `ad_id?`, `ad_ids?`, `ad_group_id?`, `status?`, `limit`, `cursor`, `refresh`, `reason`
+- `reddit_ads_list_ads` — List ads. Params: `account_id` (required), `ad_id?`, `ad_ids?`, `ad_group_id?`, `status?`, `limit`, `cursor`, `refresh`
 
 ### Custom Audiences
-- `reddit_ads_list_custom_audiences` — List custom audiences for retargeting and lookalike targeting. Params: `account_id` (required), `audience_id?`, `audience_ids?`, `limit`, `cursor`, `refresh`, `reason`
+- `reddit_ads_list_custom_audiences` — List custom audiences for retargeting and lookalike targeting. Params: `account_id` (required), `audience_id?`, `audience_ids?`, `limit`, `cursor`, `refresh`
 
 ### Analytics
-- `reddit_ads_get_performance_report` — **Primary analytics tool.** Full-funnel report with breakdowns. Params: `account_id` (required), `date_start` (YYYY-MM-DD, required), `date_end` (YYYY-MM-DD, required), `campaign_ids?`, `ad_group_ids?`, `ad_ids?`, `breakdown?` (max 3 from: campaign, ad_group, ad, community, date, country, region, placement, device_os), `reason`
-- `reddit_ads_get_account_summary` — Account-level summary. Params: `account_id` (required), `date_start` (YYYY-MM-DD, required), `date_end` (YYYY-MM-DD, required), `reason`
+- `reddit_ads_get_performance_report` — **Primary analytics tool.** Full-funnel report with breakdowns. Params: `account_id` (required), `date_start` (YYYY-MM-DD, required), `date_end` (YYYY-MM-DD, required), `campaign_ids?`, `ad_group_ids?`, `ad_ids?`, `breakdown?` (max 3 from: campaign, ad_group, ad, community, date, country, region, placement, device_os)
+- `reddit_ads_get_account_summary` — Account-level summary. Params: `account_id` (required), `date_start` (YYYY-MM-DD, required), `date_end` (YYYY-MM-DD, required)
 
 ### Visualization
-- `reddit_ads_render_chart` — Render interactive data visualization charts as MCP App UI. **Always call this when the user requests a chart, graph, map, or visualization** — never substitute a table or text summary. Fetch data first, then pass it here. Params: `chart` (config with type + data), `reason`. Chart types: `bar`, `scatter`, `timeseries`, `funnel`, `waterfall`, `choropleth`
+- `reddit_ads_render_chart` — Render interactive data visualization charts as MCP App UI. **Always call this when the user requests a chart, graph, map, or visualization** — never substitute a table or text summary. Fetch data first, then pass it here. Params: `chart` (config with type + data). Chart types: `bar`, `scatter`, `timeseries`, `funnel`, `waterfall`, `choropleth`
 
 ### Feedback & Health
-- `reddit_ads_developer_feedback` — Submit feedback about missing tools, improvements, bugs, or workflow gaps in the MCP toolset. Not for user-facing auth/API errors. Params: `feedback_type` (new_tool|improvement|bug|workflow_gap), `title`, `description`, `priority?`, `current_workaround?`, `reason`
-- `reddit_ads_ping` — Health check and connectivity test. Params: `message?`, `reason`
-
-> **Note:** Every tool call requires a `reason` (string) parameter for audit trail.
+- `reddit_ads_developer_feedback` — Submit feedback about missing tools, improvements, bugs, or workflow gaps in the MCP toolset. Not for user-facing auth/API errors. Params: `feedback_type` (new_tool|improvement|bug|workflow_gap), `title`, `description`, `priority?`, `current_workaround?`
+- `reddit_ads_ping` — Health check and connectivity test. Params: `message?`
 
 ## Core Capabilities
 
@@ -138,7 +136,7 @@ Reddit ads behave like organic posts and include unique engagement metrics:
 
 ### Write Operations (Unsupported)
 
-The MCP is **read-only**. When a user requests write operations (pause campaigns, adjust budgets, etc.):
+The MCP does not change your Reddit Ads account. Its only write tools act on Hopkin's own records or send feedback: connection management (`reddit_ads_rename_connection`, `reddit_ads_set_default_connection`, `reddit_ads_share_connection`, `reddit_ads_unshare_connection`, `reddit_ads_revoke_connection`) `reddit_ads_developer_feedback`, which sends your feedback to Hopkin, and `reddit_ads_get_billing_status`, which can create a Stripe checkout link when the organization owner asks to pay. When a user requests write operations in the account (pause campaigns, adjust budgets, etc.):
 
 1. Inform them write operations are not yet available via Hopkin
 2. Guide them to perform the action manually in **Reddit Ads Manager**

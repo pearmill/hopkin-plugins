@@ -215,7 +215,7 @@ Reddit provider tokens expire after **1 hour**, but Hopkin automatically refresh
 **Solutions:**
 - Verify the user has access to the target ad account
 - Re-authenticate via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=reddit-ads
-- Confirm this is a read operation (MCP is read-only)
+- Confirm this is a read operation (this MCP does not change the ad account)
 
 ---
 

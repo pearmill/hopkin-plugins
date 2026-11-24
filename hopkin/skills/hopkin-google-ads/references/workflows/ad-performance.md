@@ -18,7 +18,6 @@ Analyze ad creative performance, RSA asset effectiveness, and ad copy comparison
 {
   "tool": "google_ads_list_ads",
   "parameters": {
-    "reason": "Listing ads for creative performance analysis",
     "customer_id": "1234567890",
     "campaign_id": "123456789"
   }
@@ -30,7 +29,6 @@ Analyze ad creative performance, RSA asset effectiveness, and ad copy comparison
 {
   "tool": "google_ads_get_insights",
   "parameters": {
-    "reason": "Getting ad-level performance metrics for creative analysis",
     "customer_id": "1234567890",
     "level": "AD",
     "date_preset": "LAST_30_DAYS",
@@ -44,7 +42,6 @@ Analyze ad creative performance, RSA asset effectiveness, and ad copy comparison
 {
   "tool": "google_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing ad performance by device",
     "customer_id": "1234567890",
     "level": "AD",
     "date_preset": "LAST_30_DAYS",

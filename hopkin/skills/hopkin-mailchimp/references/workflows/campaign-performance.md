@@ -28,7 +28,6 @@ If the user hasn't specified a campaign:
 {
   "tool": "mailchimp_list_campaigns",
   "parameters": {
-    "reason": "Finding sent campaigns to report on",
     "status": ["sent"],
     "limit": 10
   }
@@ -45,7 +44,6 @@ For additional context about the campaign:
 {
   "tool": "mailchimp_get_campaign",
   "parameters": {
-    "reason": "Getting campaign details for context",
     "campaign_id": "abc123def4",
     "include_content": false,
     "include_send_checklist": false
@@ -59,7 +57,6 @@ For additional context about the campaign:
 {
   "tool": "mailchimp_get_campaign_report",
   "parameters": {
-    "reason": "Generating campaign performance report",
     "campaign_id": "abc123def4"
   }
 }
@@ -73,7 +70,6 @@ For deeper engagement analysis:
 {
   "tool": "mailchimp_get_email_activity",
   "parameters": {
-    "reason": "Analyzing per-recipient engagement",
     "campaign_id": "abc123def4",
     "limit": 50
   }

@@ -29,7 +29,6 @@ Use `reddit_ads_get_performance_report` with `breakdown: ["community"]` to see p
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Analyzing performance by subreddit to identify top-performing communities",
     "account_id": "t2_abc123",
     "breakdown": ["community"],
     "date_start": "2026-02-01",
@@ -48,7 +47,6 @@ Combine breakdowns to see how subreddit performance changes over time:
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Tracking subreddit performance trends over time",
     "account_id": "t2_abc123",
     "breakdown": ["community", "date"],
     "date_start": "2026-02-01",
@@ -70,7 +68,6 @@ See which campaigns perform best on which subreddits:
 {
   "tool": "reddit_ads_get_performance_report",
   "parameters": {
-    "reason": "Cross-referencing campaign performance with subreddit placement",
     "account_id": "t2_abc123",
     "breakdown": ["community", "campaign"],
     "date_start": "2026-02-01",
@@ -92,7 +89,6 @@ Use `reddit_ads_list_ad_groups` to see how subreddit targeting is configured per
 {
   "tool": "reddit_ads_list_ad_groups",
   "parameters": {
-    "reason": "Reviewing subreddit targeting configuration for each ad group",
     "account_id": "t2_abc123",
     "campaign_id": "campaign_123"
   }

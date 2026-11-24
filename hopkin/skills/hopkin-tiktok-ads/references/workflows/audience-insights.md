@@ -20,7 +20,6 @@ Use `tiktok_ads_get_insights` with `report_type: "AUDIENCE"` and the `age` dimen
 {
   "tool": "tiktok_ads_get_insights",
   "parameters": {
-    "reason": "Getting age-based audience breakdown for February 2026",
     "advertiser_id": "7012345678901234567",
     "report_type": "AUDIENCE",
     "dimensions": ["age"],
@@ -38,7 +37,6 @@ TikTok age groups are typically: 13-17, 18-24, 25-34, 35-44, 45-54, 55+.
 {
   "tool": "tiktok_ads_get_insights",
   "parameters": {
-    "reason": "Getting gender-based audience breakdown for February 2026",
     "advertiser_id": "7012345678901234567",
     "report_type": "AUDIENCE",
     "dimensions": ["gender"],
@@ -54,7 +52,6 @@ TikTok age groups are typically: 13-17, 18-24, 25-34, 35-44, 45-54, 55+.
 {
   "tool": "tiktok_ads_get_insights",
   "parameters": {
-    "reason": "Getting country-level audience breakdown for February 2026",
     "advertiser_id": "7012345678901234567",
     "report_type": "AUDIENCE",
     "dimensions": ["country_code"],
@@ -72,7 +69,6 @@ Combine dimensions for more granular insights:
 {
   "tool": "tiktok_ads_get_insights",
   "parameters": {
-    "reason": "Getting age x gender cross-dimensional audience breakdown",
     "advertiser_id": "7012345678901234567",
     "report_type": "AUDIENCE",
     "dimensions": ["age", "gender"],
@@ -92,7 +88,6 @@ Filter to a specific campaign to understand its audience composition:
 {
   "tool": "tiktok_ads_get_insights",
   "parameters": {
-    "reason": "Audience demographics for the conversion campaign specifically",
     "advertiser_id": "7012345678901234567",
     "report_type": "AUDIENCE",
     "dimensions": ["age", "gender"],

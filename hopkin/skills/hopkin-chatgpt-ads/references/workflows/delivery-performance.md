@@ -19,7 +19,7 @@ These six metrics are the **only** ones the API exposes. There is no conversions
 ### Step 1: Establish Account Context
 
 ```
-chatgpt_ads_get_ad_account(reason: "Get currency and timezone for performance report")
+chatgpt_ads_get_ad_account()
 ```
 
 Record `currency` and `timezone`. If the user has multiple connections, confirm which account first with `chatgpt_ads_list_ad_accounts`.
@@ -51,7 +51,6 @@ chatgpt_ads_get_insights(
   date_since: "YYYY-MM-DD",
   date_until: "YYYY-MM-DD",
   sort: <spend descending, for "top" questions>,
-  reason: "..."
 )
 ```
 

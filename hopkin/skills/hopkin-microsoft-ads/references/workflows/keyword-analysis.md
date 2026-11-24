@@ -20,8 +20,7 @@ Confirm the account (`microsoft_ads_list_accounts`), the date range and whether 
   "parameters": {
     "account_id": "123456789",
     "date_preset": "LastFourWeeks",
-    "aggregation": "Summary",
-    "reason": "Keyword performance and Quality Score review"
+    "aggregation": "Summary"
   }
 }
 ```
@@ -49,8 +48,7 @@ Read Quality Score components as the fix list:
   "tool": "microsoft_ads_get_search_terms",
   "parameters": {
     "account_id": "123456789",
-    "date_range": { "start": "2026-10-01", "end": "2026-10-31" },
-    "reason": "Search terms for negative keyword and expansion review"
+    "date_range": { "start": "2026-10-01", "end": "2026-10-31" }
   }
 }
 ```
@@ -79,4 +77,4 @@ Microsoft negatives are Exact or Phrase.
 - **Quality Score work:** high-spend keywords with a below-average component
 - **Match type review:** compare performance by `bid_match_type` (`keyword_match_type` filter)
 
-Present tables for each group with spend, clicks, conversions and cost per conversion in the account currency. Adding keywords or negatives happens in Microsoft Advertising; this MCP is read-only.
+Present tables for each group with spend, clicks, conversions and cost per conversion in the account currency. Adding keywords or negatives happens in Microsoft Advertising; this MCP does not change the ad account.

@@ -24,7 +24,6 @@ Analyze text asset effectiveness for Responsive Search Ads with performance labe
 {
   "tool": "google_ads_get_asset_report",
   "parameters": {
-    "reason": "Analyzing RSA headline and description performance",
     "customer_id": "1234567890",
     "date_preset": "LAST_30_DAYS",
     "levels": ["AD_GROUP"],
@@ -43,7 +42,6 @@ Analyze assets within Performance Max campaigns.
 {
   "tool": "google_ads_get_asset_report",
   "parameters": {
-    "reason": "Reviewing PMax asset group performance",
     "customer_id": "1234567890",
     "date_preset": "LAST_30_DAYS",
     "levels": ["CAMPAIGN"],
@@ -61,7 +59,6 @@ Broad view of asset performance across the entire account.
 {
   "tool": "google_ads_get_asset_report",
   "parameters": {
-    "reason": "Account-wide asset performance overview",
     "customer_id": "1234567890",
     "date_preset": "LAST_30_DAYS",
     "order_by": "impressions",
@@ -78,7 +75,6 @@ Filter to assets associated with particular campaigns.
 {
   "tool": "google_ads_get_asset_report",
   "parameters": {
-    "reason": "Reviewing assets for specific campaigns",
     "customer_id": "1234567890",
     "date_preset": "LAST_7_DAYS",
     "campaign_ids": ["123456789", "987654321"],
@@ -95,7 +91,6 @@ Include per-conversion-action breakdown for detailed conversion attribution.
 {
   "tool": "google_ads_get_asset_report",
   "parameters": {
-    "reason": "Asset performance with conversion action breakdown",
     "customer_id": "1234567890",
     "date_preset": "LAST_30_DAYS",
     "include_conversion_breakdown": true,
@@ -113,7 +108,6 @@ Include when assets were added and last modified (useful for audits).
 {
   "tool": "google_ads_get_asset_report",
   "parameters": {
-    "reason": "Asset audit with change history",
     "customer_id": "1234567890",
     "date_preset": "LAST_30_DAYS",
     "include_change_history": true
@@ -159,7 +153,6 @@ Asset reports use cursor-based pagination. For large accounts, page through resu
 {
   "tool": "google_ads_get_asset_report",
   "parameters": {
-    "reason": "Fetching next page of asset results",
     "customer_id": "1234567890",
     "date_preset": "LAST_30_DAYS",
     "cursor": "<nextCursor from previous response>"

@@ -18,7 +18,6 @@ Track budget utilization, daily/monthly spend, pacing analysis, and cost breakdo
 {
   "tool": "google_ads_list_campaigns",
   "parameters": {
-    "reason": "Getting campaign budget configuration for pacing analysis",
     "customer_id": "1234567890",
     "status": "ENABLED"
   }
@@ -30,7 +29,6 @@ Track budget utilization, daily/monthly spend, pacing analysis, and cost breakdo
 {
   "tool": "google_ads_get_insights",
   "parameters": {
-    "reason": "Getting daily spend data for budget pacing calculations",
     "customer_id": "1234567890",
     "level": "CAMPAIGN",
     "date_range": {"start_date": "2026-01-01", "end_date": "2026-01-31"},
@@ -44,7 +42,6 @@ Track budget utilization, daily/monthly spend, pacing analysis, and cost breakdo
 {
   "tool": "google_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing spend efficiency by device type",
     "customer_id": "1234567890",
     "level": "CAMPAIGN",
     "date_preset": "LAST_30_DAYS",
@@ -123,7 +120,6 @@ Render a timeseries chart with daily spend data:
 {
   "tool": "google_ads_render_chart",
   "parameters": {
-    "reason": "Showing daily spend trend for budget pacing analysis",
     "chart": {
       "type": "timeseries",
       "data": {

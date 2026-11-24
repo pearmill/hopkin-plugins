@@ -20,7 +20,6 @@ Use `linkedin_ads_list_creatives` to get both creative IDs and their actual ad c
 {
   "tool": "linkedin_ads_list_creatives",
   "parameters": {
-    "reason": "Listing active creatives with ad copy content for creative analysis",
     "account_id": "123456789",
     "status": ["ACTIVE"]
   }
@@ -32,7 +31,6 @@ Use `linkedin_ads_list_creatives` to get both creative IDs and their actual ad c
 {
   "tool": "linkedin_ads_list_creatives",
   "parameters": {
-    "reason": "Listing creatives for the Q1 Lead Gen campaign",
     "account_id": "123456789",
     "campaign_ids": ["111222333"]
   }
@@ -54,7 +52,6 @@ Use `linkedin_ads_get_performance_report` with `pivots: ["CREATIVE"]`:
 {
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
-    "reason": "Getting creative-level performance metrics for creative analysis",
     "account_id": "123456789",
     "pivots": ["CREATIVE"],
     "date_preset": "LAST_30_DAYS"
@@ -67,7 +64,6 @@ Use `linkedin_ads_get_performance_report` with `pivots: ["CREATIVE"]`:
 {
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
-    "reason": "Creative performance for the Lead Gen campaign",
     "account_id": "123456789",
     "pivots": ["CREATIVE"],
     "date_preset": "LAST_30_DAYS",
@@ -182,7 +178,6 @@ Using `time_granularity: "DAILY"`:
 {
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
-    "reason": "Tracking CTR trend for a creative to detect fatigue",
     "account_id": "123456789",
     "pivots": ["CREATIVE"],
     "date_preset": "LAST_30_DAYS",
@@ -211,7 +206,6 @@ Render a bar chart comparing creatives by CPA or CTR:
 {
   "tool": "linkedin_ads_render_chart",
   "parameters": {
-    "reason": "Comparing creative performance by CPA to identify winners",
     "chart": {
       "type": "bar",
       "data": [

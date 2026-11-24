@@ -38,7 +38,6 @@ Before analyzing demographics, establish baseline performance metrics:
 {
   "tool": "linkedin_ads_get_performance_report",
   "parameters": {
-    "reason": "Establishing baseline account performance before demographic analysis",
     "account_id": "123456789",
     "pivots": ["ACCOUNT"],
     "date_preset": "LAST_30_DAYS"
@@ -56,7 +55,6 @@ Identify which professional functions are most responsive:
 {
   "tool": "linkedin_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing ad performance by job function to identify high-value B2B segments",
     "account_id": "123456789",
     "pivot": "MEMBER_JOB_FUNCTION",
     "date_preset": "LAST_30_DAYS"
@@ -72,7 +70,6 @@ Understand which decision-making levels drive the most value:
 {
   "tool": "linkedin_ads_get_insights",
   "parameters": {
-    "reason": "Identifying which seniority levels convert best to optimize targeting",
     "account_id": "123456789",
     "pivot": "MEMBER_SENIORITY",
     "date_preset": "LAST_30_DAYS"
@@ -99,7 +96,6 @@ Find which industries offer the best ROI:
 {
   "tool": "linkedin_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing performance by industry to prioritize targeting",
     "account_id": "123456789",
     "pivot": "MEMBER_INDUSTRY",
     "date_preset": "LAST_30_DAYS"
@@ -115,7 +111,6 @@ Determine if SMB, mid-market, or enterprise targets perform differently:
 {
   "tool": "linkedin_ads_get_insights",
   "parameters": {
-    "reason": "Analyzing performance by company size to identify ideal customer profile",
     "account_id": "123456789",
     "pivot": "MEMBER_COMPANY_SIZE",
     "date_preset": "LAST_30_DAYS"
@@ -141,7 +136,6 @@ For granular analysis, filter to a specific campaign:
 {
   "tool": "linkedin_ads_get_insights",
   "parameters": {
-    "reason": "Job function breakdown for the Director+ targeting campaign",
     "account_id": "123456789",
     "pivot": "MEMBER_JOB_FUNCTION",
     "date_preset": "LAST_30_DAYS",
@@ -206,7 +200,6 @@ Render bar charts for each demographic dimension analyzed:
 {
   "tool": "linkedin_ads_render_chart",
   "parameters": {
-    "reason": "Visualizing CPA by job function to identify high-value B2B segments",
     "chart": {
       "type": "bar",
       "data": [
@@ -227,7 +220,6 @@ Render bar charts for each demographic dimension analyzed:
 {
   "tool": "linkedin_ads_render_chart",
   "parameters": {
-    "reason": "Visualizing CPA by seniority level to optimize for decision-makers",
     "chart": {
       "type": "bar",
       "data": [

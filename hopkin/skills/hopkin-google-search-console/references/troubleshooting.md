@@ -163,7 +163,7 @@ This guide provides solutions to common issues encountered when using the Google
 - Retry the request
 - Check MCP server health with `google_search_console_ping`
 - Try a simpler query (fewer dimensions, shorter date range)
-- If persistent, report via `google_search_console_developer_feedback`
+- If persistent, offer to report it via `google_search_console_developer_feedback` (send only if the user says yes)
 
 ---
 

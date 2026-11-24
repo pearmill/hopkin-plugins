@@ -57,7 +57,6 @@ Gather and confirm before pulling data:
      {
        "tool": "meta_ads_get_ad_creative_report",
        "parameters": {
-         "reason": "Getting creative performance data for creative test analysis",
          "account_id": "act_123456789",
          "level": "ad_name",
          "time_range": {"since": "2026-01-01", "until": "2026-01-31"}
@@ -104,7 +103,6 @@ Gather and confirm before pulling data:
    {
      "tool": "meta_ads_preview_ads",
      "parameters": {
-       "reason": "Rendering creative visual preview with performance metrics",
        "account_id": "act_123456789",
        "ads": [
          {"ad_id": "23842453456789", "metrics": {"spend": "450.00", "cpa": "$12.50", "ctr": "3.2%"}},
@@ -154,7 +152,6 @@ Render a bar chart comparing creatives by CPA or CTR:
 {
   "tool": "meta_ads_render_chart",
   "parameters": {
-    "reason": "Comparing creative concepts by CPA to identify top performers",
     "chart": {
       "type": "bar",
       "data": [
