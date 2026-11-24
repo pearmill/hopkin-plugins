@@ -153,7 +153,7 @@ Use `meta_ads_list_ad_accounts` to see which accounts the authenticated user can
 #### Solution 2: Check Account Role
 1. Go to Business Settings → Ad Accounts
 2. Find the user and check their role:
-   - **Analyst:** Read-only access, can view reports
+   - **Analyst:** View-only access, can view reports
    - **Advertiser:** Can create and edit ads, view reports
    - **Admin:** Full control
 

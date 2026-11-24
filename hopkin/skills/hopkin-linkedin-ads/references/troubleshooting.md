@@ -121,7 +121,7 @@ LinkedIn provider tokens expire after **60 days**. Unlike Meta and Google, Linke
 1. Log into LinkedIn Campaign Manager
 2. Navigate to Account Settings → Users
 3. Verify the user's role:
-   - **Viewer:** Read-only access to reporting
+   - **Viewer:** View-only access to reporting
    - **Creative Manager:** Can manage creatives, view reporting
    - **Campaign Manager:** Can manage campaigns, view reporting
    - **Account Manager:** Full access
