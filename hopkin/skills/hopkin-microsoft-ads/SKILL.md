@@ -19,7 +19,7 @@ This skill enables Claude to build reports and perform analysis on Microsoft Adv
 
 It covers Search, Shopping, Performance Max and Audience (Microsoft Audience Network) campaigns.
 
-**This MCP is read-only.** It can report on the account but cannot create, edit, pause or delete anything. See [Write Operations](#write-operations-unsupported--developer-feedback).
+**This MCP does not change your Microsoft Ads account.** It can report on the account but cannot create, edit, pause or delete anything there. Its only write tools act on Hopkin's own records or send feedback: connection management (`microsoft_ads_rename_connection`, `microsoft_ads_set_default_connection`, `microsoft_ads_share_connection`, `microsoft_ads_unshare_connection`, `microsoft_ads_revoke_connection`) and `microsoft_ads_developer_feedback`, which sends your feedback to Hopkin. See [Write Operations](#write-operations-unsupported--developer-feedback).
 
 ## Prerequisites
 
@@ -204,7 +204,7 @@ After fetching data, render charts with `microsoft_ads_render_chart` and pair ea
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The Hopkin Microsoft Ads MCP is **read-only by design**. When a user asks to create, edit, pause, enable or delete anything, change budgets or bids, add negatives, or upload conversions:
+The Hopkin Microsoft Ads MCP **does not change your ad account, by design**; its only write tools act on Hopkin's own records or send feedback: connection management (`microsoft_ads_rename_connection`, `microsoft_ads_set_default_connection`, `microsoft_ads_share_connection`, `microsoft_ads_unshare_connection`, `microsoft_ads_revoke_connection`) and `microsoft_ads_developer_feedback`, which sends your feedback to Hopkin. When a user asks to create, edit, pause, enable or delete anything, change budgets or bids, add negatives, or upload conversions:
 
 1. **Tell them plainly** that the change must be made in Microsoft Advertising (https://ads.microsoft.com) or Microsoft Advertising Editor
 2. **Offer the analysis** that informs the change

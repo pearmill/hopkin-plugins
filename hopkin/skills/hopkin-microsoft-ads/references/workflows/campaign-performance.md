@@ -91,4 +91,4 @@ Flag:
 3. A chart with `microsoft_ads_render_chart` (bar for comparison, timeseries for trends)
 4. The date range, currency and which conversion definition you used
 
-Any change the user wants to make (budgets, pausing, bids) happens in Microsoft Advertising; this MCP is read-only.
+Any change the user wants to make (budgets, pausing, bids) happens in Microsoft Advertising; this MCP does not change the ad account.

@@ -161,7 +161,7 @@ TikTok Ads MCP does **not** include a `render_chart` tool. When the user request
 
 ### Write Operations (Unsupported)
 
-The MCP is **read-only**. When a user requests write operations (pause campaigns, adjust budgets, etc.):
+The MCP does not change your TikTok account. Its only write tools act on Hopkin's own records or send feedback: connection management (`tiktok_ads_rename_connection`, `tiktok_ads_set_default_connection`, `tiktok_ads_share_connection`, `tiktok_ads_unshare_connection`, `tiktok_ads_revoke_connection`), turning creative intelligence on for an ad account (`tiktok_ads_enable_creative_intelligence`) and `tiktok_ads_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (pause campaigns, adjust budgets, etc.):
 
 1. Inform them write operations are not yet available via Hopkin
 2. Guide them to perform the action manually in **TikTok Ads Manager**

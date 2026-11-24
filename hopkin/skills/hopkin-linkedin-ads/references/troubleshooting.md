@@ -260,7 +260,7 @@ Rows then carry `sends`, `opens`, `open_rate`, `engagement_rate`, `cost_per_send
 **Solutions:**
 - Verify the user's role in LinkedIn Campaign Manager
 - Re-authenticate with correct scopes via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=linkedin-ads
-- Confirm this is a read operation (MCP is read-only)
+- Confirm this is a read operation (this MCP does not change the ad account)
 
 ---
 

@@ -172,7 +172,7 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The MCP is **read-only toward LinkedIn** — it cannot create, change, pause, or delete campaigns, budgets, bids, creatives, or targeting. (It can change Hopkin-side state only: which competitors are tracked, and your LinkedIn connections.) When a user requests a LinkedIn write operation:
+The MCP is **does not change your LinkedIn account** — it cannot create, change, pause, or delete campaigns, budgets, bids, creatives, or targeting. (It changes Hopkin-side state only: which competitors are tracked, whether creative intelligence is enabled for an ad account, your LinkedIn connections, and feedback sent to Hopkin.) When a user requests a LinkedIn write operation:
 
 1. Inform them write operations are not yet available via Hopkin
 2. Call `linkedin_ads_developer_feedback` with `feedback_type: "workflow_gap"`, a descriptive `title`, `description` of what was requested, and appropriate `priority`

@@ -94,4 +94,4 @@ Group findings by severity:
 2. **Partly limited:** ActiveLimited items, Inactive (under review) items, disapproved extensions
 3. **Hygiene:** URL tracking gaps and inconsistencies
 
-For each, name the campaign and ad group, quote Microsoft's reason, and give the fix. State any scan bounds that were hit. Fixes happen in Microsoft Advertising; this MCP is read-only.
+For each, name the campaign and ad group, quote Microsoft's reason, and give the fix. State any scan bounds that were hit. Fixes happen in Microsoft Advertising; this MCP does not change the ad account.

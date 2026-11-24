@@ -11,7 +11,7 @@ This document covers write operation handling and performance optimization recom
 
 ## Unsupported Write Operations
 
-The Hopkin Meta Ads MCP is **read-only**. The following operations are **not available**:
+The Hopkin Meta Ads MCP does not change your Meta ad account; its only write tools act on Hopkin's own records or send feedback: connection management (`meta_ads_rename_connection`, `meta_ads_set_default_connection`, `meta_ads_share_connection`, `meta_ads_unshare_connection`, `meta_ads_revoke_connection`), competitor tracking (`meta_ads_track_competitor`, `meta_ads_untrack_competitor`), turning creative intelligence on for an ad account (`meta_ads_enable_creative_intelligence`) and `meta_ads_developer_feedback`, which sends your feedback to Hopkin. The following operations are **not available**:
 
 - Creating campaigns, ad sets, or ads
 - Updating budgets or bid strategies

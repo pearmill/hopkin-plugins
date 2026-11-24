@@ -77,4 +77,4 @@ When asked "why isn't this delivering?", check in this order and stop at the fir
 
 - Ads carry no parent ID from the platform; the campaign and ad group context comes from the query you made, so keep track of it as you traverse.
 - Do not report a rejection reason you did not receive. If the response gives only a review state, report the state.
-- Fixing any of this requires ChatGPT Ads Manager — this MCP is read-only. Offer the diagnosis, then say where to make the change.
+- Fixing any of this requires ChatGPT Ads Manager — this MCP does not change the ad account. Offer the diagnosis, then say where to make the change.

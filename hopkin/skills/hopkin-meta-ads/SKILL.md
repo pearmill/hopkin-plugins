@@ -166,7 +166,7 @@ Charts enhance the report — they don't replace the analysis. Always include wr
 
 ### Write Operations (Unsupported — Developer Feedback)
 
-The Hopkin Meta Ads MCP is **read-only**. When a user requests write operations (create campaign, update budget, pause ads, etc.):
+The Hopkin Meta Ads MCP does not change your Meta Ads account. Its only write tools act on Hopkin's own records or send feedback: connection management (`meta_ads_rename_connection`, `meta_ads_set_default_connection`, `meta_ads_share_connection`, `meta_ads_unshare_connection`, `meta_ads_revoke_connection`), competitor tracking (`meta_ads_track_competitor`, `meta_ads_untrack_competitor`), turning creative intelligence on for an ad account (`meta_ads_enable_creative_intelligence`) and `meta_ads_developer_feedback`, which sends your feedback to Hopkin. When a user requests write operations in the account (create campaign, update budget, pause ads, etc.):
 
 1. **Inform the user** that write operations are not yet available via Hopkin
 2. **Submit a feature request** by calling `meta_ads_developer_feedback` with:

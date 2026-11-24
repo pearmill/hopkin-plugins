@@ -201,7 +201,7 @@ TikTok provider tokens may expire, but Hopkin automatically refreshes them. This
 **Solutions:**
 - Verify the user has access to the target advertiser account
 - Re-authenticate via https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=skill&utm_content=tiktok-ads
-- Confirm this is a read operation (MCP is read-only)
+- Confirm this is a read operation (this MCP does not change the ad account)
 
 #### Too Many Requests / 429
 **Cause:** Rate limiting — TikTok API enforces request rate limits.

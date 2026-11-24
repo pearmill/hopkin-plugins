@@ -26,7 +26,7 @@ Add the Hopkin plugin marketplace to Claude Code, then install:
 /plugin install hopkin@hopkin-plugins
 ```
 
-One install gives you all supported platforms. After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=readme&utm_content=readme). No performance data is stored — read-only access only.
+One install gives you all supported platforms. After installing, Claude will walk you through a one-time OAuth login at [app.hopkin.ai](https://app.hopkin.ai/?utm_source=claude-plugin&utm_medium=readme&utm_content=readme). Hopkin reads campaign data from the ad platforms and does not change your ad accounts. A few tools do write: they rename, share, set the default for or revoke your Hopkin connections, track or untrack competitors, turn on creative intelligence for an ad account, and send feedback to Hopkin.
 
 ## Why Hopkin
 
@@ -37,7 +37,7 @@ Most ad teams repeat the same workflows every week: morning performance checks, 
 - **Budget tracking** — spot underspend and overspend across 60+ accounts at once
 - **Trend analysis** — 3, 6, or 12-month views on demand
 - **Community insights** — see which subreddits drive the best Reddit Ads performance
-- **Secure by design** — OAuth only, read-only, no stored credentials
+- **Secure by design** — OAuth sign-in, and no tool changes your campaigns, budgets or ads
 
 ## Supported Platforms
 

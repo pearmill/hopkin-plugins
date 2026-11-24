@@ -79,4 +79,4 @@ Microsoft negatives are Exact or Phrase.
 - **Quality Score work:** high-spend keywords with a below-average component
 - **Match type review:** compare performance by `bid_match_type` (`keyword_match_type` filter)
 
-Present tables for each group with spend, clicks, conversions and cost per conversion in the account currency. Adding keywords or negatives happens in Microsoft Advertising; this MCP is read-only.
+Present tables for each group with spend, clicks, conversions and cost per conversion in the account currency. Adding keywords or negatives happens in Microsoft Advertising; this MCP does not change the ad account.
