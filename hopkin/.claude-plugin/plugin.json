@@ -1,7 +1,7 @@
 {
   "name": "hopkin",
   "version": "1.36.0",
-  "description": "Ad performance, creative analysis and competitor ad tracking in Claude. Report on campaigns and compare creatives across Google, Meta, Microsoft, LinkedIn, Reddit, TikTok and ChatGPT Ads, search the Meta and LinkedIn ad libraries, and read Mailchimp, GA4 and Search Console. It reads data from your ad and analytics accounts and does not change them; a few tools change your Hopkin connection settings, track competitors, send feedback to Hopkin, or create a Stripe checkout link when the organization owner asks to pay.",
+  "description": "Ad performance, creative analysis and competitor ad tracking in Claude. Report on campaigns and compare creatives across Google, Meta, Microsoft, LinkedIn, Reddit, TikTok and ChatGPT Ads, search the Meta and LinkedIn ad libraries, and read Mailchimp, GA4 and Search Console. It reads data from your ad and analytics accounts and does not edit campaigns, ads or budgets. The Meta reach forecast creates a reach and frequency prediction in your Meta ad account, and a few tools change your Hopkin connection settings, track competitors, send feedback to Hopkin, or create a Stripe checkout link when the organization owner asks to pay.",
   "author": {
     "name": "Hopkin"
   },
